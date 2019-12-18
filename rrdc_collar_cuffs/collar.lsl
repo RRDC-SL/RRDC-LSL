@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v0.24 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v0.25 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -18,17 +18,24 @@ string  g_zapAnim           = "animCollarZap";
 
 // State Variables.
 // ---------------------------------------------------------------------------------------------------------
-integer g_powerCore;                    // Link number of the power core FX prim.
-integer g_leashingPoint;                // Link number of the leashing point prim.
-integer g_shacklesPoint;                // Link number of the chain to shackles point prim.
-integer g_ledLink;                      // Link number of the LED light.
-integer g_ledState;                     // Tracks the current on-off state of the LED.
-integer g_menuChan;                     // The channel to send menu commands on.
-string  g_curMenu           = "main";   // Tracks the current menu.
-integer g_shockCount;                   // Tracks how long to keep shock active.
+integer g_powerCore;                     // Link number of the power core FX prim.
+integer g_leashingPoint;                 // Link number of the leashing point prim.
+integer g_shacklesPoint;                 // Link number of the chain to shackles point prim.
+integer g_ledLink;                       // Link number of the LED light.
+integer g_ledState;                      // Tracks the current on-off state of the LED.
+integer g_shockCount;                    // Tracks how long to keep shock active.
+integer g_appChan           = -89039937; // The channel for this application set.
+string  g_curMenu           = "main";    // Tracks the current menu.
 
 string  g_noNoteMesg        = "No character sheet is available."; // Display when no notecard.
 // ---------------------------------------------------------------------------------------------------------
+
+// getAvChannel - Given an avatar key, returns a static channel XORed with g_appChan.
+// ---------------------------------------------------------------------------------------------------------
+integer getAvChannel(key av)
+{
+    return (0x80000000 | ((integer)("0x"+(string)av) ^ g_appChan));
+}
 
 // showMenu - Given a menu name string, shows the appropriate menu.
 // ---------------------------------------------------------------------------------------------------------
@@ -58,7 +65,7 @@ showMenu(string menu, key user)
         text = "Texture Select Menu" + text;
         buttons = ["Blue", "Black", "↺ Main", "White", "Orange", "Lilac"];
     }
-    llDialog(user, text, buttons, g_menuChan);
+    llDialog(user, text, buttons, getAvChannel(llGetOwner()));
 }
 
 default
@@ -118,8 +125,7 @@ default
             );
 
             // Start listening for menu.
-            g_menuChan = (-1 * (0x80000000 | ((integer)("0x"+(string)llGetOwner()) ^ 89039937)));
-            llListen(g_menuChan, "", "", "");
+            llListen(getAvChannel(llGetOwner()), "", "", "");
             llSetTimerEvent(1.0); // Start the timer.
         }
     }
