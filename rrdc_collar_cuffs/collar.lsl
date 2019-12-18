@@ -28,10 +28,10 @@ string  g_curMenu           = "main";   // Tracks the current menu.
 integer g_shockCount;                   // Tracks how long to keep shock active.
 
 string  g_noNoteMesg        = "No character sheet is available."; // Display when no notecard.
-// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
 
 // showMenu - Given a menu name string, shows the appropriate menu.
-// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
 showMenu(string menu, key user)
 {
     g_curMenu = menu; // Last menu memory.
@@ -63,6 +63,8 @@ showMenu(string menu, key user)
 
 default
 {
+    // Initialize collar in state_entry and run_time_permissions.
+    // -----------------------------------------------------------------------------------------------------
     state_entry()
     {
         llSetMemoryLimit(llGetUsedMemory()+1024); // Limit memory for mono-compiled scripts.
@@ -122,6 +124,8 @@ default
         }
     }
 
+    // Reacquire permissions on rez. Don't do a full reset/init.
+    // ---------------------------------------------------------------------------------------------------------
     on_rez(integer s)
     {
         llRequestPermissions(llGetOwner(), 
@@ -129,11 +133,15 @@ default
         );
     }
 
+    // Show a menu to the toucher when touched.
+    // ---------------------------------------------------------------------------------------------------------
     touch_start(integer num)
     {
         showMenu("main", llDetectedKey(0));
     }
 
+    // Parse and interpret commands.
+    // ---------------------------------------------------------------------------------------------------------
     listen(integer chan, string name, key id, string mesg)
     {
         if (llGetOwnerKey(id) != id) // Only take commands from avatars.
@@ -172,7 +180,6 @@ default
             {
                 llInstantMessage(id, g_noNoteMesg);
             }
-            return;
         }
         else if (mesg == "Shock" && (llVecDist(llGetPos(), // Deliver shock. Locks av in place momentarily.
                  llList2Vector(llGetObjectDetails(id, [OBJECT_POS]), 0)) < 6.0))
@@ -241,6 +248,8 @@ default
         showMenu(g_curMenu, id); // Reshow current menu.
     }
 
+    // Controls timed effects such as blinking light and shock.
+    // ---------------------------------------------------------------------------------------------------------
     timer()
     {
         if (g_shockCount > 0) // Shock effects.

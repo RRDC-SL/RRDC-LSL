@@ -1,4 +1,4 @@
-// [SGD] Custom RRDC Titler v1.0 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] Custom RRDC Titler v1.01 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // -------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -548,17 +548,10 @@ default
                 {
                     mesg = llGetSubString(mesg, 1, -1);
                 }
-                else if (cmdMatch(" ", mesg)) // Access the last menu used.
-                {
-                    showMenu(g_curMenu);
-                    return;
-                }
-                else if (cmdMatch("close", mesg))
-                {
-                    return; // Do nothing for close command.
-                }
                 else if (cmdMatch("help", mesg)) // Help menu/command.
                 {
+                    mesg = llGetSubString(mesg, 4, -1);
+
                     if (llGetInventoryNumber(INVENTORY_NOTECARD)) // Notecard is present.
                     {
                         llGiveInventory(llGetOwner(), // Offer notecard.
@@ -569,7 +562,15 @@ default
                     {
                         llOwnerSay("Hmm.. The help notecard appears to be missing!");
                     }
+                }
+                else if (cmdMatch(" ", mesg)) // Access the last menu used.
+                {
+                    showMenu(g_curMenu);
                     return;
+                }
+                else if (cmdMatch("close", mesg))
+                {
+                    return; // Do nothing for close command.
                 }
                 else if (cmdMatch("menu", mesg) || cmdMatch("↺ Main", mesg)) // Main menu.
                 {
