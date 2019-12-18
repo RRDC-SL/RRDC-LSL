@@ -1,23 +1,23 @@
-// [SGD] RRDC Collar Script v0.23 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
-// ---------------------------------------------------------------------------------------------
+// [SGD] RRDC Collar Script v0.24 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
 //  http://mozilla.org/MPL/2.0/.
-// =============================================================================================
+// =========================================================================================================
 
 // Assets.
-// ---------------------------------------------------------------------------------------------
-string  g_whiteTex          = "RRDC_Collar_Metals_Diffuse_Wte";
-string  g_orangeTex         = "RRDC_Collar_Metals_Diffuse_Orange";
-string  g_lilacTex          = "RRDC_Collar_Metals_Diffuse_Lilac";
-string  g_blueTex           = "RRDC_Collar_Metals_Diffuse_Blue";
-string  g_blackTex          = "RRDC_Collar_Metals_Diffuse_Blk";
-string  g_zapLoopSound      = "soundZapLoop";
-string  g_zapStopSound      = "soundZapStop";
+// ---------------------------------------------------------------------------------------------------------
+string  g_whiteTex          = "aaff45c0-a0ef-c00d-58cb-bff31860d7be"; // RRDC_Collar_Metals_Diffuse_Wte.
+string  g_orangeTex         = "658f1177-cede-3ea2-57f9-d50e2b1402e4"; // RRDC_Collar_Metals_Diffuse_Orange.
+string  g_lilacTex          = "25be29e2-cc69-1559-4ad9-511d130554b9"; // RRDC_Collar_Metals_Diffuse_Lilac.
+string  g_blueTex           = "7add76cf-24f4-a2d3-6102-c6338db891fc"; // RRDC_Collar_Metals_Diffuse_Blue.
+string  g_blackTex          = "8c61b3ad-2723-cc83-c454-e602a8258ed7"; // RRDC_Collar_Metals_Diffuse_Blk.
+string  g_zapLoopSound      = "27a18333-a425-30b1-1ab6-c9a3a3554903"; // soundZapLoop.
+string  g_zapStopSound      = "a4602ead-96f3-ee86-5e0f-63faeb1ed7cf"; // soundZapStop.
 string  g_zapAnim           = "animCollarZap";
 
 // State Variables.
-// ---------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------
 integer g_powerCore;                    // Link number of the power core FX prim.
 integer g_leashingPoint;                // Link number of the leashing point prim.
 integer g_shacklesPoint;                // Link number of the chain to shackles point prim.
