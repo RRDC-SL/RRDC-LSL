@@ -240,7 +240,7 @@ default
                         g_partColor.y = fMax(0.0, fMin(llList2Float(tList, 2), 1.0));
                         g_partColor.z = fMax(0.0, fMin(llList2Float(tList, 3), 1.0));
                     }
-                    else if (llGetListLength(tList) >= 3 && cmd == "speed") // Size has 2 args.
+                    else if (llGetListLength(tList) >= 3 && cmd == "size") // Size has 2 args.
                     {
                         g_partSizeX = fMax(0.03125, fMin(llList2Float(tList, 1), 4.0));
                         g_partSizeY = fMax(0.03125, fMin(llList2Float(tList, 2), 4.0));
