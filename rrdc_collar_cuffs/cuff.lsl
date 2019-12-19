@@ -17,12 +17,10 @@ string  g_ropePartTex   = "bc586d76-c5b9-de10-5b66-e8840f175e0d"; // For 'rope' 
 integer g_appChan           = -89039937;        // The channel for this application set.
 float   g_partSizeX         = 0.04;             // Particle size X-axis.
 float   g_partSizeY         = 0.04;             // Particle size Y-axis.
-float   g_partLife          = 1.0;              // How long each particle 'lives'.
+float   g_partLife          = 1.2;              // How long each particle 'lives'.
 float   g_partGravity       = 0.3;              // How much gravity affects the particles.
-float   g_partMinSpeed      = 0.005;            // Minimum speed of the particles.
-float   g_partMaxSpeed      = 0.005;            // Maximum speed of the particles.
 vector  g_partColor         = <1.0, 1.0, 1.0>;  // Color of the particles.
-float   g_partRate          = 0.0;              // Interval between particle bursts.
+float   g_partRate          = 0.01;             // Interval between particle bursts.
 integer g_partFollow        = 0;                // Particles move relative to the emitter.
 
 // ========================================================================================
@@ -36,8 +34,6 @@ float   g_curPartSizeX;                         // Current particle X size.
 float   g_curPartSizeY;                         // Current particle Y size.
 float   g_curPartLife;                          // Current particle life.
 float   g_curPartGravity;                       // Current particle gravity.
-float   g_curPartMinSpeed;                      // Current particle min speed.
-float   g_curPartMaxSpeed;                      // Current particle max speed.
 vector  g_curPartColor;                         // Current particle color.
 float   g_curPartRate;                          // Current particle rate.
 integer g_curPartFollow;                        // Current particle follow flag.
@@ -91,8 +87,6 @@ doParticles(integer on)
         g_curPartSizeY      = g_partSizeY;
         g_curPartLife       = g_partLife;
         g_curPartGravity    = g_partGravity;
-        g_curPartMinSpeed   = g_partMinSpeed;
-        g_curPartMaxSpeed   = g_partMaxSpeed;
         g_curPartColor      = g_partColor;
         g_curPartRate       = g_partRate;
         g_curPartFollow     = g_partFollow;
@@ -105,35 +99,27 @@ doParticles(integer on)
     
         if(g_curPartGravity == 0) // Add linear mask if gravity is not zero.
         {
-            nBitField = (nBitField|PSYS_PART_TARGET_LINEAR_MASK);
+            nBitField = (nBitField | PSYS_PART_TARGET_LINEAR_MASK);
         }
 
         if(g_curPartFollow) // Add follow mask if flag is set.
         {
-            nBitField = (nBitField|PSYS_PART_FOLLOW_SRC_MASK);
+            nBitField = (nBitField | PSYS_PART_FOLLOW_SRC_MASK);
         }
-            
-        llParticleSystem([ PSYS_PART_MAX_AGE,           g_curPartLife,
-                           PSYS_PART_FLAGS,             nBitField,
-                           PSYS_PART_START_COLOR,       g_curPartColor,
-                           PSYS_PART_END_COLOR,         g_curPartColor,
-                           PSYS_PART_START_SCALE,       <g_curPartSizeX, g_curPartSizeY, 1.0>,
-                           PSYS_PART_END_SCALE,         <g_curPartSizeX, g_curPartSizeY, 1.0>,
-                           PSYS_SRC_PATTERN,            1,
-                           PSYS_SRC_BURST_RATE,         g_curPartRate,
-                           PSYS_SRC_ACCEL,              <0.0, 0.0, (g_curPartGravity * -1.0)>,
-                           PSYS_SRC_BURST_PART_COUNT,   10,
-                           PSYS_SRC_BURST_RADIUS,       0.0, 
-                           PSYS_SRC_BURST_SPEED_MIN,    g_curPartMinSpeed,
-                           PSYS_SRC_BURST_SPEED_MAX,    g_curPartMaxSpeed,
-                           PSYS_SRC_ANGLE_BEGIN,        0.0,
-                           PSYS_SRC_ANGLE_END,          0.0,
-                           PSYS_SRC_OMEGA,              ZERO_VECTOR,
-                           PSYS_SRC_MAX_AGE,            0.0,
-                           PSYS_PART_START_ALPHA,       1.0,
-                           PSYS_PART_END_ALPHA,         1.0, 
-                           PSYS_SRC_TARGET_KEY,         ((key)g_partTarget),
-                           PSYS_SRC_TEXTURE,            g_curPartTex
+        
+        llParticleSystem(
+        [
+            PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_DROP,
+            PSYS_SRC_BURST_PART_COUNT,  1,
+            PSYS_SRC_MAX_AGE,           0.0,
+            PSYS_PART_MAX_AGE,          g_curPartLife,
+            PSYS_SRC_BURST_RATE,        g_curPartRate,
+            PSYS_SRC_TEXTURE,           g_curPartTex,
+            PSYS_PART_START_COLOR,      g_curPartColor,
+            PSYS_PART_START_SCALE,      <g_curPartSizeX, g_curPartSizeY, 0.0>,
+            PSYS_SRC_ACCEL,             <0.0, 0.0, (g_curPartGravity * -1.0)>,
+            PSYS_SRC_TARGET_KEY,        (key)g_partTarget,
+            PSYS_PART_FLAGS,            nBitField
         ]);
     }
 }
@@ -265,18 +251,10 @@ default
                         g_partColor.y = fMax(0.0, fMin(llList2Float(tList, 2), 1.0));
                         g_partColor.z = fMax(0.0, fMin(llList2Float(tList, 3), 1.0));
                     }
-                    else if (llGetListLength(tList) >= 3) // Speed and size have 2 args.
+                    else if (llGetListLength(tList) >= 3 && cmd == "speed") // Speed has 2 args.
                     {
-                        if (cmd == "speed")
-                        {
-                            g_partMinSpeed = fMax(0.0, llList2Float(tList, 1));
-                            g_partMaxSpeed = fMax(0.0, llList2Float(tList, 2));
-                        }
-                        else if (cmd == "size")
-                        {
-                            g_partSizeX = fMax(0.03125, fMin(llList2Float(tList, 1), 4.0));
-                            g_partSizeY = fMax(0.03125, fMin(llList2Float(tList, 2), 4.0));
-                        }
+                        g_partMinSpeed = fMax(0.0, llList2Float(tList, 1));
+                        g_partMaxSpeed = fMax(0.0, llList2Float(tList, 2));
                     }
                     else if (llGetListLength(tList) >= 2) // Most other args have 1 arg.
                     {
@@ -413,12 +391,6 @@ default
                     {
                         g_curPartFollow = (llList2Integer(tList, (i + 1)) > 0);
                         i += 2;
-                    }
-                    else if(name == "speed")
-                    {
-                        g_curPartMinSpeed = fMax(0.0, llList2Float(tList, (i + 1)));
-                        g_curPartMaxSpeed = fMax(0.0, llList2Float(tList, (i + 2)));
-                        i += 3;
                     }
                     else if(name == "size")
                     {
