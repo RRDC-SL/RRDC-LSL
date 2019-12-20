@@ -1,0 +1,19 @@
+Role lock access to certain features?
+    (Wearer always has access?)
+    Role query integrated with collar/badge on the avatar side (both send and receive?)
+    In-world items like doors use a shared app channel, while avatars use an av channel ORed with the app channel.
+        Role check query initiated usually by touch event, so avatar key is available to the script.
+        Role check query sent on that avatar's specific app channel.
+        If querying object is an attachment, reply sent on that avatar's channel, otherwise sent on shared app channel.
+            Final step uses llRegionSayTo, and the requester will have saved the key of the avatar so to prevent cross-talk.
+
+Collar/Cuff Inter-Attachment Protocol
+-------------------------------------
+linkrequest     -   [From: Collar. To: Cuff] Requests one chain point link to another.
+                    linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
+
+link            -   [From: Any. To: Collar|Cuff] Links given cuff to the object specified.
+                    link <tag> <inner|outer> <dest-uuid>
+                    
+unlink          -   [From: Any. To: Collar|Cuff] Unlinks a given cuff from whatever.
+                    unlink <tag> <inner|outer>
