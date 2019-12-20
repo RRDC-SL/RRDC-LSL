@@ -1,5 +1,5 @@
-// LockGuard and LockMeister Combined. Created by Felis Darwin. Edits by Alex Pascal.
-//  Additional edits to add cuff relay functionality for RRDC Collar and Cuffs set.
+// [SGD] RRDC Cuffs Script v0.1 Copyright 2019 Alex Pascal (Alex Carpenter).
+//  Based on combined Lockmeister and LockGuard script by Felis Darwin.
 // ----------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -8,13 +8,14 @@
 
 // Modifiable Variables.
 // ----------------------------------------------------------------------------------------
-string  g_configCard    = "LockGuard V2 Config";
-string  g_chainPartTex  = "40809979-b6be-2b42-e915-254ccd8d9a08"; // For 'chain' command.
-string  g_ropePartTex   = "bc586d76-c5b9-de10-5b66-e8840f175e0d"; // For 'rope' command.
+integer g_appChan           = -89039937;        // The channel for this application set.
+
+// Assets.
+// ----------------------------------------------------------------------------------------
+string  g_partTex           = "40809979-b6be-2b42-e915-254ccd8d9a08"; // thinchain.
 
 // Particle System Defaults. It is best not to mess with these.
 // ----------------------------------------------------------------------------------------
-integer g_appChan           = -89039937;        // The channel for this application set.
 float   g_partSizeX         = 0.04;             // Particle size X-axis.
 float   g_partSizeY         = 0.04;             // Particle size Y-axis.
 float   g_partLife          = 1.2;              // How long each particle 'lives'.
@@ -26,9 +27,6 @@ integer g_partFollow        = 0;                // Particles move relative to th
 // ========================================================================================
 // CAUTION: Modifying anything below this line may cause issues. Edit at your own risk!
 // ========================================================================================
-string  g_partTex           = g_chainPartTex;   // Default particle texture.
-string  g_partTarget;                           // Key of the target prim for LG.
-integer g_particlesOn;                          // If TRUE, LG particles are on.
 string  g_curPartTex;                           // Current particle texture.
 float   g_curPartSizeX;                         // Current particle X size.
 float   g_curPartSizeY;                         // Current particle Y size.
@@ -37,6 +35,8 @@ float   g_curPartGravity;                       // Current particle gravity.
 vector  g_curPartColor;                         // Current particle color.
 float   g_curPartRate;                          // Current particle rate.
 integer g_curPartFollow;                        // Current particle follow flag.
+integer g_particlesOn;                          // If TRUE, LG particles are on.
+string  g_partTarget;                           // Key of the target prim for LG.
 integer g_notecardLine;                         // Current line notecard reader is on.
 key     g_queryID;                              // Current query ID for notecard reader.
 list    g_LGTags;                               // List of current LockGuard tags.
@@ -124,72 +124,6 @@ doParticles(integer on)
     }
 }
 
-// parseTag - Parses a LM or LG tag and ensure the tag lists are in sync.
-// ----------------------------------------------------------------------------------------
-parseTag(string tag)
-{
-    // List of Lockmeister IDs which have LockGuard equivalents.
-    // ----------------------------------------------------------------------------------------
-    list    lmID = ["rcuff","rbiceps","lbiceps","lcuff","lblade","rblade","rnipple",
-                    "lnipple","rtigh","ltigh","rlcuff","llcuff","pelvis","fbelt","bbelt",
-                    "rcollar","lcollar","thead","collar","lbit","rbit","nose","bcollar",
-                    "back"];
-
-    // List of LockGuard IDs which correspond to the Lockmeister IDs.
-    //  Multiples are separated by a bar |.
-    // ----------------------------------------------------------------------------------------
-    list    lgID = ["rightwrist|wrists|allfour","rightupperarm|arms","leftupperarm|arms",
-                    "leftwrist|wrists|allfour","harnessleftshoulderloop",
-                    "harnessrightshoulderloop","rightnipplering|nipples",
-                    "leftnipplering|nipples","rightupperthigh|thighs","leftupperthigh|thighs",
-                    "rightankle|ankles|allfour","leftankle|ankles|allfour",
-                    "clitring|cockring|ballring","frontbeltloop","backbeltloop",
-                    "collarrightloop","collarleftloop","topheadharness", "collarfrontloop",
-                    "leftgag","rightgag","nosering","collarbackloop","harnessbackloop"];
-
-    tag = llToLower(llStringTrim(tag, STRING_TRIM));   // Lowercase and trim whitespace.
-    list tList;                                        // Temp list for LG tags.
-
-    integer i = llListFindList(lmID, [tag]);
-    if (i > -1) // LM tag. Add if not already present.
-    {
-        if (llListFindList(g_LMTags, [tag]) <= -1)
-        {
-            g_LMTags += [tag];
-        }
-
-        // Add corresponding LG tags, if not present.
-        tList = llParseString2List(llList2String(lgID, i), ["|"], []);
-        if (llListFindList(g_LGTags, [llList2String(tList, 0)]) <= -1)
-        {
-            g_LGTags += tList;
-        }
-    }
-    else // Possible LG tag.
-    {
-        // Only check the most specific (leftmost) tag in group. We auto-add included groups.
-        for (i = 0; i < llGetListLength(lgID); i++)
-        {
-            tList = llParseString2List(llList2String(lgID, i), ["|"], []);
-
-            if (llList2String(tList, 0) == tag) // LG tag. Add if not already present.
-            {
-                if (llListFindList(g_LGTags, [llList2String(tList, 0)]) <= -1)
-                {
-                    g_LGTags += tList;
-                }
-
-                // Add corresponding LM tags, if not present.
-                if (llListFindList(g_LMTags, [llList2String(lmID, i)]) <= -1)
-                {
-                    g_LMTags += [llList2String(lmID, i)];
-                }
-            }
-        }
-    }
-    tList = [];
-}
-
 default
 {
     // Initialize the script.
@@ -203,108 +137,64 @@ default
 
         llListen(getAvChannel(llGetOwner()), "", "", ""); // Open collar/cuffs avChannel.
         
-        // Parse the description field for potential tags.
-        list tList = llParseString2List(llGetObjectDesc(),[":"],[]);
+        // Parse the description field for potential LM tags.
+        list l = llParseString2List(llGetObjectDesc(),[":"],[]);
         
-        if(llGetInventoryType(g_configCard) == INVENTORY_NOTECARD)
+        if(l == []) // If we have ZERO config information, make a guess based on attach point.
         {
-            g_notecardLine = 0; // There's a LG config notecard. Read it.
-            g_queryID = llGetNotecardLine(g_configCard,0);
-        }   
-        else if(tList == []) // If we have ZERO config information, make a guess based on attach point.
-        {
-            // Map attach point to LM tags.
-            tList = llList2List(["","collar","thead","lblade","rblade","lhand","rhand","llcuff",
-                                 "rlcuff","collar","pelvis","lbit","rbit","","","","","nose",
-                                 "rbiceps","rcuff","lbiceps","lcuff","rfbelt","rtigh","rlcuff",
-                                 "lfbelt","ltigh","llcuff","fbelt","lnipple","rnipple","","","",
-                                 "","","","","","collar","fbelt"],
-                    llGetAttached(),llGetAttached());
+            l = llList2List(["","collar","thead","lblade","rblade","lhand","rhand","llcuff",
+                             "rlcuff","collar","pelvis","lbit","rbit","","","","","nose",
+                             "rbiceps","rcuff","lbiceps","lcuff","rfbelt","rtigh","rlcuff",
+                             "lfbelt","ltigh","llcuff","fbelt","lnipple","rnipple","","","",
+                             "","","","","","collar","fbelt"],
+                llGetAttached(),llGetAttached());
         }
+
+        // List of Lockmeister IDs which have LockGuard equivalents.
+        // ------------------------------------------------------------------------------------
+        list lmID = ["rcuff","rbiceps","lbiceps","lcuff","lblade","rblade","rnipple",
+                     "lnipple","rtigh","ltigh","rlcuff","llcuff","pelvis","fbelt","bbelt",
+                     "rcollar","lcollar","thead","collar","lbit","rbit","nose","bcollar",
+                     "back"];
+
+        // List of LockGuard IDs which correspond to the Lockmeister IDs.
+        //  Multiples are separated by a bar |.
+        // ------------------------------------------------------------------------------------
+        list lgID = ["rightwrist|wrists|allfour","rightupperarm|arms","leftupperarm|arms",
+                     "leftwrist|wrists|allfour","harnessleftshoulderloop",
+                     "harnessrightshoulderloop","rightnipplering|nipples",
+                     "leftnipplering|nipples","rightupperthigh|thighs","leftupperthigh|thighs",
+                     "rightankle|ankles|allfour","leftankle|ankles|allfour",
+                     "clitring|cockring|ballring","frontbeltloop","backbeltloop",
+                     "collarrightloop","collarleftloop","topheadharness", "collarfrontloop",
+                     "leftgag","rightgag","nosering","collarbackloop","harnessbackloop"];
         
         integer i; // Parse all the LM tags found.
-        for(i = 0; i < llGetListLength(tList); i++)
+        integer j;
+        string tag;
+        list tList;
+        for(i = 0; i < llGetListLength(l); i++)
         {
-            parseTag(llList2String(tList,i));
-        }
-        tList = [];
-
-        doParticles(FALSE); // Stop any particles from LockGuard effects and init.
-    }
-
-    // Parse the LG notecard.
-    // ----------------------------------------------------------------------------------------
-    dataserver(key query, string data)
-    {
-        if (query == g_queryID) // Query matches the NC query.
-        {
-            if (data != EOF) // Not EOF. Parse the line as a config setting.
+            tag = llToLower(llStringTrim(llList2String(l,i), STRING_TRIM)); // Clean tag name.
+            
+            j = llListFindList(lmID, [tag]);
+            if (j > -1) // LM tag. Add if not already present.
             {
-                list tList = llParseString2List(data, [" ", "\t"], []);
-                if (llGetListLength(tList) > 0) // Not an empty command.
+                if (llListFindList(g_LMTags, [tag]) <= -1)
                 {
-                    string cmd = llToLower(llList2String(tList, 0)); // Save lowercase of cmd.
-
-                    if (llGetListLength(tList) >= 4 && cmd == "color") // Color has 3 args.
-                    {
-                        g_partColor.x = fMax(0.0, fMin(llList2Float(tList, 1), 1.0));
-                        g_partColor.y = fMax(0.0, fMin(llList2Float(tList, 2), 1.0));
-                        g_partColor.z = fMax(0.0, fMin(llList2Float(tList, 3), 1.0));
-                    }
-                    else if (llGetListLength(tList) >= 3 && cmd == "size") // Size has 2 args.
-                    {
-                        g_partSizeX = fMax(0.03125, fMin(llList2Float(tList, 1), 4.0));
-                        g_partSizeY = fMax(0.03125, fMin(llList2Float(tList, 2), 4.0));
-                    }
-                    else if (llGetListLength(tList) >= 2) // Most other args have 1 arg.
-                    {
-                        if (cmd == "id")
-                        {
-                            parseTag(llList2String(tList, 1));
-                        }
-                        else if (cmd == "gravity")
-                        {
-                            g_partGravity = fMax(0.0, fMin(llList2Float(tList, 1), 100.0));
-                        }
-                        else if (cmd == "life")
-                        {
-                            g_partLife = fMax(0.0, llList2Float(tList, 1));
-                        }
-                        else if (cmd == "rate")
-                        {
-                            g_partRate = fMax(0.0, llList2Float(tList, 1));
-                        }
-                        else if (cmd == "follow")
-                        {
-                            g_partFollow = (llList2Integer(tList, 1) > 0);
-                        }
-                        else if (cmd == "texture")
-                        {
-                            cmd = llToLower(llList2String(tList, 1));
-                            if (cmd == "chain")
-                            {
-                                g_partTex = g_chainPartTex;
-                            }
-                            else if (cmd == "rope")
-                            {
-                                g_partTex = g_ropePartTex;
-                            }
-                            else
-                            {
-                                g_partTex = llList2String(tList, 1);
-                            }
-                        }
-                    }
+                    g_LMTags += [tag];
                 }
 
-                tList = [];
-                g_queryID = llGetNotecardLine(g_configCard,g_notecardLine++);
-            }
-            else
-            {
-                doParticles(FALSE); // Re-init particles.
+                // Add corresponding LG tags, if not present.
+                tList = llParseString2List(llList2String(lgID, j), ["|"], []);
+                if (llListFindList(g_LGTags, [llList2String(tList, 0)]) <= -1)
+                {
+                    g_LGTags += tList;
+                }
             }
         }
+
+        doParticles(FALSE); // Stop any particles from LockGuard effects and init.
     }
 
     // Reset the script on rez and if the inventory changes.
@@ -368,13 +258,10 @@ default
                     }
                     else if(name == "texture")
                     {
-                        if(llList2String(tList, (i + 1)) == "rope")
+                        name = llList2String(tList, (i + 1));
+                        if(name == "chain" || name == "rope")
                         {
-                            g_curPartTex = g_ropePartTex;
-                        }
-                        else if(llList2String(tList, (i + 1)) == "chain")
-                        {
-                            g_curPartTex = g_chainPartTex;
+                            g_curPartTex = g_partTex;
                         }
                         else
                         {
@@ -436,7 +323,6 @@ default
                 
                 doParticles(g_particlesOn); // Refresh particles.
             }
-            tList = [];
         }
     }
 }
