@@ -252,14 +252,6 @@ default
                 // reqlink <inner|outer> <from-tag> <inner|outer> <to-tag>
                 // - Request to draw particles from one emitter point to another.
             }
-            else if (name == "leashto")
-            {
-                // leashto <inner|outer> <tag> <avatar> - Leash particles to avatar/leash.
-            }
-            else if (name == "leashreq")
-            {
-                // leashreq <inner|outer> <tag> <uuid> - Recieve leash from object.
-            }
         }
         else if(chan == -8888 && llGetSubString(mesg, 0, 35) == ((string)llGetOwner())) // Process LM.
         {
