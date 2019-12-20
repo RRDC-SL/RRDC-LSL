@@ -235,7 +235,33 @@ default
     // ----------------------------------------------------------------------------------------
     listen(integer chan, string name, key id, string mesg)
     {
-        if(chan == -8888 && llGetSubString(mesg, 0, 35) == ((string)llGetOwner())) // Process LM.
+        if (chan == getAvChannel(llGetOwner())) // Process RRDC cuff specific commands.
+        {
+            list l = llParseString2List(mesg, [" "], []);
+            name = llToLower(llList2String(l, 0));
+            if (name == "unlink") 
+            {
+                // unlink <inner|outer> <tag> - Stop particles from an emitter.
+            }
+            else if (name == "link")
+            {
+                // link <inner|outer> <tag> <uuid> - Draw particles to an object.
+            }
+            else if (name == "reqlink")
+            {
+                // reqlink <inner|outer> <from-tag> <inner|outer> <to-tag>
+                // - Request to draw particles from one emitter point to another.
+            }
+            else if (name == "leashto")
+            {
+                // leashto <inner|outer> <tag> <avatar> - Leash particles to avatar/leash.
+            }
+            else if (name == "leashreq")
+            {
+                // leashreq <inner|outer> <tag> <uuid> - Recieve leash from object.
+            }
+        }
+        else if(chan == -8888 && llGetSubString(mesg, 0, 35) == ((string)llGetOwner())) // Process LM.
         {
             if(llListFindList(g_LMTags, [llGetSubString(mesg, 36, -1)]) > -1)
             {
