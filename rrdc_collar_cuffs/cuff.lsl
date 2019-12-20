@@ -37,6 +37,8 @@ float   g_curPartRate;                          // Current particle rate.
 integer g_curPartFollow;                        // Current particle follow flag.
 integer g_particlesOn;                          // If TRUE, LG particles are on.
 string  g_partTarget;                           // Key of the target prim for LG.
+integer g_outerLink;                            // Link number of the outer/LGLM emitter.
+integer g_innerLink;                            // Link number of the inner emitter.
 list    g_LGTags;                               // List of current LockGuard tags.
 list    g_LMTags;                               // List of current LockMeister tags.
 // ========================================================================================
@@ -70,9 +72,9 @@ float fMax(float f1, float f2)
     return f1;
 }
 
-// doParticles - Turns LockGuard chain/rope particles on or off.
+// outerParticles - Turns outer/LockGuard chain/rope particles on or off.
 // ----------------------------------------------------------------------------------------
-doParticles(integer on)
+outerParticles(integer on)
 {
     g_particlesOn = on; // Save the state we passed in.
     
@@ -105,7 +107,7 @@ doParticles(integer on)
             nBitField = (nBitField | PSYS_PART_FOLLOW_SRC_MASK);
         }
         
-        llParticleSystem(
+        llLinkParticleSystem(g_outerLink,
         [
             PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_DROP,
             PSYS_SRC_BURST_PART_COUNT,  1,
@@ -127,13 +129,23 @@ default
     // Initialize the script.
     // ----------------------------------------------------------------------------------------
     state_entry()
-    {   
-        llSetMemoryLimit(llGetUsedMemory()+4096); // Limit script memory consumption.
+    {
+        outerParticles(FALSE); // Stop any particles from LockGuard effects and init.
 
-        llListen(-8888,"",NULL_KEY,""); // Open up LockGuard and Lockmeister listens.
-        llListen(-9119,"",NULL_KEY,"");
-
-        llListen(getAvChannel(llGetOwner()), "", "", ""); // Open collar/cuffs avChannel.
+        integer i; // Find the emitter links.
+        string tag;
+        for (i = 1; i <= llGetNumberOfPrims(); i++)
+        {
+            tag = llToLower(llStringTrim(llGetLinkName(i), STRING_TRIM));
+            if (tag == "innerlink")
+            {
+                g_innerLink = i;
+            }
+            else if (tag == "outerlink")
+            {
+                g_outerLink = i;
+            }
+        }
         
         // Parse the description field for potential LM tags.
         list l = llParseString2List(llGetObjectDesc(),[":"],[]);
@@ -167,9 +179,7 @@ default
                      "collarrightloop","collarleftloop","topheadharness", "collarfrontloop",
                      "leftgag","rightgag","nosering","collarbackloop","harnessbackloop"];
         
-        integer i; // Parse all the LM tags found.
-        integer j;
-        string tag;
+        integer j; // Parse all the LM tags found.
         list tList;
         for(i = 0; i < llGetListLength(l); i++)
         {
@@ -192,7 +202,18 @@ default
             }
         }
 
-        doParticles(FALSE); // Stop any particles from LockGuard effects and init.
+        llSetMemoryLimit(llGetUsedMemory() + 2048); // Limit script memory consumption.
+
+        if (g_LMTags == [] || g_innerLink <= 0 || g_outerLink <= 0)
+        {
+            llOwnerSay("FATAL: Unknown anchor and/or missing chain emitters!");
+            return;
+        }
+
+        llListen(-8888,"",NULL_KEY,""); // Open up LockGuard and Lockmeister listens.
+        llListen(-9119,"",NULL_KEY,"");
+
+        llListen(getAvChannel(llGetOwner()), "", "", ""); // Open collar/cuffs avChannel.
     }
 
     // Reset the script on rez and if the inventory changes.
@@ -235,12 +256,12 @@ default
                     if(name == "link")
                     {
                         g_partTarget = llList2Key(tList, (i + 1));
-                        doParticles(TRUE);
+                        outerParticles(TRUE);
                         i += 2;
                     }
                     else if(name == "unlink")
                     {
-                        doParticles(FALSE);
+                        outerParticles(FALSE);
                         tList = [];
                         return;
                     }
@@ -319,7 +340,7 @@ default
                     }
                 }
                 
-                doParticles(g_particlesOn); // Refresh particles.
+                outerParticles(g_particlesOn); // Refresh particles.
             }
         }
     }
