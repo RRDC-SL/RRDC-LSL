@@ -241,6 +241,13 @@ default
             {
                 llRegionSayTo(id, -8888, mesg + " ok");
             }
+            else if (llGetSubString(mesg, 36, 54) == "|LMV2|RequestPoint|" &&      // LMV2.
+                     llListFindList(g_LMTags, [llGetSubString(mesg, 55, -1)]) > -1)
+            {
+                llRegionSayTo(id, -8888, ((string)llGetOwner()) + "|LMV2|ReplyPoint|" + 
+                    llGetSubString(mesg, 55, -1) + "|" + ((string)llGetLinkKey(g_outerLink))
+                );
+            }
         }                                                                          // Process LG.
         else if(chan == -9119 && llSubStringIndex(mesg, "lockguard " + ((string)llGetOwner())) == 0)
         {
