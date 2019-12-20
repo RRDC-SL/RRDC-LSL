@@ -1137,7 +1137,7 @@ default
             }
             else if (cmdMatch("`", mesg)) // Backtick is a 'spoof'/narrator command.
             {
-                mesg = mesg = llStringTrim(llGetSubString(mesg, 1, -1), STRING_TRIM);
+                mesg  = llStringTrim(llGetSubString(mesg, 1, -1), STRING_TRIM);
                 postType = 2;
             }
 
