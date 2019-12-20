@@ -37,8 +37,6 @@ float   g_curPartRate;                          // Current particle rate.
 integer g_curPartFollow;                        // Current particle follow flag.
 integer g_particlesOn;                          // If TRUE, LG particles are on.
 string  g_partTarget;                           // Key of the target prim for LG.
-integer g_notecardLine;                         // Current line notecard reader is on.
-key     g_queryID;                              // Current query ID for notecard reader.
 list    g_LGTags;                               // List of current LockGuard tags.
 list    g_LMTags;                               // List of current LockMeister tags.
 // ========================================================================================
