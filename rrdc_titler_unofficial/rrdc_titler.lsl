@@ -1122,22 +1122,28 @@ default
         else // Process this as character text.
         {
             string t = llGetObjectName(); // Temp store original object name.
+            name = "";
 
-            integer isEmote = FALSE;
+            integer postType = 0; // Default is say.
             if (cmdMatch("/me", mesg)) // Remove /me and set emote flag.
             {
                 mesg = llStringTrim(llGetSubString(mesg, 3, -1), STRING_TRIM);
-                isEmote = TRUE;
+                postType = 1;
             }
             else if (cmdMatch(":", mesg)) // Treat MU* style pose ':' same as /me.
             {
                 mesg = llStringTrim(llGetSubString(mesg, 1, -1), STRING_TRIM);
-                isEmote = TRUE;
+                postType = 1;
+            }
+            else if (cmdMatch("`", mesg)) // Backtick is a 'spoof'/narrator command.
+            {
+                mesg = mesg = llStringTrim(llGetSubString(mesg, 1, -1), STRING_TRIM);
+                postType = 2;
             }
 
-            if (cmdMatch("((", mesg) || g_status > 0) // OOC command triggered. Set name with prefix.
+            if (cmdMatch("((", mesg) || g_status > 0) // OOC command triggered. Set prefix.
             {
-                llSetObjectName("[OOC] " + llList2String(g_characters, (g_curCharacter * 11)));
+                name = "[OOC] ";
 
                 if (!cmdMatch("((", mesg)) // Add OOC parens if we're OOC/AFK and didn't add them.
                 {
@@ -1149,15 +1155,22 @@ default
                     mesg += "))";
                 }
             }
-            else // IC text. Set name.
+
+            if (postType > 1) // Spoof/narrator?
             {
-                llSetObjectName(llList2String(g_characters, (g_curCharacter * 11)));
+                name += "-";
+            }
+            else // Add character name.
+            {
+                name += llList2String(g_characters, (g_curCharacter * 11));
+
+                if (postType) // Prepend the emote command if emote flag was set.
+                {
+                    mesg = "/me " + mesg;
+                }
             }
 
-            if (isEmote) // Prepend the emote command if emote flag was set.
-            {
-                mesg = "/me " + mesg;
-            }
+            llSetObjectName(name);
             
             if ((g_settings & 0x00000004)) // Send text at desired chat volume.
             {

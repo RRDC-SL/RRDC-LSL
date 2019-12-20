@@ -1,5 +1,5 @@
 RP Character Spoofer Syntax:
-    /4[</me|:>][((]<text>
+    /4[</me|:|`>][((]<text>
 
 Examples:
     /4This is an IC statement.
@@ -8,6 +8,8 @@ Examples:
     /4((This is an OOC statment.
     /4/me ((makes an OOC emote.
     /4:((makes an OOC emote.
+    /4`This is narrated ICly.
+    /4`((This is narrated OOCly.
 
     Note1: When your status is set OOC or AFK, all text is interpreted as OOC automatically.
     Note2: When chat redirect is enabled (provided RLV is enabled in viewer), local chat and
