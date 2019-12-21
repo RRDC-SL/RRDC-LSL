@@ -29,6 +29,7 @@ integer g_shacklesPoint;                 // Link number of the chain to shackles
 integer g_ledLink;                       // Link number of the LED light.
 integer g_ledState;                      // Tracks the current on-off state of the LED.
 integer g_shockCount;                    // Tracks how long to keep shock active.
+integer g_ledCount          = 0;         // Tracks how long to wait to blink LED.
 integer g_appChan           = -89039937; // The channel for this application set.
 string  g_curMenu           = "main";    // Tracks the current menu.
 
@@ -131,7 +132,7 @@ default
 
             // Start listening for menu.
             llListen(getAvChannel(llGetOwner()), "", "", "");
-            llSetTimerEvent(1.0); // Start the timer.
+            llSetTimerEvent(0.2); // Start the timer.
         }
     }
 
@@ -214,8 +215,8 @@ default
             );
             llStartAnimation(g_zapAnim);
             llLoopSound(g_zapLoopSound, 0.5);
-            g_shockCount = 2;
-            llSetTimerEvent(0.8);
+            g_shockCount = 13; // 0.8 seconds, then 2.0 seconds.
+            llSetTimerEvent(0.2);
         }
         else if (id == llGetOwner()) // Texture commands are owner locked.
         {
@@ -270,11 +271,10 @@ default
     {
         if (g_shockCount > 0) // Shock effects.
         {
-            if (g_shockCount == 2) // Ending effect.
+            if (g_shockCount == 10) // Ending effect.
             {
                 llStopSound();
                 llPlaySound(g_zapStopSound, 0.5);
-                llSetTimerEvent(1.0);
             }
             g_shockCount--;
         }
@@ -295,21 +295,26 @@ default
             );
         }
 
-        if (g_ledState = !g_ledState) // Blinking LED effects.
+        if (g_ledCount++ >= 4) // Trigger every 1.0 seconds.
         {
-            llSetLinkPrimitiveParamsFast(g_ledLink, [
-                PRIM_COLOR, ALL_SIDES, <0.3, 0.0, 0.0>, llGetAlpha(0), 
-                PRIM_POINT_LIGHT, FALSE, ZERO_VECTOR, 0.5, 0.5, 0.1,
-                PRIM_GLOW, ALL_SIDES, 0.0
-            ]);
+            if (g_ledState = !g_ledState) // Blinking LED effects.
+            {
+                llSetLinkPrimitiveParamsFast(g_ledLink, [
+                    PRIM_COLOR, ALL_SIDES, <0.3, 0.0, 0.0>, llGetAlpha(0), 
+                    PRIM_POINT_LIGHT, FALSE, ZERO_VECTOR, 0.5, 0.5, 0.1,
+                    PRIM_GLOW, ALL_SIDES, 0.0
+                ]);
+            }
+            else
+            {
+                llSetLinkPrimitiveParamsFast(g_ledLink, [
+                    PRIM_COLOR, ALL_SIDES, <1.0, 0.0, 0.0>, llGetAlpha(0), 
+                    PRIM_POINT_LIGHT, TRUE, <1.0, 0.0, 0.0>, 0.35, 0.075, 0.1,
+                    PRIM_GLOW, ALL_SIDES, 1.0
+                ]);
+            }
+            g_ledCount = 0;
         }
-        else
-        {
-            llSetLinkPrimitiveParamsFast(g_ledLink, [
-                PRIM_COLOR, ALL_SIDES, <1.0, 0.0, 0.0>, llGetAlpha(0), 
-                PRIM_POINT_LIGHT, TRUE, <1.0, 0.0, 0.0>, 0.35, 0.075, 0.1,
-                PRIM_GLOW, ALL_SIDES, 1.0
-            ]);
-        }
+        
     }
 }
