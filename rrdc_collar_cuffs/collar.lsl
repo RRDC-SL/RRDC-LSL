@@ -7,19 +7,34 @@
 
 // Assets.
 // ---------------------------------------------------------------------------------------------------------
-string  g_whiteTex          = "aaff45c0-a0ef-c00d-58cb-bff31860d7be"; // RRDC_Collar_Metals_Diffuse_Wte.
-string  g_orangeTex         = "658f1177-cede-3ea2-57f9-d50e2b1402e4"; // RRDC_Collar_Metals_Diffuse_Orange.
-string  g_lilacTex          = "25be29e2-cc69-1559-4ad9-511d130554b9"; // RRDC_Collar_Metals_Diffuse_Lilac.
-string  g_blueTex           = "7add76cf-24f4-a2d3-6102-c6338db891fc"; // RRDC_Collar_Metals_Diffuse_Blue.
-string  g_blackTex          = "8c61b3ad-2723-cc83-c454-e602a8258ed7"; // RRDC_Collar_Metals_Diffuse_Blk.
-string  g_whiteCuffTex      = "700b9155-5138-e4c7-d194-1db9a6c09861"; // RRDC_Cuff_Diffuse_Basic.
-string  g_orangeCuffTex     = "ec94158c-2455-be49-a07d-7604be76c933"; // RRDC_Cuff_Diffuse_Orange.
-string  g_lilacCuffTex      = "93628600-5364-0a17-fcd8-e617ddd731e5"; // RRDC_Cuff_Diffuse_Lilac.
-string  g_blueCuffTex       = "e84a056b-f95f-a0db-acf0-7354749bbc03"; // RRDC_Cuff_Diffuse_Blue.
-string  g_blackCuffTex      = "04c857b4-78d1-8add-3d45-c134e70afa8f"; // RRDC_Cuff_Diffuse_Black.
-string  g_zapLoopSound      = "27a18333-a425-30b1-1ab6-c9a3a3554903"; // soundZapLoop.
-string  g_zapStopSound      = "a4602ead-96f3-ee86-5e0f-63faeb1ed7cf"; // soundZapStop.
-string  g_zapAnim           = "animCollarZap";
+string  g_whiteTex          =   "aaff45c0-a0ef-c00d-58cb-bff31860d7be"; // RRDC_Collar_Metals_Diffuse_Wte.
+string  g_orangeTex         =   "658f1177-cede-3ea2-57f9-d50e2b1402e4"; // RRDC_Collar_Metals_Diffuse_Orange.
+string  g_lilacTex          =   "25be29e2-cc69-1559-4ad9-511d130554b9"; // RRDC_Collar_Metals_Diffuse_Lilac.
+string  g_blueTex           =   "7add76cf-24f4-a2d3-6102-c6338db891fc"; // RRDC_Collar_Metals_Diffuse_Blue.
+string  g_blackTex          =   "8c61b3ad-2723-cc83-c454-e602a8258ed7"; // RRDC_Collar_Metals_Diffuse_Blk.
+string  g_whiteCuffTex      =   "700b9155-5138-e4c7-d194-1db9a6c09861"; // RRDC_Cuff_Diffuse_Basic.
+string  g_orangeCuffTex     =   "ec94158c-2455-be49-a07d-7604be76c933"; // RRDC_Cuff_Diffuse_Orange.
+string  g_lilacCuffTex      =   "93628600-5364-0a17-fcd8-e617ddd731e5"; // RRDC_Cuff_Diffuse_Lilac.
+string  g_blueCuffTex       =   "e84a056b-f95f-a0db-acf0-7354749bbc03"; // RRDC_Cuff_Diffuse_Blue.
+string  g_blackCuffTex      =   "04c857b4-78d1-8add-3d45-c134e70afa8f"; // RRDC_Cuff_Diffuse_Black.
+ 
+string  g_zapLoopSound      =   "27a18333-a425-30b1-1ab6-c9a3a3554903"; // soundZapLoop.
+string  g_zapStopSound      =   "a4602ead-96f3-ee86-5e0f-63faeb1ed7cf"; // soundZapStop.
+list    g_chainSteps        = [ "f729d711-085e-f899-a723-a4afefd6a7d0", // ChainStep001.
+                                "1f08a669-11ac-96e0-0435-419d2ae01254", // ChainStep002.
+                                "9da21f36-14b1-9e79-3363-fc9d241628ba", // ChainStep003.
+                                "35154062-4f0d-a489-35d3-696d8004b0cc", // ChainStep004.
+                                "93ce44ed-014d-6e58-9d7b-1c9c5242ac6c"  // ChainStep005.
+                              ];
+ 
+string  g_zapAnim           =   "animCollarZap";                        // Played during shock effect.
+string  g_poseBackU         =   "cuffedArmsBackU_001";                  // Arms behind back U pose.
+string  g_poseBackV         =   "cuffedArmsBackV_001";                  // Arms behind back V pose.
+string  g_poseFrontX        =   "cuffedArmsFrontX_001";                 // Arms in front X pose.
+string  g_poseFrontV        =   "cuffedArmsFrontV_002";                 // Arms in front V pose.
+list    g_poseComboSet      = [ "cuffedArmsCollar001",                  // Arms in front V pose higher.
+                                "cuffedNeckForward001"                  // Neck forward pose.
+                              ];
 
 // State Variables.
 // ---------------------------------------------------------------------------------------------------------
