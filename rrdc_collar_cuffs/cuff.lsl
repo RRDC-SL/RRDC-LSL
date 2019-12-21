@@ -12,7 +12,7 @@ integer g_appChan           = -89039937;        // The channel for this applicat
 
 // Assets.
 // ----------------------------------------------------------------------------------------
-string  g_partTex           = "40809979-b6be-2b42-e915-254ccd8d9a08"; // thinchain.
+string  g_partTex           = "dbeee6e7-4a63-9efe-125f-ceff36ceeed2"; // thinchain.
 
 // Particle System Defaults. It is best not to mess with these.
 // ----------------------------------------------------------------------------------------
