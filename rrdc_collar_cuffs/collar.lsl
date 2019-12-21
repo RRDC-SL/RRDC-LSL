@@ -215,7 +215,7 @@ default
             );
             llStartAnimation(g_zapAnim);
             llLoopSound(g_zapLoopSound, 0.5);
-            g_shockCount = 13; // 0.8 seconds, then 2.0 seconds.
+            g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
             llSetTimerEvent(0.2);
         }
         else if (id == llGetOwner()) // Texture commands are owner locked.
