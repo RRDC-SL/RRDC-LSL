@@ -53,8 +53,6 @@ integer g_ankleChain;                    // If TRUE, ankle chain is active.
 integer g_isShackled;                    // If TRUE, wrist to ankle shackle chain active.
 integer g_leashedTo;                     // 0=Nothing,1=Collar,2=ChainGang,3=Cuffed.
 list    g_curMenus;                      // Tracks current menu by user.
-
-string  g_noNoteMesg        = "No character sheet is available."; // Display when no notecard.
 // ---------------------------------------------------------------------------------------------------------
 
 // getAvChannel - Given an avatar key, returns a static channel XORed with g_appChan.
@@ -80,6 +78,33 @@ string getAnimVersion(integer toggle)
 integer inRange(key object)
 {
     return (llVecDist(llGetPos(), llList2Vector(llGetObjectDetails(object, [OBJECT_POS]), 0)) < 6.0);
+}
+
+// giveCharSheet - Gives a copy of the character sheet to the user, if present.
+// ---------------------------------------------------------------------------------------------------------
+giveCharSheet(key user)
+{
+    if (llGetInventoryNumber(INVENTORY_NOTECARD)) // Notecard is present.
+    {
+        string note = llGetInventoryName(INVENTORY_NOTECARD, 0);
+
+        // Make sure we can transfer a copy of the notecard to the toucher.
+        if (llGetInventoryPermMask(note, MASK_OWNER) & (PERM_COPY | PERM_TRANSFER))
+        {
+            llOwnerSay("secondlife:///app/agent/" + ((string)user) + "/completename" +
+                " has requested a copy of your character sheet.");
+
+            llGiveInventory(user, note); // Offer notecard.
+        }
+        else
+        {
+            llInstantMessage(user, "No character sheet is available.");
+        }
+    }
+    else // No notecard present.
+    {
+        llInstantMessage(user, "No character sheet is available.");
+    }
 }
 
 // showMenu - Given a menu name string, shows the appropriate menu.
@@ -135,7 +160,7 @@ showMenu(string menu, key user)
         //
         // Inmate Menu.
         // -----------------------------------------------
-        // CharSheet
+        // CharSheet (Just give char sheet. No menu.)
 
         text = "Main Menu" + text;
 
@@ -152,9 +177,10 @@ showMenu(string menu, key user)
                        "Ankle Chain", "Chain Gang", "Shackle Link",
                        "CharSheet",   "Shock",      "Poses"];
         }
-        else
+        else // Only CharSheet option in menu, so just give CharSheet.
         {
-            buttons = ["CharSheet"];
+            giveCharSheet(user);
+            return;
         }
     }
     else if (menu == "poses")
@@ -267,29 +293,9 @@ default
         }
         else if (mesg == "CharSheet") // Give notecard.
         {
-            if (llGetInventoryNumber(INVENTORY_NOTECARD)) // Notecard is present.
-            {
-                string note = llGetInventoryName(INVENTORY_NOTECARD, 0);
-
-                // Make sure we can transfer a copy of the notecard to the toucher.
-                if (llGetInventoryPermMask(note, MASK_OWNER) & (PERM_COPY | PERM_TRANSFER))
-                {
-                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                        " has requested a copy of your character sheet.");
-
-                    llGiveInventory(id, note); // Offer notecard.
-                }
-                else
-                {
-                    llInstantMessage(id, g_noNoteMesg);
-                }
-            }
-            else // No notecard present.
-            {
-                llInstantMessage(id, g_noNoteMesg);
-            }
+            giveCharSheet(id);
         }
-        else if (inRange(id) || id == llGetOwner()) // Only parse these options if we're in range or wearer.
+        else if (inRange(id) || id == llGetOwner()) // Only parse these if we're in range/the wearer.
         {
             if (mesg == "Shock")
             {
@@ -315,7 +321,7 @@ default
                 g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
                 llSetTimerEvent(0.2);
             }
-            else if (id == llGetOwner()) // Texture commands are owner locked.
+            else if (id == llGetOwner()) // Sound and texture commands are owner locked.
             {
                 if (mesg == "Textures") // Texture select.
                 {
