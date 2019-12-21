@@ -12,6 +12,11 @@ string  g_orangeTex         = "658f1177-cede-3ea2-57f9-d50e2b1402e4"; // RRDC_Co
 string  g_lilacTex          = "25be29e2-cc69-1559-4ad9-511d130554b9"; // RRDC_Collar_Metals_Diffuse_Lilac.
 string  g_blueTex           = "7add76cf-24f4-a2d3-6102-c6338db891fc"; // RRDC_Collar_Metals_Diffuse_Blue.
 string  g_blackTex          = "8c61b3ad-2723-cc83-c454-e602a8258ed7"; // RRDC_Collar_Metals_Diffuse_Blk.
+string  g_whiteCuffTex      = "700b9155-5138-e4c7-d194-1db9a6c09861"; // RRDC_Cuff_Diffuse_Basic.
+string  g_orangeCuffTex     = "ec94158c-2455-be49-a07d-7604be76c933"; // RRDC_Cuff_Diffuse_Orange.
+string  g_lilacCuffTex      = "93628600-5364-0a17-fcd8-e617ddd731e5"; // RRDC_Cuff_Diffuse_Lilac.
+string  g_blueCuffTex       = "e84a056b-f95f-a0db-acf0-7354749bbc03"; // RRDC_Cuff_Diffuse_Blue.
+string  g_blackCuffTex      = "04c857b4-78d1-8add-3d45-c134e70afa8f"; // RRDC_Cuff_Diffuse_Black.
 string  g_zapLoopSound      = "27a18333-a425-30b1-1ab6-c9a3a3554903"; // soundZapLoop.
 string  g_zapStopSound      = "a4602ead-96f3-ee86-5e0f-63faeb1ed7cf"; // soundZapStop.
 string  g_zapAnim           = "animCollarZap";
@@ -224,30 +229,35 @@ default
                 llSetLinkPrimitiveParamsFast(LINK_THIS, [
                     PRIM_TEXTURE, 0, g_blueTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                 ]);
+                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blueCuffTex);
             }
             else if (mesg == "Black")
             {
                 llSetLinkPrimitiveParamsFast(LINK_THIS, [
                     PRIM_TEXTURE, 0, g_blackTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                 ]);
+                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blackCuffTex);
             }
             else if (mesg == "White")
             {
                 llSetLinkPrimitiveParamsFast(LINK_THIS, [
                     PRIM_TEXTURE, 0, g_whiteTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                 ]);
+                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_whiteCuffTex);
             }
             else if (mesg == "Orange")
             {
                 llSetLinkPrimitiveParamsFast(LINK_THIS, [
                     PRIM_TEXTURE, 0, g_orangeTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                 ]);
+                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_orangeCuffTex);
             }
             else if (mesg == "Lilac")
             {
                 llSetLinkPrimitiveParamsFast(LINK_THIS, [
                     PRIM_TEXTURE, 0, g_lilacTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                 ]);
+                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_lilacCuffTex);
             }
         }
 

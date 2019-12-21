@@ -295,7 +295,7 @@ default
     // ----------------------------------------------------------------------------------------
     listen(integer chan, string name, key id, string mesg)
     {
-        if (chan == getAvChannel(llGetOwner())) // Process RRDC cuff specific commands.
+        if (chan == getAvChannel(llGetOwner()) && llGetOwnerKey(id) != id) // Process RRDC commands.
         {
             list l = llParseString2List(mesg, [" "], []);
             if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
@@ -341,6 +341,12 @@ default
                         llList2String(l, 3) + " " +
                         llList2String(l, 4) + " " + name
                     );
+                }
+                else if (name == "settexture") // settexture <tag> <uuid>
+                {
+                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                        PRIM_TEXTURE, 1, llList2String(l, 2), <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                    ]);
                 }
             }
         }
