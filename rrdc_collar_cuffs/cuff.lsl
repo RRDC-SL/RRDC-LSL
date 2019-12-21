@@ -83,16 +83,7 @@ outerParticles(integer on)
     
     if(!on) // If LG particles should be turned off, turn them off and reset defaults.
     {
-        llParticleSystem([]); // Stop particle system.
-
-        g_curPartTex        = g_partTex;        // Set defaults and clear target.
-        g_curPartSizeX      = g_partSizeX;
-        g_curPartSizeY      = g_partSizeY;
-        g_curPartLife       = g_partLife;
-        g_curPartGravity    = g_partGravity;
-        g_curPartColor      = g_partColor;
-        g_curPartRate       = g_partRate;
-        g_curPartFollow     = g_partFollow;
+        llLinkParticleSystem(g_outerLink, []); // Stop particle system and clear target.
         g_outerPartTarget   = NULL_KEY;
     }
     else // If LG particles are to be turned on, turn them on.
@@ -135,7 +126,7 @@ innerParticles(integer on)
 
     if (!on) // Turn inner particle system off.
     {
-        llParticleSystem([]); // Stop particle system and clear target.
+        llLinkParticleSystem(g_innerLink, []); // Stop particle system and clear target.
         g_innerPartTarget   = NULL_KEY;
     }
     else // Turn the inner particle system on.
@@ -189,8 +180,6 @@ default
     // ----------------------------------------------------------------------------------------
     state_entry()
     {
-        outerParticles(FALSE); // Stop any particles from LockGuard effects and init.
-
         integer i; // Find the emitter links.
         string tag;
         for (i = 1; i <= llGetNumberOfPrims(); i++)
@@ -268,6 +257,18 @@ default
             llOwnerSay("FATAL: Unknown anchor and/or missing chain emitters!");
             return;
         }
+
+        g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
+        g_curPartSizeX      = g_partSizeX;
+        g_curPartSizeY      = g_partSizeY;
+        g_curPartLife       = g_partLife;
+        g_curPartGravity    = g_partGravity;
+        g_curPartColor      = g_partColor;
+        g_curPartRate       = g_partRate;
+        g_curPartFollow     = g_partFollow;
+
+        innerParticles(FALSE); // Stop any particle effects and init.
+        outerParticles(FALSE);
 
         llListen(-8888,"",NULL_KEY,""); // Open up LockGuard and Lockmeister listens.
         llListen(-9119,"",NULL_KEY,"");
@@ -378,6 +379,15 @@ default
                     }
                     else if(name == "unlink")
                     {
+                        g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
+                        g_curPartSizeX      = g_partSizeX;
+                        g_curPartSizeY      = g_partSizeY;
+                        g_curPartLife       = g_partLife;
+                        g_curPartGravity    = g_partGravity;
+                        g_curPartColor      = g_partColor;
+                        g_curPartRate       = g_partRate;
+                        g_curPartFollow     = g_partFollow;
+
                         outerParticles(FALSE);
                         tList = [];
                         return;
