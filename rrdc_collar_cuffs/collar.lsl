@@ -75,6 +75,13 @@ string getAnimVersion(integer toggle)
     return "a";
 }
 
+// inRange - Returns TRUE if the object is less than 6m from our position.
+// ---------------------------------------------------------------------------------------------------------
+integer inRange(key object)
+{
+    return (llVecDist(llGetPos(), llList2Vector(llGetObjectDetails(user, [OBJECT_POS]), 0)) < 6.0);
+}
+
 // showMenu - Given a menu name string, shows the appropriate menu.
 // ---------------------------------------------------------------------------------------------------------
 showMenu(string menu, key user)
@@ -127,7 +134,7 @@ showMenu(string menu, key user)
         //
         // Inmate Menu.
         // -----------------------------------------------
-        // CharSheet (just offer the char sheet?)
+        // CharSheet
 
         text = "Main Menu" + text;
 
@@ -137,13 +144,21 @@ showMenu(string menu, key user)
                        "Leash",     "Chain Gang", "Shackle Link",
                        "CharSheet", "Poses",      "Ankle Chain"];
         }
-        else if (llVecDist(llGetPos(), // Shock option only available if within 6m.
-                 llList2Vector(llGetObjectDetails(user, [OBJECT_POS]), 0)) < 6.0)
+        else if (inRange(user))
         {
             buttons = ["Cuff To",   " ",          "Close", 
                        "Leash",     "Chain Gang", "Shackle Link",
                        "CharSheet", "Poses",      "Ankle Chain"];
         }
+        else
+        {
+            buttons = ["CharSheet"];
+        }
+    }
+    else if (menu == "poses")
+    {
+        text = "Pose Selection Menu" + text;
+        buttons = [" ", " ", "↺ Main", "Back U", "Release", "ComboSet", "Front X", "Front V", "Back V"];
     }
     else if (menu == "textures")
     {
@@ -272,30 +287,32 @@ default
                 llInstantMessage(id, g_noNoteMesg);
             }
         }
-        else if (mesg == "Shock" && (llVecDist(llGetPos(), // Deliver shock. Locks av in place momentarily.
-                 llList2Vector(llGetObjectDetails(id, [OBJECT_POS]), 0)) < 6.0))
+        else if (inRange(id)) // Only parse these options if we're in range.
         {
-            llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                " just activated your shock collar!");
+            if (mesg == "Shock")
+            {
+                llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                    " just activated your shock collar!");
 
-            llSetTimerEvent(0.0);
-            llTakeControls(
-                            CONTROL_FWD |
-                            CONTROL_BACK |
-                            CONTROL_LEFT |
-                            CONTROL_RIGHT |
-                            CONTROL_ROT_LEFT |
-                            CONTROL_ROT_RIGHT |
-                            CONTROL_UP |
-                            CONTROL_DOWN |
-                            CONTROL_LBUTTON |
-                            CONTROL_ML_LBUTTON,
-                            TRUE, FALSE
-            );
-            llStartAnimation(g_zapAnim);
-            llLoopSound(g_zapLoopSound, 0.5);
-            g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
-            llSetTimerEvent(0.2);
+                llSetTimerEvent(0.0);
+                llTakeControls(
+                                CONTROL_FWD |
+                                CONTROL_BACK |
+                                CONTROL_LEFT |
+                                CONTROL_RIGHT |
+                                CONTROL_ROT_LEFT |
+                                CONTROL_ROT_RIGHT |
+                                CONTROL_UP |
+                                CONTROL_DOWN |
+                                CONTROL_LBUTTON |
+                                CONTROL_ML_LBUTTON,
+                                TRUE, FALSE
+                );
+                llStartAnimation(g_zapAnim);
+                llLoopSound(g_zapLoopSound, 0.5);
+                g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
+                llSetTimerEvent(0.2);
+            }
         }
         else if (id == llGetOwner()) // Texture commands are owner locked.
         {
