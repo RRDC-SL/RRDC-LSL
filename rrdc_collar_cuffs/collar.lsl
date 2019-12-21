@@ -79,7 +79,7 @@ string getAnimVersion(integer toggle)
 // ---------------------------------------------------------------------------------------------------------
 integer inRange(key object)
 {
-    return (llVecDist(llGetPos(), llList2Vector(llGetObjectDetails(user, [OBJECT_POS]), 0)) < 6.0);
+    return (llVecDist(llGetPos(), llList2Vector(llGetObjectDetails(object, [OBJECT_POS]), 0)) < 6.0);
 }
 
 // showMenu - Given a menu name string, shows the appropriate menu.
