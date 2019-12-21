@@ -282,7 +282,7 @@ default
     // ---------------------------------------------------------------------------------------------------------
     timer()
     {
-        if (g_animList != []) // Persistent AO.
+        if (g_animList != []) // Persistent AO (0.2 seconds).
         {
             g_animToggle = !g_animToggle;
 
@@ -320,9 +320,9 @@ default
             );
         }
 
-        if (g_ledCount++ >= 4) // Trigger every 1.0 seconds.
+        if (g_ledCount++ >= 4) // Blinking LED effects (1.0 seconds).
         {
-            if (g_ledState = !g_ledState) // Blinking LED effects.
+            if (g_ledState = !g_ledState) 
             {
                 llSetLinkPrimitiveParamsFast(g_ledLink, [
                     PRIM_COLOR, ALL_SIDES, <0.3, 0.0, 0.0>, llGetAlpha(0), 
