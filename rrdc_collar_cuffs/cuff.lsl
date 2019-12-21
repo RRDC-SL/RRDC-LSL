@@ -22,7 +22,7 @@ float   g_partLife          = 1.2;              // How long each particle 'lives
 float   g_partGravity       = 0.3;              // How much gravity affects the particles.
 vector  g_partColor         = <1.0, 1.0, 1.0>;  // Color of the particles.
 float   g_partRate          = 0.01;             // Interval between particle bursts.
-integer g_partFollow        = 0;                // Particles move relative to the emitter.
+integer g_partFollow        = 1;                // Particles move relative to the emitter.
 
 // ========================================================================================
 // CAUTION: Modifying anything below this line may cause issues. Edit at your own risk!
@@ -35,10 +35,13 @@ float   g_curPartGravity;                       // Current particle gravity.
 vector  g_curPartColor;                         // Current particle color.
 float   g_curPartRate;                          // Current particle rate.
 integer g_curPartFollow;                        // Current particle follow flag.
-integer g_particlesOn;                          // If TRUE, LG particles are on.
-string  g_partTarget;                           // Key of the target prim for LG.
+integer g_outerPartOn;                          // If TRUE, outerLink particles are on.
+integer g_innerPartOn;                          // If TRUE, innerLink particles are on.
+string  g_outerPartTarget;                      // Key of the target prim for LG/outer.
+string  g_innerPartTarget;                      // Key of the target prim for inner.
 integer g_outerLink;                            // Link number of the outer/LGLM emitter.
 integer g_innerLink;                            // Link number of the inner emitter.
+integer g_particleMode;                         // FALSE = LG/LM, TRUE = Intercuff.
 list    g_LGTags;                               // List of current LockGuard tags.
 list    g_LMTags;                               // List of current LockMeister tags.
 // ========================================================================================
@@ -76,7 +79,7 @@ float fMax(float f1, float f2)
 // ----------------------------------------------------------------------------------------
 outerParticles(integer on)
 {
-    g_particlesOn = on; // Save the state we passed in.
+    g_outerPartOn = on; // Save the state we passed in.
     
     if(!on) // If LG particles should be turned off, turn them off and reset defaults.
     {
@@ -90,7 +93,7 @@ outerParticles(integer on)
         g_curPartColor      = g_partColor;
         g_curPartRate       = g_partRate;
         g_curPartFollow     = g_partFollow;
-        g_partTarget        = NULL_KEY;
+        g_outerPartTarget   = NULL_KEY;
     }
     else // If LG particles are to be turned on, turn them on.
     {
@@ -118,9 +121,65 @@ outerParticles(integer on)
             PSYS_PART_START_COLOR,      g_curPartColor,
             PSYS_PART_START_SCALE,      <g_curPartSizeX, g_curPartSizeY, 0.0>,
             PSYS_SRC_ACCEL,             <0.0, 0.0, (g_curPartGravity * -1.0)>,
-            PSYS_SRC_TARGET_KEY,        (key)g_partTarget,
+            PSYS_SRC_TARGET_KEY,        (key)g_outerPartTarget,
             PSYS_PART_FLAGS,            nBitField
         ]);
+    }
+}
+
+// innerParticles - Turns inner chain/rope particles on or off.
+// ----------------------------------------------------------------------------------------
+innerParticles(integer on)
+{
+    g_innerPartOn = on;
+
+    if (!on) // Turn inner particle system off.
+    {
+        llParticleSystem([]); // Stop particle system and clear target.
+        g_innerPartTarget   = NULL_KEY;
+    }
+    else // Turn the inner particle system on.
+    {
+        // Particle bitfield defaults.
+        integer nBitField = (PSYS_PART_TARGET_POS_MASK | PSYS_PART_FOLLOW_VELOCITY_MASK);
+    
+        if(g_partGravity == 0) // Add linear mask if gravity is not zero.
+        {
+            nBitField = (nBitField | PSYS_PART_TARGET_LINEAR_MASK);
+        }
+
+        if(g_partFollow) // Add follow mask if flag is set.
+        {
+            nBitField = (nBitField | PSYS_PART_FOLLOW_SRC_MASK);
+        }
+        
+        llLinkParticleSystem(g_innerLink,
+        [
+            PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_DROP,
+            PSYS_SRC_BURST_PART_COUNT,  1,
+            PSYS_SRC_MAX_AGE,           0.0,
+            PSYS_PART_MAX_AGE,          g_partLife,
+            PSYS_SRC_BURST_RATE,        g_partRate,
+            PSYS_SRC_TEXTURE,           g_partTex,
+            PSYS_PART_START_COLOR,      g_partColor,
+            PSYS_PART_START_SCALE,      <g_partSizeX, g_partSizeY, 0.0>,
+            PSYS_SRC_ACCEL,             <0.0, 0.0, (g_partGravity * -1.0)>,
+            PSYS_SRC_TARGET_KEY,        (key)g_innerPartTarget,
+            PSYS_PART_FLAGS,            nBitField
+        ]);
+    }
+}
+
+// toggleMode - Controls particle system when changing between LG/LM and Interlink.
+// ----------------------------------------------------------------------------------------
+toggleMode(integer mode)
+{
+    if (g_particleMode != mode) // If the mode actually changed.
+    {
+        outerParticles(FALSE); // Clear all particles.
+        innerParticles(FALSE);
+
+        g_particleMode = mode; // Toggle mode.
     }
 }
 
@@ -257,6 +316,7 @@ default
         {
             if(llListFindList(g_LMTags, [llGetSubString(mesg, 36, -1)]) > -1)
             {
+                toggleMode(FALSE);
                 llRegionSayTo(id, -8888, mesg + " ok");
             }
             else if (llGetSubString(mesg, 36, 54) == "|LMV2|RequestPoint|" &&      // LMV2.
@@ -280,7 +340,8 @@ default
                     name = llList2String(tList, i);
                     if(name == "link")
                     {
-                        g_partTarget = llList2Key(tList, (i + 1));
+                        toggleMode(FALSE);
+                        g_outerPartTarget = llList2Key(tList, (i + 1));
                         outerParticles(TRUE);
                         i += 2;
                     }
@@ -345,7 +406,7 @@ default
                     }
                     else if(name == "free")
                     {
-                        if(g_particlesOn)
+                        if(g_outerPartOn)
                         {
                             llRegionSayTo(id, -9119, "lockguard " + ((string)llGetOwner()) + " " + 
                                 llList2String(g_LGTags, 0) + " no"
@@ -365,7 +426,7 @@ default
                     }
                 }
                 
-                outerParticles(g_particlesOn); // Refresh particles.
+                outerParticles(g_outerPartOn); // Refresh particles.
             }
         }
     }
