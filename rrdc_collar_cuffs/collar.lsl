@@ -40,7 +40,6 @@ list    g_poseComboSet      = [ "cuffedArmsCollar001",                  // Arms 
 // ---------------------------------------------------------------------------------------------------------
 integer g_appChan           = -89039937; // The channel for this application set.
 integer g_useChainSteps     = TRUE;      // If FALSE, random chain steps are not played.
-string  g_curMenu           = "main";    // Tracks the current menu.
 list    g_animList          = [];        // List of currently playing (base) anim names.
 integer g_animToggle        = 0;         // 0 = A versions playing. 1 = B versions playing.
 integer g_powerCore;                     // Link number of the power core FX prim.
@@ -53,6 +52,7 @@ integer g_shockCount;                    // Tracks how long to keep shock active
 integer g_ankleChain;                    // If TRUE, ankle chain is active.
 integer g_isShackled;                    // If TRUE, wrist to ankle shackle chain active.
 integer g_leashedTo;                     // 0=Nothing,1=Collar,2=ChainGang,3=Cuffed.
+list    g_curMenus;                      // Tracks current menu by user.
 
 string  g_noNoteMesg        = "No character sheet is available."; // Display when no notecard.
 // ---------------------------------------------------------------------------------------------------------
@@ -79,23 +79,70 @@ string getAnimVersion(integer toggle)
 // ---------------------------------------------------------------------------------------------------------
 showMenu(string menu, key user)
 {
-    g_curMenu = menu; // Last menu memory.
+    integer i;
+    for (i = 0; i < llGetListLength(g_curMenus); i += 3) // Updating existing and remove old.
+    {
+        if (llList2Key(g_curMenus, i) == user)
+        {
+            if (menu == "") // Access last used menu if menu argument is empty.
+            {
+                menu = llList2String(g_curMenus, (i + 2));
+            }
+
+            g_curMenus = llListReplaceList(g_curMenus, [(string)llGetTime(), menu], (i + 1), (i + 2));
+        }
+        else if (llList2Key(g_curMenus, i) != llGetOwner() &&
+                 (llGetTime() - llList2Float(g_curMenus, (i + 1))) > 60.0)
+        {
+            g_curMenus = llDeleteSubList(g_curMenus, i, (i + 2));
+            i -= 3;
+        }
+    }
+
+    if (menu == "") // Ensure we always have a menu name.
+    {
+        menu = "main";
+    }
+
+    if (llListFindList(g_curMenus, [(string)user]) <= -1) // Add user if they are new.
+    {
+        g_curMenus += [(string)user, (string)llGetTime(), menu];
+    }
 
     string text = "\n\nChoose an option:";
     list buttons = [];
     if (menu == "main") // Show main menu.
     {
+        // Wearer Menu.
+        // -----------------------------------------------
+        // CharSheet        Poses           Ankle Chain
+        // Leash            Chain Gang      Shackle Link
+        // Cuff To          Sounds          Textures
+        //
+        // Staff Menu.
+        // -----------------------------------------------
+        // CharSheet        Poses           Ankle Chain
+        // Leash            Chain Gang      Shackle Link
+        // Cuff To                          Close
+        //
+        // Inmate Menu.
+        // -----------------------------------------------
+        // CharSheet (just offer the char sheet?)
+
         text = "Main Menu" + text;
-        buttons = ["CharSheet"];
 
         if (user == llGetOwner())
         {
-            buttons += ["Shock", "Textures"];
+            buttons = ["Cuff To",   "Sounds",     "Textures", 
+                       "Leash",     "Chain Gang", "Shackle Link",
+                       "CharSheet", "Poses",      "Ankle Chain"];
         }
         else if (llVecDist(llGetPos(), // Shock option only available if within 6m.
                  llList2Vector(llGetObjectDetails(user, [OBJECT_POS]), 0)) < 6.0)
         {
-            buttons += ["Shock"];
+            buttons = ["Cuff To",   " ",          "Close", 
+                       "Leash",     "Chain Gang", "Shackle Link",
+                       "CharSheet", "Poses",      "Ankle Chain"];
         }
     }
     else if (menu == "textures")
@@ -294,7 +341,7 @@ default
             }
         }
 
-        showMenu(g_curMenu, id); // Reshow current menu.
+        showMenu("", id); // Reshow current menu. Whitespace menu items end up here.
     }
 
     // Controls timed effects such as blinking light and shock.
