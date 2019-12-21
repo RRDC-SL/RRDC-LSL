@@ -12,7 +12,7 @@ Sub-projects are organized into directories. Not all sub-projects are used.
 3. For each object, go through every prim in the linkset and copy any contents to your inventory.
     * After copying the contents, delete them from the prim.
 
-4. Rename the following animations to make them consistent with the naming scheme.
+4. Rename the following animations to make them consistent with the naming scheme:
     * Rename 'cuffedArmsCollar001' to 'cuffedArmsCollar001a'.
     * Rename 'cuffedNeckForward001' to 'cuffedNeckForward001a'.
     
