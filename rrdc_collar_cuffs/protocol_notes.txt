@@ -17,3 +17,5 @@ link            -   [From: Any. To: Collar|Cuff] Links given cuff to the object 
                     
 unlink          -   [From: Any. To: Collar|Cuff] Unlinks a given cuff from whatever.
                     unlink <tag> <inner|outer>
+
+*Note: Tags follow the LockGuard schema.

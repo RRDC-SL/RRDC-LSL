@@ -298,7 +298,7 @@ default
         if (chan == getAvChannel(llGetOwner())) // Process RRDC cuff specific commands.
         {
             list l = llParseString2List(mesg, [" "], []);
-            if (llListFindList(g_LMTags, [llList2String(l, 1)]) > -1) // LM tagh match.
+            if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
             {
                 name = llToLower(llList2String(l, 0));
                 if (name == "unlink") // unlink <tag> <inner|outer>
