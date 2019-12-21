@@ -122,15 +122,16 @@ showMenu(string menu, key user)
     {
         // Wearer Menu.
         // -----------------------------------------------
-        // CharSheet        Poses           Ankle Chain
-        // Leash            Chain Gang      Shackle Link
-        // Cuff To          Sounds          Textures
+        // CharSheet        Shock           Poses
+        // Ankle Chain      Chain Gang      Shackle Link
+        // Cuff To          Grab Leash      Leash To
+        // Textures         Sounds          Close
         //
         // Staff Menu.
         // -----------------------------------------------
-        // CharSheet        Poses           Ankle Chain
-        // Leash            Chain Gang      Shackle Link
-        // Cuff To                          Close
+        // CharSheet        Shock           Poses
+        // Ankle Chain      Chain Gang      Shackle Link
+        // Cuff To          Grab Leash      Leash To
         //
         // Inmate Menu.
         // -----------------------------------------------
@@ -140,15 +141,16 @@ showMenu(string menu, key user)
 
         if (user == llGetOwner())
         {
-            buttons = ["Cuff To",   "Sounds",     "Textures", 
-                       "Leash",     "Chain Gang", "Shackle Link",
-                       "CharSheet", "Poses",      "Ankle Chain"];
+            buttons = ["Textures",    "Sounds",     "Close",
+                       "Cuff To",     "Grab Leash", "Leash To",
+                       "Ankle Chain", "Chain Gang", "Shackle Link",
+                       "CharSheet",   "Shock",      "Poses"];
         }
         else if (inRange(user))
         {
-            buttons = ["Cuff To",   " ",          "Close", 
-                       "Leash",     "Chain Gang", "Shackle Link",
-                       "CharSheet", "Poses",      "Ankle Chain"];
+            buttons = ["Cuff To",     "Grab Leash", "Leash To",
+                       "Ankle Chain", "Chain Gang", "Shackle Link",
+                       "CharSheet",   "Shock",      "Poses"];
         }
         else
         {
@@ -287,7 +289,7 @@ default
                 llInstantMessage(id, g_noNoteMesg);
             }
         }
-        else if (inRange(id)) // Only parse these options if we're in range.
+        else if (inRange(id) || id == llGetOwner()) // Only parse these options if we're in range or wearer.
         {
             if (mesg == "Shock")
             {
@@ -313,51 +315,50 @@ default
                 g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
                 llSetTimerEvent(0.2);
             }
+            else if (id == llGetOwner()) // Texture commands are owner locked.
+            {
+                if (mesg == "Textures") // Texture select.
+                {
+                    showMenu("textures", id);
+                    return;
+                }
+                else if (mesg == "Blue") // Set textures.
+                {
+                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                        PRIM_TEXTURE, 0, g_blueTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                    ]);
+                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blueCuffTex);
+                }
+                else if (mesg == "Black")
+                {
+                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                        PRIM_TEXTURE, 0, g_blackTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                    ]);
+                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blackCuffTex);
+                }
+                else if (mesg == "White")
+                {
+                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                        PRIM_TEXTURE, 0, g_whiteTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                    ]);
+                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_whiteCuffTex);
+                }
+                else if (mesg == "Orange")
+                {
+                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                        PRIM_TEXTURE, 0, g_orangeTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                    ]);
+                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_orangeCuffTex);
+                }
+                else if (mesg == "Lilac")
+                {
+                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                        PRIM_TEXTURE, 0, g_lilacTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                    ]);
+                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_lilacCuffTex);
+                }
+            }
         }
-        else if (id == llGetOwner()) // Texture commands are owner locked.
-        {
-            if (mesg == "Textures") // Texture select.
-            {
-                showMenu("textures", id);
-                return;
-            }
-            else if (mesg == "Blue") // Set textures.
-            {
-                llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                    PRIM_TEXTURE, 0, g_blueTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                ]);
-                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blueCuffTex);
-            }
-            else if (mesg == "Black")
-            {
-                llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                    PRIM_TEXTURE, 0, g_blackTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                ]);
-                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blackCuffTex);
-            }
-            else if (mesg == "White")
-            {
-                llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                    PRIM_TEXTURE, 0, g_whiteTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                ]);
-                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_whiteCuffTex);
-            }
-            else if (mesg == "Orange")
-            {
-                llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                    PRIM_TEXTURE, 0, g_orangeTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                ]);
-                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_orangeCuffTex);
-            }
-            else if (mesg == "Lilac")
-            {
-                llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                    PRIM_TEXTURE, 0, g_lilacTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                ]);
-                llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_lilacCuffTex);
-            }
-        }
-
         showMenu("", id); // Reshow current menu. Whitespace menu items end up here.
     }
 
