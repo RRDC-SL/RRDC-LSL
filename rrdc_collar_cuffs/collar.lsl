@@ -38,17 +38,21 @@ list    g_poseComboSet      = [ "cuffedArmsCollar001",                  // Arms 
 
 // State Variables.
 // ---------------------------------------------------------------------------------------------------------
+integer g_appChan           = -89039937; // The channel for this application set.
+integer g_useChainSteps     = TRUE;      // If FALSE, random chain steps are not played.
+string  g_curMenu           = "main";    // Tracks the current menu.
+list    g_animList          = [];        // List of currently playing (base) anim names.
+integer g_animToggle        = 0;         // 0 = A versions playing. 1 = B versions playing.
 integer g_powerCore;                     // Link number of the power core FX prim.
 integer g_leashingPoint;                 // Link number of the leashing point prim.
 integer g_shacklesPoint;                 // Link number of the chain to shackles point prim.
 integer g_ledLink;                       // Link number of the LED light.
 integer g_ledState;                      // Tracks the current on-off state of the LED.
+integer g_ledCount;                      // Tracks how long to wait to blink LED.
 integer g_shockCount;                    // Tracks how long to keep shock active.
-integer g_ledCount          = 0;         // Tracks how long to wait to blink LED.
-integer g_appChan           = -89039937; // The channel for this application set.
-string  g_curMenu           = "main";    // Tracks the current menu.
-list    g_animList          = [];        // List of currently playing (base) anim names.
-integer g_animToggle        = 0;         // 0 = A versions playing. 1 = B versions playing.
+integer g_ankleChain;                    // If TRUE, ankle chain is active.
+integer g_isShackled;                    // If TRUE, wrist to ankle shackle chain active.
+integer g_leashedTo;                     // 0=Nothing,1=Collar,2=ChainGang,3=Cuffed.
 
 string  g_noNoteMesg        = "No character sheet is available."; // Display when no notecard.
 // ---------------------------------------------------------------------------------------------------------
@@ -355,6 +359,23 @@ default
             }
             g_ledCount = 0;
         }
-        
+    }
+
+    // Controls random chain sound effects.
+    // ---------------------------------------------------------------------------------------------------------
+    moving_start()
+    {
+        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashedTo))
+        {
+            llTriggerSound(llList2String(g_chainSteps, (integer)llFrand(llGetListLength(g_chainSteps))), 0.2);
+        }
+    }
+
+    moving_end()
+    {
+        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashedTo))
+        {
+            llTriggerSound(llList2String(g_chainSteps, (integer)llFrand(llGetListLength(g_chainSteps))), 0.2);
+        }
     }
 }
