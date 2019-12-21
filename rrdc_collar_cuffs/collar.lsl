@@ -32,6 +32,8 @@ integer g_shockCount;                    // Tracks how long to keep shock active
 integer g_ledCount          = 0;         // Tracks how long to wait to blink LED.
 integer g_appChan           = -89039937; // The channel for this application set.
 string  g_curMenu           = "main";    // Tracks the current menu.
+list    g_animList          = [];        // List of currently playing (base) anim names.
+integer g_animToggle        = 0;         // 0 = A versions playing. 1 = B versions playing.
 
 string  g_noNoteMesg        = "No character sheet is available."; // Display when no notecard.
 // ---------------------------------------------------------------------------------------------------------
@@ -41,6 +43,17 @@ string  g_noNoteMesg        = "No character sheet is available."; // Display whe
 integer getAvChannel(key av)
 {
     return (0x80000000 | ((integer)("0x"+(string)av) ^ g_appChan));
+}
+
+// getAnimVersion - Given a toggle state, returns the anim version as a string.
+// ---------------------------------------------------------------------------------------------------------
+string getAnimVersion(integer toggle)
+{
+    if (toggle)
+    {
+        return "b";
+    }
+    return "a";
 }
 
 // showMenu - Given a menu name string, shows the appropriate menu.
@@ -269,6 +282,18 @@ default
     // ---------------------------------------------------------------------------------------------------------
     timer()
     {
+        if (g_animList != []) // Persistent AO.
+        {
+            g_animToggle = !g_animToggle;
+
+            integer i;
+            for (i = 0; i < llGetListLength(g_animList); i++)
+            {
+                llStartAnimation(llList2String(g_animList, i) + getAnimVersion(g_animToggle));
+                llStopAnimation(llList2String(g_animList, i) + getAnimVersion(!g_animToggle));
+            }
+        }
+
         if (g_shockCount > 0) // Shock effects.
         {
             if (g_shockCount == 10) // Ending effect.
