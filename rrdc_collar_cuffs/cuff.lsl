@@ -297,19 +297,50 @@ default
         if (chan == getAvChannel(llGetOwner())) // Process RRDC cuff specific commands.
         {
             list l = llParseString2List(mesg, [" "], []);
-            name = llToLower(llList2String(l, 0));
-            if (name == "unlink") 
+            if (llListFindList(g_LMTags, [llList2String(l, 1)]) > -1) // LM tagh match.
             {
-                // unlink <inner|outer> <tag> - Stop particles from an emitter.
-            }
-            else if (name == "link")
-            {
-                // link <inner|outer> <tag> <uuid> - Draw particles to an object.
-            }
-            else if (name == "reqlink")
-            {
-                // reqlink <inner|outer> <from-tag> <inner|outer> <to-tag>
-                // - Request to draw particles from one emitter point to another.
+                name = llToLower(llList2String(l, 0));
+                if (name == "unlink") // unlink <tag> <inner|outer>
+                {
+                    if (llToLower(llList2String(l, 2)) == "inner")
+                    {
+                        innerParticles(FALSE);
+                    }
+                    else if (g_particleMode) // Outer.
+                    {
+                        outerParticles(FALSE);
+                    }
+                }
+                else if (name == "link") // link <tag> <inner|outer> <dest-uuid>
+                {
+                    toggleMode(TRUE);
+                    if (llToLower(llList2String(l, 2)) == "inner")
+                    {
+                        g_innerPartTarget = llList2Key(l, 3);
+                        innerParticles(TRUE);
+                    }
+                    else // Outer.
+                    {
+                        g_outerPartTarget = llList2Key(l, 3);
+                        outerParticles(TRUE);
+                    }
+                }       // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
+                else if (name == "linkrequest")
+                {
+                    if (llToLower(llList2String(l, 2)) == "inner") // Get the link UUID.
+                    {
+                        name = (string)llGetLinkKey(g_innerLink);
+                    }
+                    else // Outer.
+                    {
+                        name = (string)llGetLinkKey(g_outerLink);
+                    }
+
+                    llWhisper(getAvChannel(llGetOwner()), "link " + // Send link message.
+                        llList2String(l, 3) + " " +
+                        llList2String(l, 4) + " " + name
+                    );
+                }
             }
         }
         else if(chan == -8888 && llGetSubString(mesg, 0, 35) == ((string)llGetOwner())) // Process LM.
