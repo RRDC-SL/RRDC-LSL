@@ -583,7 +583,7 @@ state main
                             g_shacklePartTarget = llList2Key(l, 3);
                             shackleParticles(TRUE);
                         }
-                        else // Outer.
+                        else // Leash.
                         {
                             g_leashPartTarget = llList2Key(l, 3);
                             leashParticles(TRUE);
@@ -595,7 +595,7 @@ state main
                         {
                             name = (string)llGetLinkKey(g_shackleLink);
                         }
-                        else // Outer.
+                        else // Leash.
                         {
                             name = (string)llGetLinkKey(g_leashLink);
                         }
@@ -703,42 +703,42 @@ state main
                 { // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
                     stopCurAnims();
                     g_animList = [g_poseBackU];
-                    // TODO: Unlink collar shackles point.
+                    shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
                 }
                 else if (mesg == "Back V")
                 {
                     stopCurAnims();
                     g_animList = [g_poseBackV];
-                    // TODO: Unlink collar shackles point.
+                    shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
                 else if (mesg == "Front X")
                 {
                     stopCurAnims();
                     g_animList = [g_poseFrontX];
-                    // TODO: Unlink collar shackles point.
+                    shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
                 }
                 else if (mesg == "Front V")
                 {
                     stopCurAnims();
                     g_animList = [g_poseFrontV];
-                    // TODO: Unlink collar shackles point.
+                    shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
                 else if (mesg == "ComboSet") // Combination two poses.
                 {
                     stopCurAnims();
                     g_animList = g_poseComboSet;
-                    // TODO: Link collar shackles point.
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest leftwrist inner collarfrontloop shackle");
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
                 else if (mesg == "Release") // Release from pose.
                 {
                     stopCurAnims();
-                    // TODO: Unlink collar shackles point.
-                    llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist inner"); // Unlink wrists.
+                    shackleParticles(FALSE);
+                    llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist inner");
                 }
                 else if (id == llGetOwner()) // Sound and texture commands are owner locked.
                 {
