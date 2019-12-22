@@ -21,4 +21,7 @@ unlink          -   [From: Any. To: Collar|Cuff] Unlinks a given cuff from whate
 settexture      -   [From: Collar. To: Cuff] Sets the metal texture of the cuff.
                     settexture <tag> <uuid>
 
+stopposes       -   [From: Cuffs. To: Collar] Tells the collar to stop playing poses.
+                    stopposes <tag>
+
 *Note: Tags follow the LockGuard schema.

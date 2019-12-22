@@ -238,7 +238,7 @@ default
     // -----------------------------------------------------------------------------------------------------
     state_entry()
     {
-        llSetMemoryLimit(llGetUsedMemory()+2048); // Limit memory for mono-compiled scripts.
+        llSetMemoryLimit(llGetUsedMemory()+4096); // Limit memory for mono-compiled scripts.
         llRequestPermissions(llGetOwner(), 
             (PERMISSION_TAKE_CONTROLS | PERMISSION_TRIGGER_ANIMATION)
         );
