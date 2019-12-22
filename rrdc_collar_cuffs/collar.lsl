@@ -5,6 +5,11 @@
 //  http://mozilla.org/MPL/2.0/.
 // =========================================================================================================
 
+// Modifiable Variables.
+// ---------------------------------------------------------------------------------------------------------
+integer g_appChan           = -89039937;        // The channel for this application set.
+integer g_useChainSteps     = TRUE;             // If FALSE, random chain steps are not played.
+
 // Assets.
 // ---------------------------------------------------------------------------------------------------------
 string  g_whiteTex          =   "aaff45c0-a0ef-c00d-58cb-bff31860d7be"; // RRDC_Collar_Metals_Diffuse_Wte.
@@ -17,6 +22,7 @@ string  g_orangeCuffTex     =   "ec94158c-2455-be49-a07d-7604be76c933"; // RRDC_
 string  g_lilacCuffTex      =   "93628600-5364-0a17-fcd8-e617ddd731e5"; // RRDC_Cuff_Diffuse_Lilac.
 string  g_blueCuffTex       =   "e84a056b-f95f-a0db-acf0-7354749bbc03"; // RRDC_Cuff_Diffuse_Blue.
 string  g_blackCuffTex      =   "04c857b4-78d1-8add-3d45-c134e70afa8f"; // RRDC_Cuff_Diffuse_Black.
+string  g_partTex           =   "dbeee6e7-4a63-9efe-125f-ceff36ceeed2"; // thinchain.
  
 string  g_zapLoopSound      =   "27a18333-a425-30b1-1ab6-c9a3a3554903"; // soundZapLoop.
 string  g_zapStopSound      =   "a4602ead-96f3-ee86-5e0f-63faeb1ed7cf"; // soundZapStop.
@@ -36,23 +42,50 @@ list    g_poseComboSet      = [ "cuffedArmsCollar001",                  // Arms 
                                 "cuffedNeckForward001"                  // Neck forward pose.
                               ];
 
+// Particle System Defaults. It is best not to mess with these.
+// ---------------------------------------------------------------------------------------------------------
+float   g_partSizeX         = 0.04;             // Particle size X-axis.
+float   g_partSizeY         = 0.04;             // Particle size Y-axis.
+float   g_partLife          = 1.2;              // How long each particle 'lives'.
+float   g_partGravity       = 0.3;              // How much gravity affects the particles.
+vector  g_partColor         = <1.0, 1.0, 1.0>;  // Color of the particles.
+float   g_partRate          = 0.01;             // Interval between particle bursts.
+integer g_partFollow        = 1;                // Particles move relative to the emitter.
+
+// =========================================================================================================
+// CAUTION: Modifying anything below this line may cause issues. Edit at your own risk!
+// =========================================================================================================
+string  g_curPartTex;                           // Current particle texture.
+float   g_curPartSizeX;                         // Current particle X size.
+float   g_curPartSizeY;                         // Current particle Y size.
+float   g_curPartLife;                          // Current particle life.
+float   g_curPartGravity;                       // Current particle gravity.
+vector  g_curPartColor;                         // Current particle color.
+float   g_curPartRate;                          // Current particle rate.
+integer g_curPartFollow;                        // Current particle follow flag.
+integer g_outerPartOn;                          // If TRUE, outerLink particles are on.
+integer g_innerPartOn;                          // If TRUE, innerLink particles are on.
+string  g_outerPartTarget;                      // Key of the target prim for LG/outer.
+string  g_innerPartTarget;                      // Key of the target prim for inner.
+integer g_outerLink;                            // Link number of the leashing point prim.
+integer g_innerLink;                            // Link number of the chain to shackles point prim.
+integer g_particleMode;                         // FALSE = LG/LM, TRUE = Intercuff.
+list    g_LGTags;                               // List of current LockGuard tags.
+list    g_LMTags;                               // List of current LockMeister tags.
+
 // State Variables.
 // ---------------------------------------------------------------------------------------------------------
-integer g_appChan           = -89039937; // The channel for this application set.
-integer g_useChainSteps     = TRUE;      // If FALSE, random chain steps are not played.
-list    g_animList          = [];        // List of currently playing (base) anim names.
-integer g_animToggle        = 0;         // 0 = A versions playing. 1 = B versions playing.
-integer g_powerCore;                     // Link number of the power core FX prim.
-integer g_leashingPoint;                 // Link number of the leashing point prim.
-integer g_shacklesPoint;                 // Link number of the chain to shackles point prim.
-integer g_ledLink;                       // Link number of the LED light.
-integer g_ledState;                      // Tracks the current on-off state of the LED.
-integer g_ledCount;                      // Tracks how long to wait to blink LED.
-integer g_shockCount;                    // Tracks how long to keep shock active.
-integer g_ankleChain;                    // If TRUE, ankle chain is active.
-integer g_isShackled;                    // If TRUE, wrist to ankle shackle chain active.
-integer g_leashedTo;                     // 0=Nothing,1=Collar,2=ChainGang,3=Cuffed.
-list    g_curMenus;                      // Tracks current menu by user.
+list    g_animList;                             // List of currently playing (base) anim names.
+integer g_animToggle;                           // 0 = A versions playing. 1 = B versions playing.
+integer g_powerLink;                            // Link number of the power core FX prim.
+integer g_ledLink;                              // Link number of the LED light.
+integer g_ledState;                             // Tracks the current on-off state of the LED.
+integer g_ledCount;                             // Tracks how long to wait to blink LED.
+integer g_shockCount;                           // Tracks how long to keep shock active.
+integer g_ankleChain;                           // If TRUE, ankle chain is active.
+integer g_isShackled;                           // If TRUE, wrist to ankle shackle chain active.
+integer g_leashMode;                            // 0=Nothing,1=Collar,2=ChainGang,3=Cuffed.
+list    g_curMenus;                             // Tracks current menu by user.
 // ---------------------------------------------------------------------------------------------------------
 
 // getAvChannel - Given an avatar key, returns a static channel XORed with g_appChan.
@@ -60,6 +93,28 @@ list    g_curMenus;                      // Tracks current menu by user.
 integer getAvChannel(key av)
 {
     return (0x80000000 | ((integer)("0x"+(string)av) ^ g_appChan));
+}
+
+// fMin - Given two floats, returns the smallest.
+// ---------------------------------------------------------------------------------------------------------
+float fMin(float f1, float f2)
+{
+    if (f2 < f1)
+    {
+        return f2;
+    }
+    return f1;
+}
+
+// fMax - Given two floats, returns the largest.
+// ---------------------------------------------------------------------------------------------------------
+float fMax(float f1, float f2)
+{
+    if (f2 > f1)
+    {
+        return f2;
+    }
+    return f1;
 }
 
 // inRange - Returns TRUE if the object is less than 6m from our position.
@@ -101,6 +156,105 @@ stopCurAnims()
     llSetTimerEvent(0.2); // Restart timer.
 
     playRandomSound();
+}
+
+// outerParticles - Turns outer/LockGuard chain/rope particles on or off.
+// ---------------------------------------------------------------------------------------------------------
+outerParticles(integer on)
+{
+    g_outerPartOn = on; // Save the state we passed in.
+    
+    if(!on) // If LG particles should be turned off, turn them off and reset defaults.
+    {
+        llLinkParticleSystem(g_outerLink, []); // Stop particle system and clear target.
+        g_outerPartTarget   = NULL_KEY;
+    }
+    else // If LG particles are to be turned on, turn them on.
+    {
+        // Particle bitfield defaults.
+        integer nBitField = (PSYS_PART_TARGET_POS_MASK | PSYS_PART_FOLLOW_VELOCITY_MASK);
+    
+        if(g_curPartGravity == 0) // Add linear mask if gravity is not zero.
+        {
+            nBitField = (nBitField | PSYS_PART_TARGET_LINEAR_MASK);
+        }
+
+        if(g_curPartFollow) // Add follow mask if flag is set.
+        {
+            nBitField = (nBitField | PSYS_PART_FOLLOW_SRC_MASK);
+        }
+        
+        llLinkParticleSystem(g_outerLink,
+        [
+            PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_DROP,
+            PSYS_SRC_BURST_PART_COUNT,  1,
+            PSYS_SRC_MAX_AGE,           0.0,
+            PSYS_PART_MAX_AGE,          g_curPartLife,
+            PSYS_SRC_BURST_RATE,        g_curPartRate,
+            PSYS_SRC_TEXTURE,           g_curPartTex,
+            PSYS_PART_START_COLOR,      g_curPartColor,
+            PSYS_PART_START_SCALE,      <g_curPartSizeX, g_curPartSizeY, 0.0>,
+            PSYS_SRC_ACCEL,             <0.0, 0.0, (g_curPartGravity * -1.0)>,
+            PSYS_SRC_TARGET_KEY,        (key)g_outerPartTarget,
+            PSYS_PART_FLAGS,            nBitField
+        ]);
+    }
+}
+
+// innerParticles - Turns inner chain/rope particles on or off.
+// ---------------------------------------------------------------------------------------------------------
+innerParticles(integer on)
+{
+    g_innerPartOn = on;
+
+    if (!on) // Turn inner particle system off.
+    {
+        llLinkParticleSystem(g_innerLink, []); // Stop particle system and clear target.
+        g_innerPartTarget   = NULL_KEY;
+    }
+    else // Turn the inner particle system on.
+    {
+        // Particle bitfield defaults.
+        integer nBitField = (PSYS_PART_TARGET_POS_MASK | PSYS_PART_FOLLOW_VELOCITY_MASK);
+    
+        if(g_partGravity == 0) // Add linear mask if gravity is not zero.
+        {
+            nBitField = (nBitField | PSYS_PART_TARGET_LINEAR_MASK);
+        }
+
+        if(g_partFollow) // Add follow mask if flag is set.
+        {
+            nBitField = (nBitField | PSYS_PART_FOLLOW_SRC_MASK);
+        }
+        
+        llLinkParticleSystem(g_innerLink,
+        [
+            PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_DROP,
+            PSYS_SRC_BURST_PART_COUNT,  1,
+            PSYS_SRC_MAX_AGE,           0.0,
+            PSYS_PART_MAX_AGE,          g_partLife,
+            PSYS_SRC_BURST_RATE,        g_partRate,
+            PSYS_SRC_TEXTURE,           g_partTex,
+            PSYS_PART_START_COLOR,      g_partColor,
+            PSYS_PART_START_SCALE,      <g_partSizeX, g_partSizeY, 0.0>,
+            PSYS_SRC_ACCEL,             <0.0, 0.0, (g_partGravity * -1.0)>,
+            PSYS_SRC_TARGET_KEY,        (key)g_innerPartTarget,
+            PSYS_PART_FLAGS,            nBitField
+        ]);
+    }
+}
+
+// toggleMode - Controls particle system when changing between LG/LM and Interlink.
+// ---------------------------------------------------------------------------------------------------------
+toggleMode(integer mode)
+{
+    if (g_particleMode != mode) // If the mode actually changed.
+    {
+        outerParticles(FALSE); // Clear all particles.
+        innerParticles(FALSE);
+
+        g_particleMode = mode; // Toggle mode.
+    }
 }
 
 // giveCharSheet - Gives a copy of the character sheet to the user, if present.
@@ -206,17 +360,17 @@ showMenu(string menu, key user)
             return;
         }
     }
-    else if (menu == "poses")
+    else if (menu == "poses") // Poses menu.
     {
         text = "Pose Selection Menu" + text;
         buttons = [" ", " ", "↺ Main", "Back U", "Release", "ComboSet", "Front X", "Front V", "Back V"];
     }
-    else if (menu == "textures")
+    else if (menu == "textures") // Textures menu.
     {
         text = "Texture Select Menu" + text;
         buttons = ["Blue", "Black", "↺ Main", "White", "Orange", "Lilac"];
     }
-    else if (menu == "sounds")
+    else if (menu == "sounds") // Sound settings menu.
     {
         text = "Walking Sound Effects Menu" + text + "\n\nCurrent setting: ";
         if (g_useChainSteps)
@@ -232,13 +386,12 @@ showMenu(string menu, key user)
     llDialog(user, text, buttons, getAvChannel(llGetOwner()));
 }
 
+// Make sure we have permissions before we allow anything to happen.
+// ---------------------------------------------------------------------------------------------------------
 default
 {
-    // Initialize collar in state_entry and run_time_permissions.
-    // -----------------------------------------------------------------------------------------------------
     state_entry()
     {
-        llSetMemoryLimit(llGetUsedMemory()+4096); // Limit memory for mono-compiled scripts.
         llRequestPermissions(llGetOwner(), 
             (PERMISSION_TAKE_CONTROLS | PERMISSION_TRIGGER_ANIMATION)
         );
@@ -248,62 +401,151 @@ default
     {
         if (perm & (PERMISSION_TAKE_CONTROLS | PERMISSION_TRIGGER_ANIMATION))
         {
-            // Set the texture anim for the electric effects on the collar base.
-            llSetLinkTextureAnim(LINK_THIS, ANIM_ON | LOOP, 2, 32, 32, 0.0, 64.0, 20.4);
-
-            integer i; // Find the prims we will work with.
-            for (i = 1; i <= llGetNumberOfPrims(); i++)
-            {
-                string name = llList2String(llGetLinkPrimitiveParams(i, [PRIM_NAME]), 0);
-                if (name == "powerCore")
-                {
-                    g_powerCore = i; // Also set texture anim for the power core.
-                    llSetLinkTextureAnim(i, ANIM_ON | LOOP, ALL_SIDES, 20, 20, 0.0, 64.0, 30.4);
-                }
-                else if (name == "LED")
-                {
-                    g_ledLink = i;
-                }
-                else if (name == "leashingPoint")
-                {
-                    g_leashingPoint = i;
-                }
-                else if (name == "chainToShacklesPoint")
-                {
-                    g_shacklesPoint = i;
-                }
-            }
-
-            llTakeControls( // Initial take of controls in passthrough, just to be safe.
-                            CONTROL_FWD |
-                            CONTROL_BACK |
-                            CONTROL_LEFT |
-                            CONTROL_RIGHT |
-                            CONTROL_ROT_LEFT |
-                            CONTROL_ROT_RIGHT |
-                            CONTROL_UP |
-                            CONTROL_DOWN |
-                            CONTROL_LBUTTON |
-                            CONTROL_ML_LBUTTON,
-                            FALSE, TRUE
-            );
-
-            // Start listening for menu.
-            llListen(getAvChannel(llGetOwner()), "", "", "");
-            llSetTimerEvent(0.2); // Start the timer.
+            state main;
         }
     }
+}
 
-    // Reacquire permissions on rez. Don't do a full reset/init.
-    // ---------------------------------------------------------------------------------------------------------
-    on_rez(integer s)
+// Main state is where everything happens once we have perms.
+// ---------------------------------------------------------------------------------------------------------
+state main
+{
+    // Initialize collar.
+    // -----------------------------------------------------------------------------------------------------
+    state_entry()
     {
-        llRequestPermissions(llGetOwner(), 
-            (PERMISSION_TAKE_CONTROLS | PERMISSION_TRIGGER_ANIMATION)
+        // Set the texture anim for the electric effects on the collar base.
+        llSetLinkTextureAnim(LINK_THIS, ANIM_ON | LOOP, 2, 32, 32, 0.0, 64.0, 20.4);
+
+        integer i; // Find the prims we will work with.
+        string tag;
+        for (i = 1; i <= llGetNumberOfPrims(); i++)
+        {
+            tag = llList2String(llGetLinkPrimitiveParams(i, [PRIM_NAME]), 0);
+            if (tag == "powerCore")
+            {
+                g_powerLink = i; // Also set texture anim for the power core.
+                llSetLinkTextureAnim(i, ANIM_ON | LOOP, ALL_SIDES, 20, 20, 0.0, 64.0, 30.4);
+            }
+            else if (tag == "LED")
+            {
+                g_ledLink = i;
+            }
+            else if (tag == "leashingPoint")
+            {
+                g_outerLink = i;
+            }
+            else if (tag == "chainToShacklesPoint")
+            {
+                g_innerLink = i;
+            }
+        }
+
+        // Parse the description field for potential LM tags.
+        list l = llParseString2List(llGetObjectDesc(),[":"],[]);
+        
+        if(l == []) // If we have ZERO config information, make a guess based on attach point.
+        {
+            l = llList2List(["","collar","thead","lblade","rblade","lhand","rhand","llcuff",
+                            "rlcuff","collar","pelvis","lbit","rbit","","","","","nose",
+                            "rbiceps","rcuff","lbiceps","lcuff","rfbelt","rtigh","rlcuff",
+                            "lfbelt","ltigh","llcuff","fbelt","lnipple","rnipple","","","",
+                            "","","","","","collar","fbelt"],
+                llGetAttached(),llGetAttached());
+        }
+
+        // List of Lockmeister IDs which have LockGuard equivalents.
+        // ------------------------------------------------------------------------------------
+        list lmID = ["rcuff","rbiceps","lbiceps","lcuff","lblade","rblade","rnipple",
+                    "lnipple","rtigh","ltigh","rlcuff","llcuff","pelvis","fbelt","bbelt",
+                    "rcollar","lcollar","thead","collar","lbit","rbit","nose","bcollar",
+                    "back"];
+
+        // List of LockGuard IDs which correspond to the Lockmeister IDs.
+        //  Multiples are separated by a bar |.
+        // ------------------------------------------------------------------------------------
+        list lgID = ["rightwrist|wrists|allfour","rightupperarm|arms","leftupperarm|arms",
+                    "leftwrist|wrists|allfour","harnessleftshoulderloop",
+                    "harnessrightshoulderloop","rightnipplering|nipples",
+                    "leftnipplering|nipples","rightupperthigh|thighs","leftupperthigh|thighs",
+                    "rightankle|ankles|allfour","leftankle|ankles|allfour",
+                    "clitring|cockring|ballring","frontbeltloop","backbeltloop",
+                    "collarrightloop","collarleftloop","topheadharness", "collarfrontloop",
+                    "leftgag","rightgag","nosering","collarbackloop","harnessbackloop"];
+        
+        integer j; // Parse all the LM tags found.
+        list tList;
+        for(i = 0; i < llGetListLength(l); i++)
+        {
+            tag = llToLower(llStringTrim(llList2String(l,i), STRING_TRIM)); // Clean tag name.
+            
+            j = llListFindList(lmID, [tag]);
+            if (j > -1) // LM tag. Add if not already present.
+            {
+                if (llListFindList(g_LMTags, [tag]) <= -1)
+                {
+                    g_LMTags += [tag];
+                }
+
+                // Add corresponding LG tags, if not present.
+                tList = llParseString2List(llList2String(lgID, j), ["|"], []);
+                if (llListFindList(g_LGTags, [llList2String(tList, 0)]) <= -1)
+                {
+                    g_LGTags += tList;
+                }
+            }
+        }
+
+        llSetMemoryLimit(llGetUsedMemory() + 2048); // Limit script memory consumption.
+
+        if (g_LMTags == [] || g_innerLink <= 0 || g_outerLink <= 0)
+        {
+            llOwnerSay("FATAL: Unknown anchor and/or missing chain emitters!");
+            return;
+        }
+
+        g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
+        g_curPartSizeX      = g_partSizeX;
+        g_curPartSizeY      = g_partSizeY;
+        g_curPartLife       = g_partLife;
+        g_curPartGravity    = g_partGravity;
+        g_curPartColor      = g_partColor;
+        g_curPartRate       = g_partRate;
+        g_curPartFollow     = g_partFollow;
+
+        innerParticles(FALSE); // Stop any particle effects and init.
+        outerParticles(FALSE);
+
+        llTakeControls( // Initial take of controls in passthrough, just to be safe.
+                        CONTROL_FWD |
+                        CONTROL_BACK |
+                        CONTROL_LEFT |
+                        CONTROL_RIGHT |
+                        CONTROL_ROT_LEFT |
+                        CONTROL_ROT_RIGHT |
+                        CONTROL_UP |
+                        CONTROL_DOWN |
+                        CONTROL_LBUTTON |
+                        CONTROL_ML_LBUTTON,
+                        FALSE, TRUE
         );
+
+        llListen(-8888,"",NULL_KEY,""); // Open up LockGuard and Lockmeister listens.
+        llListen(-9119,"",NULL_KEY,"");
+
+        llListen(getAvChannel(llGetOwner()), "", "", ""); // Open collar/cuffs avChannel.
+        
+        llSetTimerEvent(0.2); // Start the timer.
     }
 
-    // Show a menu to the toucher when touched.
+    // Reset the script on rez.
+    // ---------------------------------------------------------------------------------------------------------
+    on_rez(integer param)
+    {
+        llResetScript();
+    }
+    
+    // Show the menu to the user on touch.
     // ---------------------------------------------------------------------------------------------------------
     touch_start(integer num)
     {
@@ -314,201 +556,377 @@ default
     // ---------------------------------------------------------------------------------------------------------
     listen(integer chan, string name, key id, string mesg)
     {
-        if (llGetOwnerKey(id) != id) // Only take commands from avatars.
+        if (chan == getAvChannel(llGetOwner())) // Process RRDC Menu/Commands.
         {
-            return;
-        }
-        else if (mesg == "↺ Main") // Show main menu.
-        {
-            showMenu("main", id);
-            return;
-        }
-        else if (mesg == "Close") // Close button does nothing but return.
-        {
-            return;
-        }
-        else if (mesg == "CharSheet") // Give notecard.
-        {
-            giveCharSheet(id);
-        }
-        else if (inRange(id) || id == llGetOwner()) // Only parse these if we're in range/the wearer.
-        {
-            if (mesg == "Shock") // Shock feature.
+            if (llGetOwnerKey(id) != id) // Process RRDC commands.
             {
-                llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                    " just activated your shock collar!");
-
-                llSetTimerEvent(0.0);
-                llTakeControls(
-                                CONTROL_FWD |
-                                CONTROL_BACK |
-                                CONTROL_LEFT |
-                                CONTROL_RIGHT |
-                                CONTROL_ROT_LEFT |
-                                CONTROL_ROT_RIGHT |
-                                CONTROL_UP |
-                                CONTROL_DOWN |
-                                CONTROL_LBUTTON |
-                                CONTROL_ML_LBUTTON,
-                                TRUE, FALSE
-                );
-                llStartAnimation(g_zapAnim);
-                llLoopSound(g_zapLoopSound, 0.5);
-                g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
-                llSetTimerEvent(0.2);
-            }
-            else if (mesg == "Ankle Chain") // Draw chain between ankles.
-            {
-                if (g_ankleChain = !g_ankleChain)
+                list l = llParseString2List(mesg, [" "], []);
+                if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
                 {
-                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                        " attached your ankle chain.");
+                    name = llToLower(llList2String(l, 0));
+                    if (name == "unlink") // unlink <tag> <inner|outer>
+                    {
+                        if (llToLower(llList2String(l, 2)) == "inner")
+                        {
+                            innerParticles(FALSE);
+                        }
+                        else if (g_particleMode) // Outer.
+                        {
+                            outerParticles(FALSE);
+                        }
+                    }
+                    else if (name == "link") // link <tag> <inner|outer> <dest-uuid>
+                    {
+                        toggleMode(TRUE);
+                        if (llToLower(llList2String(l, 2)) == "inner")
+                        {
+                            g_innerPartTarget = llList2Key(l, 3);
+                            innerParticles(TRUE);
+                        }
+                        else // Outer.
+                        {
+                            g_outerPartTarget = llList2Key(l, 3);
+                            outerParticles(TRUE);
+                        }
+                    }       // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
+                    else if (name == "linkrequest")
+                    {
+                        if (llToLower(llList2String(l, 2)) == "inner") // Get the link UUID.
+                        {
+                            name = (string)llGetLinkKey(g_innerLink);
+                        }
+                        else // Outer.
+                        {
+                            name = (string)llGetLinkKey(g_outerLink);
+                        }
 
-                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightankle inner leftankle inner");
+                        llWhisper(getAvChannel(llGetOwner()), "link " + // Send link message.
+                            llList2String(l, 3) + " " +
+                            llList2String(l, 4) + " " + name
+                        );
+                    }
                 }
-                else
-                {
-                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                        " removed your ankle chain.");
-
-                    llWhisper(getAvChannel(llGetOwner()), "unlink leftankle inner");
-                }
-                playRandomSound();
-            }
-            else if (mesg == "Shackle Link") // Draw chains from wrists to ankles.
-            {
-                if (g_isShackled = !g_isShackled)
-                {
-                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                        " attached your shackle links.");
-
-                    llWhisper(getAvChannel(llGetOwner()), "linkrequest leftankle outer leftwrist outer");
-                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightankle outer rightwrist outer");
-                }
-                else
-                {
-                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                        " removed your shackle links.");
-
-                    llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist outer");
-                    llWhisper(getAvChannel(llGetOwner()), "unlink rightwrist outer");
-                }
-                playRandomSound();
-            }
-            // Pose Commands.
-            // -------------------------------------------------------------------------------------------------
-            else if (mesg == "Poses") // Pose selection menu.
-            {
-                llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                    " is interacting with your handcuffs.");
-
-                showMenu("poses", id);
                 return;
             }
-            else if (mesg == "Back U") // Emitter is always leftwrist inner or collar shacklesPoint.
-            { // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
-                stopCurAnims();
-                g_animList = [g_poseBackU];
-                // TODO: Unlink collar shackles point.
-                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
-            }
-            else if (mesg == "Back V")
+            else if (mesg == "↺ Main") // Show main menu.
             {
-                stopCurAnims();
-                g_animList = [g_poseBackV];
-                // TODO: Unlink collar shackles point.
-                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
+                showMenu("main", id);
+                return;
             }
-            else if (mesg == "Front X")
+            else if (mesg == "Close") // Close button does nothing but return.
             {
-                stopCurAnims();
-                g_animList = [g_poseFrontX];
-                // TODO: Unlink collar shackles point.
-                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
+                return;
             }
-            else if (mesg == "Front V")
+            else if (mesg == "CharSheet") // Give notecard.
             {
-                stopCurAnims();
-                g_animList = [g_poseFrontV];
-                // TODO: Unlink collar shackles point.
-                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
+                giveCharSheet(id);
             }
-            else if (mesg == "ComboSet") // Combination two poses.
+            else if (inRange(id) || id == llGetOwner()) // Only parse these if we're in range/the wearer.
             {
-                stopCurAnims();
-                g_animList = g_poseComboSet;
-                // TODO: Link collar shackles point.
-                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
-            }
-            else if (mesg == "Release") // Release from pose.
-            {
-                stopCurAnims();
-                // TODO: Unlink collar shackles point.
-                llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist inner"); // Unlink wrists.
-            }
-            else if (id == llGetOwner()) // Sound and texture commands are owner locked.
-            {
-                // Texture Commands.
-                // ---------------------------------------------------------------------------------------------
-                if (mesg == "Textures") // Texture select.
+                if (mesg == "Shock") // Shock feature.
                 {
-                    showMenu("textures", id);
+                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                        " just activated your shock collar!");
+
+                    llSetTimerEvent(0.0);
+                    llTakeControls(
+                                    CONTROL_FWD |
+                                    CONTROL_BACK |
+                                    CONTROL_LEFT |
+                                    CONTROL_RIGHT |
+                                    CONTROL_ROT_LEFT |
+                                    CONTROL_ROT_RIGHT |
+                                    CONTROL_UP |
+                                    CONTROL_DOWN |
+                                    CONTROL_LBUTTON |
+                                    CONTROL_ML_LBUTTON,
+                                    TRUE, FALSE
+                    );
+                    llStartAnimation(g_zapAnim);
+                    llLoopSound(g_zapLoopSound, 0.5);
+                    g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
+                    llSetTimerEvent(0.2);
+                }
+                else if (mesg == "Ankle Chain") // Toggle chain between ankles.
+                {
+                    if (g_ankleChain = !g_ankleChain)
+                    {
+                        llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " attached your ankle chain.");
+
+                        llWhisper(getAvChannel(llGetOwner()), "linkrequest rightankle inner leftankle inner");
+                    }
+                    else
+                    {
+                        llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " removed your ankle chain.");
+
+                        llWhisper(getAvChannel(llGetOwner()), "unlink leftankle inner");
+                    }
+                    playRandomSound();
+                }
+                else if (mesg == "Shackle Link") // Toggle chains from wrists to ankles.
+                {
+                    if (g_isShackled = !g_isShackled)
+                    {
+                        llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " attached your shackle links.");
+
+                        llWhisper(getAvChannel(llGetOwner()), "linkrequest leftankle outer leftwrist outer");
+                        llWhisper(getAvChannel(llGetOwner()), "linkrequest rightankle outer rightwrist outer");
+                    }
+                    else
+                    {
+                        llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " removed your shackle links.");
+
+                        llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist outer");
+                        llWhisper(getAvChannel(llGetOwner()), "unlink rightwrist outer");
+                    }
+                    playRandomSound();
+                }
+                // Pose Commands.
+                // ---------------------------------------------------------------------------------------------
+                else if (mesg == "Poses") // Pose selection menu.
+                {
+                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                        " is interacting with your handcuffs.");
+
+                    showMenu("poses", id);
                     return;
                 }
-                else if (mesg == "Blue") // Set textures.
-                {
-                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                        PRIM_TEXTURE, 0, g_blueTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                    ]);
-                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blueCuffTex);
+                else if (mesg == "Back U") // Emitter is always leftwrist inner or collar shacklesPoint.
+                { // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
+                    stopCurAnims();
+                    g_animList = [g_poseBackU];
+                    // TODO: Unlink collar shackles point.
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
                 }
-                else if (mesg == "Black")
+                else if (mesg == "Back V")
                 {
-                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                        PRIM_TEXTURE, 0, g_blackTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                    ]);
-                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blackCuffTex);
+                    stopCurAnims();
+                    g_animList = [g_poseBackV];
+                    // TODO: Unlink collar shackles point.
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
-                else if (mesg == "White")
+                else if (mesg == "Front X")
                 {
-                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                        PRIM_TEXTURE, 0, g_whiteTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                    ]);
-                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_whiteCuffTex);
+                    stopCurAnims();
+                    g_animList = [g_poseFrontX];
+                    // TODO: Unlink collar shackles point.
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
                 }
-                else if (mesg == "Orange")
+                else if (mesg == "Front V")
                 {
-                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                        PRIM_TEXTURE, 0, g_orangeTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                    ]);
-                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_orangeCuffTex);
+                    stopCurAnims();
+                    g_animList = [g_poseFrontV];
+                    // TODO: Unlink collar shackles point.
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
-                else if (mesg == "Lilac")
+                else if (mesg == "ComboSet") // Combination two poses.
                 {
-                    llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                        PRIM_TEXTURE, 0, g_lilacTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
-                    ]);
-                    llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_lilacCuffTex);
+                    stopCurAnims();
+                    g_animList = g_poseComboSet;
+                    // TODO: Link collar shackles point.
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
-                // Sound Commands.
-                // ---------------------------------------------------------------------------------------------
-                else if (mesg == "Sounds") // Turn chain walk sounds on/off.
+                else if (mesg == "Release") // Release from pose.
                 {
-                    showMenu("sounds", id);
-                    return;
+                    stopCurAnims();
+                    // TODO: Unlink collar shackles point.
+                    llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist inner"); // Unlink wrists.
                 }
-                else if (mesg == "Mute Walk")
+                else if (id == llGetOwner()) // Sound and texture commands are owner locked.
                 {
-                    g_useChainSteps = FALSE;
+                    // Texture Commands.
+                    // -----------------------------------------------------------------------------------------
+                    if (mesg == "Textures") // Texture select.
+                    {
+                        showMenu("textures", id);
+                        return;
+                    }
+                    else if (mesg == "Blue") // Set textures.
+                    {
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                            PRIM_TEXTURE, 0, g_blueTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        ]);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blueCuffTex);
+                    }
+                    else if (mesg == "Black")
+                    {
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                            PRIM_TEXTURE, 0, g_blackTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        ]);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blackCuffTex);
+                    }
+                    else if (mesg == "White")
+                    {
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                            PRIM_TEXTURE, 0, g_whiteTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        ]);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_whiteCuffTex);
+                    }
+                    else if (mesg == "Orange")
+                    {
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                            PRIM_TEXTURE, 0, g_orangeTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        ]);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_orangeCuffTex);
+                    }
+                    else if (mesg == "Lilac")
+                    {
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
+                            PRIM_TEXTURE, 0, g_lilacTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        ]);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_lilacCuffTex);
+                    }
+                    // Sound Commands.
+                    // -----------------------------------------------------------------------------------------
+                    else if (mesg == "Sounds") // Turn chain walk sounds on/off.
+                    {
+                        showMenu("sounds", id);
+                        return;
+                    }
+                    else if (mesg == "Mute Walk")
+                    {
+                        g_useChainSteps = FALSE;
+                    }
+                    else if (mesg == "Unmute Walk")
+                    {
+                        g_useChainSteps = TRUE;
+                    }
                 }
-                else if (mesg == "Unmute Walk")
-                {
-                    g_useChainSteps = TRUE;
+            }
+            showMenu("", id); // Reshow current menu. Whitespace menu items end up here.
+        }
+        else if(chan == -8888 && llGetSubString(mesg, 0, 35) == ((string)llGetOwner())) // Process LM.
+        {
+            if(llListFindList(g_LMTags, [llGetSubString(mesg, 36, -1)]) > -1)
+            {
+                toggleMode(FALSE);
+                llRegionSayTo(id, -8888, mesg + " ok");
+            }
+            else if (llGetSubString(mesg, 36, 54) == "|LMV2|RequestPoint|" &&      // LMV2.
+                     llListFindList(g_LMTags, [llGetSubString(mesg, 55, -1)]) > -1)
+            {
+                llRegionSayTo(id, -8888, ((string)llGetOwner()) + "|LMV2|ReplyPoint|" + 
+                    llGetSubString(mesg, 55, -1) + "|" + ((string)llGetLinkKey(g_outerLink))
+                );
+            }
+        }                                                                          // Process LG.
+        else if(chan == -9119 && llSubStringIndex(mesg, "lockguard " + ((string)llGetOwner())) == 0)
+        {
+            list tList = llParseString2List(mesg, [" "], []);
+            
+            // lockguard [avatarKey/ownerKey] [item] [command] [variable(s)] 
+            if(llListFindList(g_LGTags, [llList2String(tList, 2)]) > -1 || llList2String(tList, 2) == "all")
+            {
+                integer i = 3; // Start at the first command position and parse the commands.
+                while(i < llGetListLength(tList))
+                {                    
+                    name = llList2String(tList, i);
+                    if(name == "link")
+                    {
+                        toggleMode(FALSE);
+                        g_outerPartTarget = llList2Key(tList, (i + 1));
+                        outerParticles(TRUE);
+                        i += 2;
+                    }
+                    else if(name == "unlink")
+                    {
+                        g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
+                        g_curPartSizeX      = g_partSizeX;
+                        g_curPartSizeY      = g_partSizeY;
+                        g_curPartLife       = g_partLife;
+                        g_curPartGravity    = g_partGravity;
+                        g_curPartColor      = g_partColor;
+                        g_curPartRate       = g_partRate;
+                        g_curPartFollow     = g_partFollow;
+
+                        outerParticles(FALSE);
+                        tList = [];
+                        return;
+                    }
+                    else if(name == "gravity")
+                    {
+                        g_curPartGravity = fMax(0.0, fMin(llList2Float(tList, (i + 1)), 100.0));
+                        i += 2;
+                    }
+                    else if(name == "life")
+                    {
+                        g_curPartLife = fMax(0.0, llList2Float(tList, (i + 1)));
+                        i += 2;
+                    }
+                    else if(name == "texture")
+                    {
+                        name = llList2String(tList, (i + 1));
+                        if(name == "chain" || name == "rope")
+                        {
+                            g_curPartTex = g_partTex;
+                        }
+                        else
+                        {
+                            g_curPartTex = llList2Key(tList, (i + 1));
+                        }
+                        i += 2;
+                    }
+                    else if(name == "rate")
+                    {
+                        g_curPartRate = fMax(0.0, llList2Float(tList, (i + 1)));
+                        i += 2;
+                    }
+                    else if(name == "follow")
+                    {
+                        g_curPartFollow = (llList2Integer(tList, (i + 1)) > 0);
+                        i += 2;
+                    }
+                    else if(name == "size")
+                    {
+                        g_curPartSizeX = fMax(0.03125, fMin(llList2Float(tList, (i + 1)), 4.0));
+                        g_curPartSizeY = fMax(0.03125, fMin(llList2Float(tList, (i + 2)), 4.0));
+                        i += 3;
+                    }
+                    else if(name == "color")
+                    {
+                        g_curPartColor.x = fMax(0.0, fMin(llList2Float(tList, (i + 1)), 1.0));
+                        g_curPartColor.y = fMax(0.0, fMin(llList2Float(tList, (i + 2)), 1.0));
+                        g_curPartColor.z = fMax(0.0, fMin(llList2Float(tList, (i + 3)), 1.0));
+                        i += 4;
+                    }
+                    else if(name == "ping")
+                    {
+                        llRegionSayTo(id, -9119, "lockguard " + ((string)llGetOwner()) + " " +
+                            llList2String(g_LGTags, 0) + " okay"
+                        );
+                        i++;
+                    }
+                    else if(name == "free")
+                    {
+                        if(g_outerPartOn)
+                        {
+                            llRegionSayTo(id, -9119, "lockguard " + ((string)llGetOwner()) + " " + 
+                                llList2String(g_LGTags, 0) + " no"
+                            );
+                        }
+                        else
+                        {
+                            llRegionSayTo(id, -9119, "lockguard " + ((string)llGetOwner()) + " " + 
+                                llList2String(g_LGTags, 0) + " yes"
+                            );
+                        }
+                        i++;
+                    }
+                    else // Skip unknown commands.
+                    {
+                        i++;
+                    }
                 }
+                
+                outerParticles(g_outerPartOn); // Refresh particles.
             }
         }
-        showMenu("", id); // Reshow current menu. Whitespace menu items end up here.
     }
+
     // Controls timed effects such as blinking light and shock.
     // ---------------------------------------------------------------------------------------------------------
     timer()
@@ -577,7 +995,7 @@ default
     // ---------------------------------------------------------------------------------------------------------
     moving_start()
     {
-        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashedTo))
+        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashMode))
         {
             playRandomSound();
         }
@@ -585,7 +1003,7 @@ default
 
     moving_end()
     {
-        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashedTo))
+        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashMode))
         {
             playRandomSound();
         }
