@@ -39,6 +39,8 @@ Sub-projects are organized into directories. Not all sub-projects are used.
 10. Drop the collar.lsl script into the root prim of the collar.
 11. Drop the cuff.lsl script into the root prim of each cuff.
 
+------
+
 ## Leash Handle Script Instructions ##
 
 1. Edit the object you want to act as a leash handle and select the prim you want to recieve chains.
