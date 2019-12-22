@@ -23,6 +23,7 @@ stopposes       -   [From: Cuff. To: Collar] Tells the collar to stop playing po
 Collar/Cuff Leash-To Protocol
 -------------------------------------
 leashto         -   [From: Collar. To: Cuff] Requests chain point to link to object/avatar.
-                    leashto <src-tag> <inner|outer> <uuid> <dest-tag> <inner|outer|x>
+                    leashto <src-tag> <inner|outer> <uuid> <dest-tag> <inner|outer>
+                    leashto <src-tag> <inner|outer> <uuid> leashanchor x
 
 *Note: Introduces the 'leashanchor' tag for leash holders.
