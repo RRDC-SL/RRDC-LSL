@@ -84,6 +84,7 @@ integer g_ledCount;                             // Tracks how long to wait to bl
 integer g_shockCount;                           // Tracks how long to keep shock active.
 integer g_ankleChain;                           // If TRUE, ankle chain is active.
 integer g_isShackled;                           // If TRUE, wrist to ankle shackle chain active.
+integer g_isLeashed;                            // If TRUE, wearer is leashed to something.
 integer g_leashMode;                            // 0=Nothing,1=Collar,2=ChainGang,3=Cuffed.
 list    g_curMenus;                             // Tracks current menu by user.
 // ---------------------------------------------------------------------------------------------------------
@@ -999,7 +1000,7 @@ state main
     // ---------------------------------------------------------------------------------------------------------
     moving_start()
     {
-        if (g_useChainSteps && (g_animList != [] || g_leashPartTarget != NULL_KEY || g_ankleChain || g_isShackled))
+        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_isLeashed))
         {
             playRandomSound();
         }
@@ -1007,7 +1008,7 @@ state main
 
     moving_end()
     {
-        if (g_useChainSteps && (g_animList != [] || g_leashPartTarget != NULL_KEY || g_ankleChain || g_isShackled))
+        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_isLeashed))
         {
             playRandomSound();
         }
