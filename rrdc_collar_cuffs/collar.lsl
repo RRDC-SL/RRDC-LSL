@@ -62,6 +62,13 @@ integer getAvChannel(key av)
     return (0x80000000 | ((integer)("0x"+(string)av) ^ g_appChan));
 }
 
+// inRange - Returns TRUE if the object is less than 6m from our position.
+// ---------------------------------------------------------------------------------------------------------
+integer inRange(key object)
+{
+    return (llVecDist(llGetPos(), llList2Vector(llGetObjectDetails(object, [OBJECT_POS]), 0)) < 6.0);
+}
+
 // getAnimVersion - Given a toggle state, returns the anim version as a string.
 // ---------------------------------------------------------------------------------------------------------
 string getAnimVersion(integer toggle)
@@ -73,11 +80,18 @@ string getAnimVersion(integer toggle)
     return "a";
 }
 
-// inRange - Returns TRUE if the object is less than 6m from our position.
+// stopCurAnims - Stop all AO anims that are playing.
 // ---------------------------------------------------------------------------------------------------------
-integer inRange(key object)
+stopCurAnims()
 {
-    return (llVecDist(llGetPos(), llList2Vector(llGetObjectDetails(object, [OBJECT_POS]), 0)) < 6.0);
+    llSetTimerEvent(0.0); // Stop timer, then anims.
+    integer i;
+    for (i = 0; i < llGetListLength(g_animList); i++)
+    {
+        llStopAnimation(llList2String(g_animList, i) + getAnimVersion(g_animToggle));
+    }
+    g_animList = [];
+    llSetTimerEvent(0.2); // Restart timer.
 }
 
 // giveCharSheet - Gives a copy of the character sheet to the user, if present.
@@ -193,6 +207,19 @@ showMenu(string menu, key user)
         text = "Texture Select Menu" + text;
         buttons = ["Blue", "Black", "↺ Main", "White", "Orange", "Lilac"];
     }
+    else if (menu == "sounds")
+    {
+        text = "Walking Sound Effects Menu" + text + "\n\nCurrent setting: ";
+        if (g_useChainSteps)
+        {
+            text += "Walk Sounds";
+        }
+        else
+        {
+            text += "Walk Muted";
+        }
+        buttons = ["Mute Walk", "Unmute Walk", "↺ Main"];
+    }
     llDialog(user, text, buttons, getAvChannel(llGetOwner()));
 }
 
@@ -297,7 +324,7 @@ default
         }
         else if (inRange(id) || id == llGetOwner()) // Only parse these if we're in range/the wearer.
         {
-            if (mesg == "Shock")
+            if (mesg == "Shock") // Shock feature.
             {
                 llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                     " just activated your shock collar!");
@@ -321,8 +348,82 @@ default
                 g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
                 llSetTimerEvent(0.2);
             }
+            else if (mesg == "Ankle Chain") // Draw chain between ankles.
+            {
+                if (g_ankleChain = !g_ankleChain)
+                {
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightankle inner leftankle inner");
+                }
+                else
+                {
+                    llWhisper(getAvChannel(llGetOwner()), "unlink leftankle inner");
+                }
+            }
+            else if (mesg == "Shackle Link") // Draw chains from wrists to ankles.
+            {
+                if (g_isShackled = !g_isShackled)
+                {
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest leftankle outer leftwrist outer");
+                    llWhisper(getAvChannel(llGetOwner()), "linkrequest rightankle outer rightwrist outer");
+                }
+                else
+                {
+                    llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist outer");
+                    llWhisper(getAvChannel(llGetOwner()), "unlink rightwrist outer");
+                }
+            }
+            // Pose Commands.
+            // -------------------------------------------------------------------------------------------------
+            else if (mesg == "Poses") // Pose selection menu.
+            {
+                showMenu("poses", id);
+                return;
+            }
+            else if (mesg == "Back U") // Emitter is always leftwrist inner or collar shacklesPoint.
+            { // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
+                stopCurAnims();
+                g_animList = [g_poseBackU];
+                // TODO: Unlink collar shackles point.
+                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
+            }
+            else if (mesg == "Back V")
+            {
+                stopCurAnims();
+                g_animList = [g_poseBackV];
+                // TODO: Unlink collar shackles point.
+                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
+            }
+            else if (mesg == "Front X")
+            {
+                stopCurAnims();
+                g_animList = [g_poseFrontX];
+                // TODO: Unlink collar shackles point.
+                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
+            }
+            else if (mesg == "Front V")
+            {
+                stopCurAnims();
+                g_animList = [g_poseFrontV];
+                // TODO: Unlink collar shackles point.
+                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
+            }
+            else if (mesg == "ComboSet") // Combination two poses.
+            {
+                stopCurAnims();
+                g_animList = g_poseComboSet;
+                // TODO: Link collar shackles point.
+                llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
+            }
+            else if (mesg == "Release") // Release from pose.
+            {
+                stopCurAnims();
+                // TODO: Unlink collar shackles point.
+                llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist inner"); // Unlink wrists.
+            }
             else if (id == llGetOwner()) // Sound and texture commands are owner locked.
             {
+                // Texture Commands.
+                // ---------------------------------------------------------------------------------------------
                 if (mesg == "Textures") // Texture select.
                 {
                     showMenu("textures", id);
@@ -363,11 +464,25 @@ default
                     ]);
                     llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_lilacCuffTex);
                 }
+                // Sound Commands.
+                // ---------------------------------------------------------------------------------------------
+                else if (mesg == "Sounds") // Turn chain walk sounds on/off.
+                {
+                    showMenu("sounds", id);
+                    return;
+                }
+                else if (mesg == "Mute Walk")
+                {
+                    g_useChainSteps = FALSE;
+                }
+                else if (mesg == "Unmute Walk")
+                {
+                    g_useChainSteps = TRUE;
+                }
             }
         }
         showMenu("", id); // Reshow current menu. Whitespace menu items end up here.
     }
-
     // Controls timed effects such as blinking light and shock.
     // ---------------------------------------------------------------------------------------------------------
     timer()
