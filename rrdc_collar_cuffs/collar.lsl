@@ -82,11 +82,14 @@ integer g_ledLink;                              // Link number of the LED light.
 integer g_ledState;                             // Tracks the current on-off state of the LED.
 integer g_ledCount;                             // Tracks how long to wait to blink LED.
 integer g_shockCount;                           // Tracks how long to keep shock active.
+integer g_pingCount;                            // Tracks how long to wait for pong messages.
 integer g_ankleChain;                           // If TRUE, ankle chain is active.
 integer g_isShackled;                           // If TRUE, wrist to ankle shackle chain active.
 integer g_isLeashed;                            // If TRUE, wearer is leashed to something.
-integer g_leashMode;                            // 0=Nothing,1=Collar,2=ChainGang,3=Cuffed.
+string  g_leashMode;                            // Tag of the anchor point we're polling for.
+string  g_leashUser;                            // Key of the avatar currently polling for leash points.
 list    g_curMenus;                             // Tracks current menu by user.
+list    g_avList;                               // Tracks leash/chaingang enabled avatars.
 // ---------------------------------------------------------------------------------------------------------
 
 // getAvChannel - Given an avatar key, returns a static channel XORed with g_appChan.
@@ -604,6 +607,23 @@ state main
                             llList2String(l, 4) + " " + name
                         );
                     }
+                    else if (name == "ping") // ping <dest-tag> <src-tag>
+                    {
+                        llWhisper(getAvChannel(llGetOwnerKey(id)), "pong " + 
+                            llList2String(l, 2) + " " +
+                            llList2String(l, 1)
+                        );
+                    }           // pong collarfrontloop <my-tag>
+                    else if (name == "pong" && llList2String(l, 2) == g_leashMode)
+                    {
+                        id == llGetOwnerKey(id); // Add responder av keys to list.
+                        if (id != llGetOwner() && llGetListLength(g_avList) < 12 && 
+                            llListFindList(g_avList, [(string)id]) <= -1)
+                        {
+                            g_avList += [(string)id];
+                            g_pingCount = 5;
+                        }
+                    }
                     else if (name == "stopposes") // stopposes collarfrontloop
                     {
                         stopCurAnims();
@@ -991,6 +1011,16 @@ state main
                 ]);
             }
             g_ledCount = 0;
+        }
+
+        if (g_pingCount == 1) // Pong message wait timer.
+        {
+            showMenu("leashlist", g_leashUser);
+            g_pingCount = 0;
+        }
+        else if (g_pingCount > 0)
+        {
+            g_pingCount--;
         }
     }
 

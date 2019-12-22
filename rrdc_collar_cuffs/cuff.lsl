@@ -360,6 +360,13 @@ default
                         llList2String(l, 2)
                     );
                 }
+                else if (name == "ping") // ping <dest-tag> <src-tag>
+                {
+                    llWhisper(getAvChannel(llGetOwnerKey(id)), "pong " + 
+                        llList2String(l, 2) + " " +
+                        llList2String(l, 1)
+                    );
+                }
                 else if (name == "settexture") // settexture <tag> <uuid>
                 {
                     llSetLinkPrimitiveParamsFast(LINK_THIS, [

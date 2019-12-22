@@ -26,4 +26,11 @@ leashto         -   [From: Collar. To: Cuff] Requests chain point to link to obj
                     leashto <src-tag> <inner|outer> <uuid> <dest-tag> <inner|outer>
                     leashto <src-tag> <inner|outer> <uuid> leashanchor x
 
+ping            -   [From: Collar. To: Any] Searches for a given anchor point on an avatar.
+                    ping <dest-tag> <src-tag>
+
+pong            -   [From: Any. To: Collar] Replies to the ping message.
+                    pong <ping-tag> <my-tag>
+                    pong collarfrontloop <my-tag>
+
 *Note: Introduces the 'leashanchor' tag for leash holders.

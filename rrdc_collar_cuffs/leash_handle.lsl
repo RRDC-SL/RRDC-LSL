@@ -34,12 +34,22 @@ default
         if (llGetOwnerKey(id) != id) // Process RRDC commands.
         {
             list l = llParseString2List(mesg, [" "], []); // Match tag and command.
-            if (llList2String(l, 1) == "leashanchor" && llList2String(l, 0) == "linkrequest")
+            if (llList2String(l, 1) == "leashanchor")
             {
-                llWhisper(getAvChannel(llGetOwnerKey(id)), "link " + // Send link message back.
-                    llList2String(l, 3) + " " +
-                    llList2String(l, 4) + " " + (string)llGetKey()
-                );
+                if (llList2String(l, 0) == "linkrequest") // Link request.
+                {
+                    llWhisper(getAvChannel(llGetOwnerKey(id)), "link " + // Send link message back.
+                        llList2String(l, 3) + " " +
+                        llList2String(l, 4) + " " + (string)llGetKey()
+                    );
+                }
+                else if (llList2String(l, 0) == "ping") // Ping.
+                {
+                    llWhisper(getAvChannel(llGetOwnerKey(id)), "pong " + 
+                        llList2String(l, 2) + " " +
+                        llList2String(l, 1)
+                    );
+                }
             }
         }
     }
