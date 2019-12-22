@@ -334,7 +334,7 @@ default
                         name = (string)llGetLinkKey(g_outerLink);
                     }
 
-                    llSay(getAvChannel(llGetOwnerKey(id)), "link " + // Send link message.
+                    llWhisper(getAvChannel(llGetOwnerKey(id)), "link " + // Send link message.
                         llList2String(l, 3) + " " +
                         llList2String(l, 4) + " " + name
                     );
@@ -353,24 +353,12 @@ default
                         outerParticles(TRUE);
                     }
 
-                    if (llGetOwnerKey(llList2Key(l, 3)) == llList2Key(l, 3)) // Is avatar?
-                    {
-                        llSay(getAvChannel(llList2Key(l, 3)), "linkrequest " +
-                            llList2String(l, 4) + " " +
-                            llList2String(l, 5) + " " +
-                            llList2String(l, 1) + " " +
-                            llList2String(l, 2)
-                        );
-                    }
-                    else
-                    {
-                        llRegionSayTo(llList2Key(l, 3), g_appChan, "linkrequest " +
-                            llList2String(l, 4) + " " +
-                            llList2String(l, 5) + " " +
-                            llList2String(l, 1) + " " +
-                            llList2String(l, 2)
-                        );
-                    }
+                    llWhisper(getAvChannel(llList2Key(l, 3)), "linkrequest " +
+                        llList2String(l, 4) + " " +
+                        llList2String(l, 5) + " " +
+                        llList2String(l, 1) + " " +
+                        llList2String(l, 2)
+                    );
                 }
                 else if (name == "settexture") // settexture <tag> <uuid>
                 {

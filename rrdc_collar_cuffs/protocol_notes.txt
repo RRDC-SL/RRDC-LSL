@@ -25,4 +25,4 @@ Collar/Cuff Leash-To Protocol
 leashto         -   [From: Collar. To: Cuff] Requests chain point to link to object/avatar.
                     leashto <src-tag> <inner|outer> <uuid> <dest-tag> <inner|outer|x>
 
-*Note: Introduces the 'leashanchor' tag for leash holders and anchors.
+*Note: Introduces the 'leashanchor' tag for leash holders.

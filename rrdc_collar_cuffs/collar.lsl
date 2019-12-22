@@ -326,15 +326,14 @@ showMenu(string menu, key user)
         // Wearer Menu.
         // -----------------------------------------------
         // CharSheet        Shock           Poses
-        // Ankle Chain      Chain Gang      Shackle Link
-        // Cuff To          Grab Leash      Leash To
-        // Textures         Sounds          Close
+        // Chain Gang       Ankle Chain     Shackle Link
+        // Leash            Textures        Sounds
         //
         // Staff Menu.
         // -----------------------------------------------
         // CharSheet        Shock           Poses
-        // Ankle Chain      Chain Gang      Shackle Link
-        // Cuff To          Grab Leash      Leash To
+        // Chain Gang       Ankle Chain     Shackle Link
+        // Leash                            Close
         //
         // Inmate Menu.
         // -----------------------------------------------
@@ -344,16 +343,15 @@ showMenu(string menu, key user)
 
         if (user == llGetOwner())
         {
-            buttons = ["Textures",    "Sounds",     "Close",
-                       "Cuff To",     "Grab Leash", "Leash To",
-                       "Ankle Chain", "Chain Gang", "Shackle Link",
-                       "CharSheet",   "Shock",      "Poses"];
+            buttons = ["Leash",      "Textures",    "Sounds",
+                       "Chain Gang", "Ankle Chain", "Shackle Link",
+                       "CharSheet",  "Shock",       "Poses"];
         }
         else if (inRange(user))
         {
-            buttons = ["Cuff To",     "Grab Leash", "Leash To",
-                       "Ankle Chain", "Chain Gang", "Shackle Link",
-                       "CharSheet",   "Shock",      "Poses"];
+            buttons = ["Leash",      " ",           "Close",
+                       "Chain Gang", "Ankle Chain", "Shackle Link",
+                       "CharSheet",  "Shock",       "Poses"];
         }
         else // Only CharSheet option in menu, so just give CharSheet.
         {
@@ -601,7 +599,7 @@ state main
                             name = (string)llGetLinkKey(g_leashLink);
                         }
 
-                        llSay(getAvChannel(llGetOwnerKey(id)), "link " + // Send link message.
+                        llWhisper(getAvChannel(llGetOwnerKey(id)), "link " + // Send link message.
                             llList2String(l, 3) + " " +
                             llList2String(l, 4) + " " + name
                         );
