@@ -276,19 +276,11 @@ default
         llListen(getAvChannel(llGetOwner()), "", "", ""); // Open collar/cuffs avChannel.
     }
 
-    // Reset the script on rez and if the inventory changes.
+    // Reset the script on rez.
     // ----------------------------------------------------------------------------------------
     on_rez(integer param)
     {
         llResetScript();
-    }
-    
-    changed(integer change)
-    {
-        if(change & CHANGED_INVENTORY)
-        {
-            llResetScript();
-        }
     }
 
     // Listen for LG and LM commands.
