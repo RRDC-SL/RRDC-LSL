@@ -324,66 +324,98 @@ showMenu(string menu, key user)
 
     string text = "\n\nChoose an option:";
     list buttons = [];
-    if (menu == "main") // Show main menu.
+    if (menu == "main") // Show main menu. ▩☐☒↺☠☯📜✖
     {
         // Wearer Menu.
         // -----------------------------------------------
-        // CharSheet        Shock           Poses
-        // Chain Gang       Ankle Chain     Shackle Link
-        // Leash            Textures        Sounds
+        // ☯ CharSheet     ☠ Shock        📜 Poses..
+        // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
+        // ☐ Leash        📜 Textures..    ☐ WalkSound
         //
         // Staff Menu.
         // -----------------------------------------------
-        // CharSheet        Shock           Poses
-        // Chain Gang       Ankle Chain     Shackle Link
-        // Leash                            Close
+        // ☯ CharSheet     ☠ Shock        📜 Poses..
+        // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
+        // ☐ Leash                         ✖ Close
         //
         // Inmate Menu.
         // -----------------------------------------------
         // CharSheet (Just give char sheet. No menu.)
 
-        text = "Main Menu" + text;
-
-        if (user == llGetOwner())
+        if (!inRange(user) && user != llGetOwner())
         {
-            buttons = ["Leash",      "Textures",    "Sounds",
-                       "Chain Gang", "Ankle Chain", "Shackle Link",
-                       "CharSheet",  "Shock",       "Poses"];
-        }
-        else if (inRange(user))
-        {
-            buttons = ["Leash",      " ",           "Close",
-                       "Chain Gang", "Ankle Chain", "Shackle Link",
-                       "CharSheet",  "Shock",       "Poses"];
-        }
-        else // Only CharSheet option in menu, so just give CharSheet.
-        {
-            giveCharSheet(user);
+            giveCharSheet(user); // Only CharSheet option in menu, so just give CharSheet.
             return;
         }
+
+        text = "Main Menu" + text;
+
+        if (user == llGetOwner()) // Textures and walk sound options for owner.
+        {
+            buttons = ["📜 Textures"];
+
+            if (g_useChainSteps)
+            {
+                buttons += ["☒ WalkSound"];
+            }
+            else
+            {
+                buttons += ["☐ WalkSound"];
+            }
+        }
+        else // Blank and close button for others.
+        {
+            buttons = [" ", "✖ Close"];
+        }
+
+        if (g_isLeashed && g_leashMode == "leashanchor") // Leash toggle.
+        {
+            buttons = ["☒ Leash"] + buttons;
+        }
+        else
+        {
+            buttons = ["☐ Leash"] + buttons;
+        }
+
+        if (g_isLeashed && g_leashMode == "leftankle") // Chain gang toggle.
+        {
+            buttons += ["☒ ChainGang"];
+        }
+        else
+        {
+            buttons += ["☐ ChainGang"];
+        }
+
+        if (g_ankleChain) // Ankle chain toggle.
+        {
+            buttons += ["☒ AnkleChain"];
+        }
+        else
+        {
+            buttons += ["☐ AnkleChain"];
+        }
+
+        if (g_isShackled) // Shackle link toggle.
+        {
+            buttons += ["☒ Shackles"];
+        }
+        else
+        {
+            buttons += ["☐ Shackles"];
+        }
+
+        buttons += ["☯ CharSheet", "☠ Shock", "📜 Poses"];
     }
     else if (menu == "poses") // Poses menu.
     {
         text = "Pose Selection Menu" + text;
-        buttons = [" ", " ", "↺ Main", "Back U", "Release", "ComboSet", "Front X", "Front V", "Back V"];
+        buttons = [" ", " ", "↺ Main", "웃 Back U", "✖ Release", "웃 ComboSet", 
+                   "웃 Front X", "웃 Front V", "웃 Back V"];
     }
     else if (menu == "textures") // Textures menu.
     {
         text = "Texture Select Menu" + text;
-        buttons = ["Blue", "Black", "↺ Main", "White", "Orange", "Lilac"];
-    }
-    else if (menu == "sounds") // Sound settings menu.
-    {
-        text = "Walking Sound Effects Menu" + text + "\n\nCurrent setting: ";
-        if (g_useChainSteps)
-        {
-            text += "Walk Sounds";
-        }
-        else
-        {
-            text += "Walk Muted";
-        }
-        buttons = ["Mute Walk", "Unmute Walk", "↺ Main"];
+        buttons = ["▩ Blue", "▩ Black", "↺ Main", "▩ White", "▩ Orange", "▩ Lilac"];
     }
     llDialog(user, text, buttons, getAvChannel(llGetOwner()));
 }
@@ -636,17 +668,17 @@ state main
                 showMenu("main", id);
                 return;
             }
-            else if (mesg == "Close") // Close button does nothing but return.
+            else if (mesg == "✖ Close") // Close button does nothing but return.
             {
                 return;
             }
-            else if (mesg == "CharSheet") // Give notecard.
+            else if (mesg == "☯ CharSheet") // Give notecard.
             {
                 giveCharSheet(id);
             }
             else if (inRange(id) || id == llGetOwner()) // Only parse these if we're in range/the wearer.
             {
-                if (mesg == "Shock") // Shock feature.
+                if (mesg == "☠ Shock") // Shock feature.
                 {
                     llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                         " just activated your shock collar!");
@@ -670,7 +702,7 @@ state main
                     g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
                     llSetTimerEvent(0.2);
                 }
-                else if (mesg == "Ankle Chain") // Toggle chain between ankles.
+                else if (mesg == "☐ AnkleChain" || mesg == "☒ AnkleChain") // Toggle chain between ankles.
                 {
                     if (g_ankleChain = !g_ankleChain)
                     {
@@ -688,7 +720,7 @@ state main
                     }
                     playRandomSound();
                 }
-                else if (mesg == "Shackle Link") // Toggle chains from wrists to ankles.
+                else if (mesg == "☐ Shackles" || mesg == "☒ Shackles") // Chains from wrists to ankles.
                 {
                     if (g_isShackled = !g_isShackled)
                     {
@@ -710,7 +742,7 @@ state main
                 }
                 // Pose Commands.
                 // ---------------------------------------------------------------------------------------------
-                else if (mesg == "Poses") // Pose selection menu.
+                else if (mesg == "📜 Poses") // Pose selection menu.
                 {
                     llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                         " is interacting with your handcuffs.");
@@ -718,42 +750,42 @@ state main
                     showMenu("poses", id);
                     return;
                 }
-                else if (mesg == "Back U") // Emitter is always leftwrist inner or collar shacklesPoint.
+                else if (mesg == "웃 Back U") // Emitter is always leftwrist inner or collar shacklesPoint.
                 { // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
                     stopCurAnims();
                     g_animList = [g_poseBackU];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
                 }
-                else if (mesg == "Back V")
+                else if (mesg == "웃 Back V")
                 {
                     stopCurAnims();
                     g_animList = [g_poseBackV];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
-                else if (mesg == "Front X")
+                else if (mesg == "웃 Front X")
                 {
                     stopCurAnims();
                     g_animList = [g_poseFrontX];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
                 }
-                else if (mesg == "Front V")
+                else if (mesg == "웃 Front V")
                 {
                     stopCurAnims();
                     g_animList = [g_poseFrontV];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
-                else if (mesg == "ComboSet") // Combination two poses.
+                else if (mesg == "웃 ComboSet") // Combination two poses.
                 {
                     stopCurAnims();
                     g_animList = g_poseComboSet;
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest leftwrist inner collarfrontloop shackle");
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
-                else if (mesg == "Release") // Release from pose.
+                else if (mesg == "✖ Release") // Release from pose.
                 {
                     stopCurAnims();
                     shackleParticles(FALSE);
@@ -763,40 +795,40 @@ state main
                 {
                     // Texture Commands.
                     // -----------------------------------------------------------------------------------------
-                    if (mesg == "Textures") // Texture select.
+                    if (mesg == "📜 Textures") // Texture select.
                     {
                         showMenu("textures", id);
                         return;
                     }
-                    else if (mesg == "Blue") // Set textures.
+                    else if (mesg == "▩ Blue") // Set textures.
                     {
                         llSetLinkPrimitiveParamsFast(LINK_THIS, [
                             PRIM_TEXTURE, 0, g_blueTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
                         llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blueCuffTex);
                     }
-                    else if (mesg == "Black")
+                    else if (mesg == "▩ Black")
                     {
                         llSetLinkPrimitiveParamsFast(LINK_THIS, [
                             PRIM_TEXTURE, 0, g_blackTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
                         llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blackCuffTex);
                     }
-                    else if (mesg == "White")
+                    else if (mesg == "▩ White")
                     {
                         llSetLinkPrimitiveParamsFast(LINK_THIS, [
                             PRIM_TEXTURE, 0, g_whiteTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
                         llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_whiteCuffTex);
                     }
-                    else if (mesg == "Orange")
+                    else if (mesg == "▩ Orange")
                     {
                         llSetLinkPrimitiveParamsFast(LINK_THIS, [
                             PRIM_TEXTURE, 0, g_orangeTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
                         llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_orangeCuffTex);
                     }
-                    else if (mesg == "Lilac")
+                    else if (mesg == "▩ Lilac")
                     {
                         llSetLinkPrimitiveParamsFast(LINK_THIS, [
                             PRIM_TEXTURE, 0, g_lilacTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
@@ -805,18 +837,16 @@ state main
                     }
                     // Sound Commands.
                     // -----------------------------------------------------------------------------------------
-                    else if (mesg == "Sounds") // Turn chain walk sounds on/off.
+                    else if (mesg == "☐ WalkSound" || mesg == "☒ WalkSound" ) // Turn chain walk sounds on/off.
                     {
-                        showMenu("sounds", id);
-                        return;
-                    }
-                    else if (mesg == "Mute Walk")
-                    {
-                        g_useChainSteps = FALSE;
-                    }
-                    else if (mesg == "Unmute Walk")
-                    {
-                        g_useChainSteps = TRUE;
+                        if (g_useChainSteps = !g_useChainSteps)
+                        {
+                            g_useChainSteps = TRUE;
+                        }
+                        else
+                        {
+                            g_useChainSteps = FALSE;
+                        }
                     }
                 }
             }
