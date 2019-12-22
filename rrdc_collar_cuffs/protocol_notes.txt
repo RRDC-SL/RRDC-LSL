@@ -11,12 +11,15 @@ Collar/Cuff Inter-Attachment Protocol
 -------------------------------------
 linkrequest     -   [From: Collar. To: Cuff] Requests one chain point link to another.
                     linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
+                    linkrequest collarfrontloop <leash|shackle> <src-tag> <inner|outer>
 
 link            -   [From: Any. To: Collar|Cuff] Links given cuff to the object specified.
                     link <tag> <inner|outer> <dest-uuid>
+                    link collarfrontloop <leash|shackle> <dest-uuid>
                     
 unlink          -   [From: Any. To: Collar|Cuff] Unlinks a given cuff from whatever.
                     unlink <tag> <inner|outer>
+                    unlink collarfrontloop <leash|shackle>
 
 settexture      -   [From: Collar. To: Cuff] Sets the metal texture of the cuff.
                     settexture <tag> <uuid>

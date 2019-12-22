@@ -171,6 +171,11 @@ toggleMode(integer mode)
         innerParticles(FALSE);
 
         g_particleMode = mode; // Toggle mode.
+
+        if (!mode && llList2String(g_LMTags, 0) == "lcuff") // Send stop poses command.
+        {
+            llWhisper(getAvChannel(llGetOwner()), "stopposes collarfrontloop");
+        }
     }
 }
 
