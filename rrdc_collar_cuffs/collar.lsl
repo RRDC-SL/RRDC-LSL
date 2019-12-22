@@ -248,14 +248,27 @@ shackleParticles(integer on)
     }
 }
 
+// resetParticles - When activated sets current leash particle settings to defaults.
+// ---------------------------------------------------------------------------------------------------------
+resetParticles()
+{
+    g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
+    g_curPartSizeX      = g_partSizeX;
+    g_curPartSizeY      = g_partSizeY;
+    g_curPartLife       = g_partLife;
+    g_curPartGravity    = g_partGravity;
+    g_curPartColor      = g_partColor;
+    g_curPartRate       = g_partRate;
+    g_curPartFollow     = g_partFollow;
+}
 // toggleMode - Controls particle system when changing between LG/LM and Interlink.
 // ---------------------------------------------------------------------------------------------------------
 toggleMode(integer mode)
 {
     if (g_particleMode != mode) // If the mode actually changed.
     {
-        leashParticles(FALSE);   // Clear all particles.
-        shackleParticles(FALSE);
+        shackleParticles(FALSE); // Clear all particles.
+        leashParticles(FALSE);
 
         g_particleMode = mode; // Toggle mode.
     }
@@ -326,19 +339,19 @@ showMenu(string menu, key user)
     list buttons = [];
     if (menu == "main") // Show main menu. ▩☐☒↺☠☯📜✖
     {
-        // Wearer Menu.
+        // Wearer Menu. (Owner Only)
         // -----------------------------------------------
         // ☯ CharSheet     ☠ Shock        📜 Poses..
         // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
         // ☐ Leash        📜 Textures..    ☐ WalkSound
         //
-        // Staff Menu.
+        // Staff Menu. (Within 6m)
         // -----------------------------------------------
         // ☯ CharSheet     ☠ Shock        📜 Poses..
         // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
         // ☐ Leash                         ✖ Close
         //
-        // Inmate Menu.
+        // Inmate Menu. (From Anywhere)
         // -----------------------------------------------
         // CharSheet (Just give char sheet. No menu.)
 
@@ -538,15 +551,7 @@ state main
             return;
         }
 
-        g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
-        g_curPartSizeX      = g_partSizeX;
-        g_curPartSizeY      = g_partSizeY;
-        g_curPartLife       = g_partLife;
-        g_curPartGravity    = g_partGravity;
-        g_curPartColor      = g_partColor;
-        g_curPartRate       = g_partRate;
-        g_curPartFollow     = g_partFollow;
-
+        resetParticles();
         shackleParticles(FALSE); // Stop any particle effects and init.
         leashParticles(FALSE);
 
@@ -592,6 +597,8 @@ state main
     {
         if (chan == getAvChannel(llGetOwner())) // Process RRDC Menu/Commands.
         {
+            // Protocol Commands.
+            // -------------------------------------------------------------------------------------------------
             if (llGetOwnerKey(id) != id) // Process RRDC commands.
             {
                 list l = llParseString2List(mesg, [" "], []);
@@ -600,6 +607,7 @@ state main
                     name = llToLower(llList2String(l, 0));
                     if (name == "unlink") // unlink collarfrontloop <leash|shackle>
                     {
+                        resetParticles();
                         if (llToLower(llList2String(l, 2)) == "shackle")
                         {
                             shackleParticles(FALSE);
@@ -611,6 +619,7 @@ state main
                     }
                     else if (name == "link") // link collarfrontloop <leash|shackle> <dest-uuid>
                     {
+                        resetParticles();
                         toggleMode(TRUE);
                         if (llToLower(llList2String(l, 2)) == "shackle")
                         {
@@ -663,6 +672,8 @@ state main
                 }
                 return;
             }
+            // Misc Commands.
+            // -------------------------------------------------------------------------------------------------
             else if (mesg == "↺ Main") // Show main menu.
             {
                 showMenu("main", id);
@@ -678,6 +689,8 @@ state main
             }
             else if (inRange(id) || id == llGetOwner()) // Only parse these if we're in range/the wearer.
             {
+                // Shock Command.
+                // ---------------------------------------------------------------------------------------------
                 if (mesg == "☠ Shock") // Shock feature.
                 {
                     llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
@@ -702,6 +715,8 @@ state main
                     g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
                     llSetTimerEvent(0.2);
                 }
+                // Ankle Chain Toggle.
+                // ---------------------------------------------------------------------------------------------
                 else if (mesg == "☐ AnkleChain" || mesg == "☒ AnkleChain") // Toggle chain between ankles.
                 {
                     if (g_ankleChain = !g_ankleChain)
@@ -720,6 +735,8 @@ state main
                     }
                     playRandomSound();
                 }
+                // Shackle Link Toggle.
+                // ---------------------------------------------------------------------------------------------
                 else if (mesg == "☐ Shackles" || mesg == "☒ Shackles") // Chains from wrists to ankles.
                 {
                     if (g_isShackled = !g_isShackled)
@@ -885,17 +902,9 @@ state main
                         leashParticles(TRUE);
                         i += 2;
                     }
-                    else if(name == "unlink")
+                    else if(name == "unlink" && !g_particleMode)
                     {
-                        g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
-                        g_curPartSizeX      = g_partSizeX;
-                        g_curPartSizeY      = g_partSizeY;
-                        g_curPartLife       = g_partLife;
-                        g_curPartGravity    = g_partGravity;
-                        g_curPartColor      = g_partColor;
-                        g_curPartRate       = g_partRate;
-                        g_curPartFollow     = g_partFollow;
-
+                        resetParticles();
                         leashParticles(FALSE);
                         tList = [];
                         return;

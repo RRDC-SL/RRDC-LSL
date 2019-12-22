@@ -161,6 +161,20 @@ innerParticles(integer on)
     }
 }
 
+// resetParticles - When activated sets current outer particle settings to defaults.
+// ---------------------------------------------------------------------------------------------------------
+resetParticles()
+{
+    g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
+    g_curPartSizeX      = g_partSizeX;
+    g_curPartSizeY      = g_partSizeY;
+    g_curPartLife       = g_partLife;
+    g_curPartGravity    = g_partGravity;
+    g_curPartColor      = g_partColor;
+    g_curPartRate       = g_partRate;
+    g_curPartFollow     = g_partFollow;
+}
+
 // toggleMode - Controls particle system when changing between LG/LM and Interlink.
 // ----------------------------------------------------------------------------------------
 toggleMode(integer mode)
@@ -263,15 +277,7 @@ default
             return;
         }
 
-        g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
-        g_curPartSizeX      = g_partSizeX;
-        g_curPartSizeY      = g_partSizeY;
-        g_curPartLife       = g_partLife;
-        g_curPartGravity    = g_partGravity;
-        g_curPartColor      = g_partColor;
-        g_curPartRate       = g_partRate;
-        g_curPartFollow     = g_partFollow;
-
+        resetParticles();
         innerParticles(FALSE); // Stop any particle effects and init.
         outerParticles(FALSE);
 
@@ -300,6 +306,7 @@ default
                 name = llToLower(llList2String(l, 0));
                 if (name == "unlink") // unlink <tag> <inner|outer>
                 {
+                    resetParticles();
                     if (llToLower(llList2String(l, 2)) == "inner")
                     {
                         innerParticles(FALSE);
@@ -311,6 +318,7 @@ default
                 }
                 else if (name == "link") // link <tag> <inner|outer> <dest-uuid>
                 {
+                    resetParticles();
                     toggleMode(TRUE);
                     if (llToLower(llList2String(l, 2)) == "inner")
                     {
@@ -341,6 +349,7 @@ default
                 }           // leashto <src-tag> <inner|outer> <uuid> <dest-tag> <inner|outer|x>
                 else if (name == "leashto")
                 {
+                    resetParticles();
                     toggleMode(TRUE);
                     if (llToLower(llList2String(l, 2)) == "inner") // Make a temp link.
                     {
@@ -408,17 +417,9 @@ default
                         outerParticles(TRUE);
                         i += 2;
                     }
-                    else if(name == "unlink")
+                    else if(name == "unlink" && !g_particleMode)
                     {
-                        g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
-                        g_curPartSizeX      = g_partSizeX;
-                        g_curPartSizeY      = g_partSizeY;
-                        g_curPartLife       = g_partLife;
-                        g_curPartGravity    = g_partGravity;
-                        g_curPartColor      = g_partColor;
-                        g_curPartRate       = g_partRate;
-                        g_curPartFollow     = g_partFollow;
-
+                        resetParticles();
                         outerParticles(FALSE);
                         tList = [];
                         return;
