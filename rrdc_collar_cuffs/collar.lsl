@@ -261,6 +261,24 @@ resetParticles()
     g_curPartRate       = g_partRate;
     g_curPartFollow     = g_partFollow;
 }
+
+// resetLeash - When activated, turns off all leashing functions and resets variables.
+// ---------------------------------------------------------------------------------------------------------
+resetLeash()
+{
+    if (g_isLeashed)
+    {
+        // TODO: Stop follow functions.
+        leashParticles(FALSE);
+        llWhisper(getAvChannel(llGetOwner()), "unlink leftankle outer");
+        g_leashUser = "";
+        g_leashMode = "";
+        g_avList    = [];
+        g_pingCount = 0;
+        g_isLeashed = FALSE;
+    }
+}
+
 // toggleMode - Controls particle system when changing between LG/LM and Interlink.
 // ---------------------------------------------------------------------------------------------------------
 toggleMode(integer mode)
@@ -269,6 +287,7 @@ toggleMode(integer mode)
     {
         shackleParticles(FALSE); // Clear all particles.
         leashParticles(FALSE);
+        resetLeash();
 
         g_particleMode = mode; // Toggle mode.
     }
@@ -658,7 +677,7 @@ state main
                     else if (name == "pong" && llList2String(l, 2) == g_leashMode)
                     {
                         id == llGetOwnerKey(id); // Add responder av keys to list.
-                        if (id != llGetOwner() && llGetListLength(g_avList) < 12 && 
+                        if (id != llGetOwner() && llGetListLength(g_avList) <= 12 && 
                             llListFindList(g_avList, [(string)id]) <= -1)
                         {
                             g_avList += [(string)id];
@@ -756,6 +775,81 @@ state main
                         llWhisper(getAvChannel(llGetOwner()), "unlink rightwrist outer");
                     }
                     playRandomSound();
+                }
+                // Leash Commands.
+                // ---------------------------------------------------------------------------------------------
+                else if (mesg == "☐ Leash" || mesg == "☒ Leash")
+                {
+                    if (g_isLeashed && g_leashMode == "leashanchor") // Turn off leash.
+                    {
+                        llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " removed your leash.");
+
+                        resetLeash();
+                    }
+                    else // Grab leash.
+                    {
+                        if (g_isLeashed) // Switch to leash from chain gang.
+                        {
+                            resetLeash();
+                        }
+
+                        llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " attached your leash.");
+                    
+                        g_isLeashed = TRUE;
+                        g_leashMode = "leashanchor";
+                        llWhisper(getAvChannel(id), "linkrequest leashanchor x collarfrontloop leash");
+                        // TODO: Start follow effect on id.
+                    }
+                }
+                // Chain Gang Commands.
+                // ---------------------------------------------------------------------------------------------
+                else if (mesg == "☐ ChainGang" || mesg == "☒ ChainGang")
+                {
+                    if (g_isLeashed && g_leashMode == "leftankle") // Turn off chain gang.
+                    {
+                        llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " removed you from the chain gang.");
+
+                        resetLeash();
+                    }
+                    else // Poll for Chain Gang.
+                    {
+                        if (g_isLeashed) // Switch to chain gang from leash.
+                        {
+                            resetLeash();
+                        }
+
+                        if (g_leashUser != "" && g_leashUser != (string)id)
+                        {
+                            g_leashUser = (string)id; // Start scan for chain gang anchors.
+                            g_leashMode = "leftankle";
+                            llSensor("", NULL_KEY, AGENT, 10.0, PI);
+                        }
+                        else
+                        {
+                            llInstantMessage(id, "Someone else is currently using this feature. " +
+                                "Please wait a moment and try again.");
+                        }
+                    }
+                }
+                // Chain Gang Inmate Selector.
+                // ---------------------------------------------------------------------------------------------
+                else if ((integer)mesg >= 1 && (integer)mesg <= llGetListLength(g_avList))
+                {
+                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " added you to a chain gang.");
+
+                    id = llList2Key(g_avList, ((integer)mesg - 1));
+                    g_avList    = [];
+                    g_leashUser = "";
+                    g_pingCount = 0;
+                    g_isLeashed = TRUE;
+                    llWhisper(getAvChannel(llGetOwner()), "leashto leftankle outer " +
+                        (string)id + " " + "leftankle outer"
+                    );
+                    // TODO: Start follow effect on id.
                 }
                 // Pose Commands.
                 // ---------------------------------------------------------------------------------------------
@@ -1054,13 +1148,37 @@ state main
 
         if (g_pingCount == 1) // Pong message wait timer.
         {
-            showMenu("leashlist", g_leashUser);
-            g_pingCount = 0;
+            //TODO: Show avs found by query and allow select. llDialog.
+            g_pingCount = -100;
         }
         else if (g_pingCount > 0)
         {
             g_pingCount--;
         }
+        else if (g_pingCount == -1 && !g_isLeashed) // To clear the leash user.
+        {
+            llInstantMessage(g_leashUser, "Chain gang selection menu expired.");
+            g_leashUser = "";
+        }
+        else if (g_pingCount < 0)
+        {
+            g_pingCount++;
+        }
+    }
+
+    // Finds nearby avatars and queries them for chain gang anchors.
+    // ---------------------------------------------------------------------------------------------------------
+    sensor(integer num)
+    {
+        integer i;
+        for (i = 0; i < num; i++)
+        {
+            if (llDetectedKey(i) != llGetOwner()) // Exclude the wearer.
+            {
+                llSay(getAvChannel(llDetectedKey(i)), "ping leftankle collarfrontloop");
+            }
+        }
+        g_pingCount = 5;
     }
 
     // Controls random chain sound effects.
