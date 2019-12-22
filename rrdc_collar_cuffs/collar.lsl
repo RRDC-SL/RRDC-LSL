@@ -80,6 +80,13 @@ string getAnimVersion(integer toggle)
     return "a";
 }
 
+// playRandomSound - Plays a random chain sound.
+// ---------------------------------------------------------------------------------------------------------
+playRandomSound()
+{
+    llTriggerSound(llList2String(g_chainSteps, (integer)llFrand(llGetListLength(g_chainSteps))), 0.2);
+}
+
 // stopCurAnims - Stop all AO anims that are playing.
 // ---------------------------------------------------------------------------------------------------------
 stopCurAnims()
@@ -92,6 +99,8 @@ stopCurAnims()
     }
     g_animList = [];
     llSetTimerEvent(0.2); // Restart timer.
+
+    playRandomSound();
 }
 
 // giveCharSheet - Gives a copy of the character sheet to the user, if present.
@@ -229,7 +238,7 @@ default
     // -----------------------------------------------------------------------------------------------------
     state_entry()
     {
-        llSetMemoryLimit(llGetUsedMemory()+1024); // Limit memory for mono-compiled scripts.
+        llSetMemoryLimit(llGetUsedMemory()+2048); // Limit memory for mono-compiled scripts.
         llRequestPermissions(llGetOwner(), 
             (PERMISSION_TAKE_CONTROLS | PERMISSION_TRIGGER_ANIMATION)
         );
@@ -352,30 +361,47 @@ default
             {
                 if (g_ankleChain = !g_ankleChain)
                 {
+                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                        " attached your ankle chain.");
+
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightankle inner leftankle inner");
                 }
                 else
                 {
+                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                        " removed your ankle chain.");
+
                     llWhisper(getAvChannel(llGetOwner()), "unlink leftankle inner");
                 }
+                playRandomSound();
             }
             else if (mesg == "Shackle Link") // Draw chains from wrists to ankles.
             {
                 if (g_isShackled = !g_isShackled)
                 {
+                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                        " attached your shackle links.");
+
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest leftankle outer leftwrist outer");
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightankle outer rightwrist outer");
                 }
                 else
                 {
+                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                        " removed your shackle links.");
+
                     llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist outer");
                     llWhisper(getAvChannel(llGetOwner()), "unlink rightwrist outer");
                 }
+                playRandomSound();
             }
             // Pose Commands.
             // -------------------------------------------------------------------------------------------------
             else if (mesg == "Poses") // Pose selection menu.
             {
+                llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                    " is interacting with your handcuffs.");
+
                 showMenu("poses", id);
                 return;
             }
@@ -553,7 +579,7 @@ default
     {
         if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashedTo))
         {
-            llTriggerSound(llList2String(g_chainSteps, (integer)llFrand(llGetListLength(g_chainSteps))), 0.2);
+            playRandomSound();
         }
     }
 
@@ -561,7 +587,7 @@ default
     {
         if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashedTo))
         {
-            llTriggerSound(llList2String(g_chainSteps, (integer)llFrand(llGetListLength(g_chainSteps))), 0.2);
+            playRandomSound();
         }
     }
 }
