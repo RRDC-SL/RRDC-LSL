@@ -322,7 +322,7 @@ default
                         g_outerPartTarget = llList2Key(l, 3);
                         outerParticles(TRUE);
                     }
-                }       // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
+                }       // linkrequest <dest-tag> <inner|outer|x> <src-tag> <inner|outer>
                 else if (name == "linkrequest")
                 {
                     if (llToLower(llList2String(l, 2)) == "inner") // Get the link UUID.
@@ -334,10 +334,43 @@ default
                         name = (string)llGetLinkKey(g_outerLink);
                     }
 
-                    llWhisper(getAvChannel(llGetOwner()), "link " + // Send link message.
+                    llSay(getAvChannel(llGetOwnerKey(id)), "link " + // Send link message.
                         llList2String(l, 3) + " " +
                         llList2String(l, 4) + " " + name
                     );
+                }           // leashto <src-tag> <inner|outer> <uuid> <dest-tag> <inner|outer|x>
+                else if (name == "leashto")
+                {
+                    toggleMode(TRUE);
+                    if (llToLower(llList2String(l, 2)) == "inner") // Make a temp link.
+                    {
+                        g_innerPartTarget = llList2Key(l, 3);
+                        innerParticles(TRUE);
+                    }
+                    else // Outer.
+                    {
+                        g_outerPartTarget = llList2Key(l, 3);
+                        outerParticles(TRUE);
+                    }
+
+                    if (llGetOwnerKey(llList2Key(l, 3)) == llList2Key(l, 3)) // Is avatar?
+                    {
+                        llSay(getAvChannel(llList2Key(l, 3)), "linkrequest " +
+                            llList2String(l, 4) + " " +
+                            llList2String(l, 5) + " " +
+                            llList2String(l, 1) + " " +
+                            llList2String(l, 2)
+                        );
+                    }
+                    else
+                    {
+                        llRegionSayTo(llList2Key(l, 3), g_appChan, "linkrequest " +
+                            llList2String(l, 4) + " " +
+                            llList2String(l, 5) + " " +
+                            llList2String(l, 1) + " " +
+                            llList2String(l, 2)
+                        );
+                    }
                 }
                 else if (name == "settexture") // settexture <tag> <uuid>
                 {

@@ -600,7 +600,7 @@ state main
                             name = (string)llGetLinkKey(g_leashLink);
                         }
 
-                        llWhisper(getAvChannel(llGetOwner()), "link " + // Send link message.
+                        llSay(getAvChannel(llGetOwnerKey(id)), "link " + // Send link message.
                             llList2String(l, 3) + " " +
                             llList2String(l, 4) + " " + name
                         );
@@ -999,7 +999,7 @@ state main
     // ---------------------------------------------------------------------------------------------------------
     moving_start()
     {
-        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashMode))
+        if (g_useChainSteps && (g_animList != [] || g_leashPartTarget != NULL_KEY || g_ankleChain || g_isShackled))
         {
             playRandomSound();
         }
@@ -1007,7 +1007,7 @@ state main
 
     moving_end()
     {
-        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_leashMode))
+        if (g_useChainSteps && (g_animList != [] || g_leashPartTarget != NULL_KEY || g_ankleChain || g_isShackled))
         {
             playRandomSound();
         }
