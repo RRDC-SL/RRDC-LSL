@@ -140,7 +140,7 @@ string getAnimVersion(integer toggle)
 // ---------------------------------------------------------------------------------------------------------
 playRandomSound()
 {
-    llTriggerSound(llList2String(g_chainSteps, (integer)llFrand(llGetListLength(g_chainSteps))), 0.2);
+    llPlaySound(llList2String(g_chainSteps, (integer)llFrand(llGetListLength(g_chainSteps))), 0.2);
 }
 
 // stopCurAnims - Stop all AO anims that are playing.

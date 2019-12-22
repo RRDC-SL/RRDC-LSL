@@ -1,17 +1,18 @@
-<!-- Tufts VUE 3.3.0 concept-map (emitter_map.vue) 2019-12-17 -->
+<!-- Tufts VUE 3.3.0 concept-map (emitter_map.vue) 2019-12-22 -->
 <!-- Tufts VUE: http://vue.tufts.edu/ -->
 <!-- Do Not Remove: VUE mapping @version(1.1) jar:file:/C:/Program%20Files%20(x86)/VUE/VUE.jar!/tufts/vue/resources/lw_mapping_1_1.xml -->
-<!-- Do Not Remove: Saved date Tue Dec 17 00:56:15 EST 2019 by tzolk on platform Windows 8 6.2 in JVM 1.7.0_21-b11 -->
+<!-- Do Not Remove: Saved date Sun Dec 22 01:07:50 EST 2019 by tzolk on platform Windows 8 6.2 in JVM 1.7.0_21-b11 -->
 <!-- Do Not Remove: Saving version @(#)VUE: built October 8 2015 at 1658 by tomadm on Linux 2.6.32-504.23.4.el6.x86_64 i386 JVM 1.7.0_21-b11(bits=32) -->
 <?xml version="1.0" encoding="US-ASCII"?>
 <LW-MAP xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="none" ID="0" label="emitter_map.vue"
     created="1576556915849" x="0.0" y="0.0" width="1.4E-45"
     height="1.4E-45" strokeWidth="0.0" autoSized="false">
-    <resource referenceCreated="1576562175907" size="33439"
-        spec="C:\Users\tzolk\Desktop\emitter_map.vue" type="1" xsi:type="URLResource">
+    <resource referenceCreated="1576994870545" size="33447"
+        spec="D:\My Repositories\RRDC\rrdc_collar_cuffs\emitter_map.vue"
+        type="1" xsi:type="URLResource">
         <title>emitter_map.vue</title>
-        <property key="File" value="C:\Users\tzolk\Desktop\emitter_map.vue"/>
+        <property key="File" value="D:\My Repositories\RRDC\rrdc_collar_cuffs\emitter_map.vue"/>
     </resource>
     <fillColor>#FFFFFF</fillColor>
     <strokeColor>#404040</strokeColor>
@@ -19,7 +20,7 @@
     <font>SansSerif-plain-14</font>
     <URIString>http://vue.tufts.edu/rdf/resource/125668e8c0a8010901019fc12951e0b8</URIString>
     <child ID="6" label="Collar" layerID="1" created="1576556952695"
-        x="491.0" y="77.0" width="111.0" height="37.0" strokeWidth="1.0"
+        x="487.0" y="68.0" width="111.0" height="37.0" strokeWidth="1.0"
         autoSized="false" xsi:type="node">
         <fillColor>#00000000</fillColor>
         <strokeColor>#000000</strokeColor>
@@ -168,29 +169,29 @@
         <URIString>http://vue.tufts.edu/rdf/resource/125668f1c0a8010901019fc1831e10f3</URIString>
         <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
     </child>
-    <child ID="21" layerID="1" created="1576557226995" x="506.39996"
-        y="113.5" width="24.67392" height="28.5" strokeWidth="1.0"
+    <child ID="21" layerID="1" created="1576557226995" x="504.36838"
+        y="104.5" width="25.973694" height="37.5" strokeWidth="1.0"
         strokeStyle="3" autoSized="false" controlCount="0"
         arrowState="0" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/125668f1c0a8010901019fc182900891</URIString>
-        <point1 x="530.5739" y="114.0"/>
-        <point2 x="506.9" y="141.5"/>
+        <point1 x="529.8421" y="105.0"/>
+        <point2 x="504.8684" y="141.5"/>
         <ID1 xsi:type="node">6</ID1>
         <ID2 xsi:type="node">11</ID2>
     </child>
-    <child ID="22" layerID="1" created="1576557233806" x="563.14636"
-        y="113.5" width="30.19513" height="32.5" strokeWidth="1.0"
+    <child ID="22" layerID="1" created="1576557233806" x="558.0071"
+        y="104.5" width="36.042603" height="41.5" strokeWidth="1.0"
         strokeStyle="3" autoSized="false" controlCount="0"
         arrowState="0" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/125668f2c0a8010901019fc1816108ff</URIString>
-        <point1 x="563.64636" y="114.0"/>
-        <point2 x="592.8415" y="145.5"/>
+        <point1 x="558.5071" y="105.0"/>
+        <point2 x="593.5497" y="145.5"/>
         <ID1 xsi:type="node">6</ID1>
         <ID2 xsi:type="node">12</ID2>
     </child>
@@ -322,7 +323,7 @@
         <shape xsi:type="rectangle"/>
     </child>
     <child ID="33" label="Leash Holder" layerID="1"
-        created="1576557414393" x="201.0" y="116.5" width="86.0"
+        created="1576557414393" x="217.0" y="70.5" width="86.0"
         height="32.0" strokeWidth="1.0" autoSized="false" xsi:type="node">
         <fillColor>#00000000</fillColor>
         <strokeColor>#000000</strokeColor>
@@ -352,7 +353,7 @@
         <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
     </child>
     <child ID="36" label="Leash [0]" layerID="1" created="1576557490126"
-        x="324.0" y="136.5" width="62.0" height="23.0" strokeWidth="1.0"
+        x="353.0" y="74.5" width="62.0" height="23.0" strokeWidth="1.0"
         autoSized="true" xsi:type="node">
         <fillColor>#83CEFF</fillColor>
         <strokeColor>#000000</strokeColor>
@@ -387,28 +388,29 @@
         <ID1 xsi:type="node">32</ID1>
         <ID2 xsi:type="node">35</ID2>
     </child>
-    <child ID="39" layerID="1" created="1576557568145" x="286.5"
-        y="138.0045" width="38.55548" height="6.244232"
-        strokeWidth="1.0" strokeStyle="3" autoSized="false"
-        controlCount="0" arrowState="0" xsi:type="link">
+    <child ID="39" layerID="1" created="1576557568145" x="302.5"
+        y="85.625" width="51.0" height="1.2016144" strokeWidth="1.0"
+        strokeStyle="3" autoSized="false" controlCount="0"
+        arrowState="0" xsi:type="link">
         <strokeColor>#404040</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/125668f6c0a8010901019fc11eea30eb</URIString>
-        <point1 x="287.0" y="138.5045"/>
-        <point2 x="324.55548" y="143.74873"/>
+        <point1 x="303.0" y="86.326614"/>
+        <point2 x="353.0" y="86.125"/>
         <ID1 xsi:type="node">33</ID1>
         <ID2 xsi:type="node">36</ID2>
     </child>
-    <child ID="40" label="Leash" layerID="1" created="1576557579087"
-        x="385.5" y="143.5" width="81.0" height="14.0" strokeWidth="1.0"
-        autoSized="false" controlCount="0" arrowState="2" xsi:type="link">
-        <strokeColor>#404040</strokeColor>
+    <child ID="40" label="GrabLeash" layerID="1" created="1576557579087"
+        x="402.8955" y="97.0" width="75.208984" height="45.0"
+        strokeWidth="1.0" autoSized="false" controlCount="0"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#0877C0</strokeColor>
         <textColor>#404040</textColor>
         <font>Arial-plain-11</font>
         <URIString>http://vue.tufts.edu/rdf/resource/125668f7c0a8010901019fc10b214e83</URIString>
-        <point1 x="466.0" y="151.90845"/>
-        <point2 x="386.0" y="149.09155"/>
+        <point1 x="477.6045" y="141.5"/>
+        <point2 x="403.3955" y="97.5"/>
         <ID1 xsi:type="node">11</ID1>
         <ID2 xsi:type="node">36</ID2>
     </child>
@@ -574,25 +576,84 @@
         <font>-plain-48</font>
         <URIString>http://vue.tufts.edu/rdf/resource/125668fbc0a8010901019fc18d1c495e</URIString>
         <richText>&lt;html&gt;
-  &lt;head color="#000000" style="color: #000000"&gt;
+  &lt;head style="color: #000000" color="#000000"&gt;
     &lt;style type="text/css"&gt;
       &lt;!--
-        body { margin-top: 0px; font-size: 12; color: #000000; margin-bottom: 0px; margin-right: 0px; font-family: Arial; margin-left: 0px }
-        ol { margin-top: 6; font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-left: 30 }
-        p { margin-top: 0; color: #000000; margin-bottom: 0; margin-right: 0; margin-left: 0 }
-        ul { margin-top: 6; font-size: 12; list-style-position: outside; vertical-align: middle; font-family: Arial; margin-left: 30 }
+        body { margin-right: 0px; font-size: 12; font-family: Arial; margin-top: 0px; margin-left: 0px; margin-bottom: 0px; color: #000000 }
+        ol { font-family: Arial; font-size: 12; margin-top: 6; margin-left: 30; vertical-align: middle; list-style-position: outside }
+        p { margin-right: 0; margin-top: 0; margin-left: 0; margin-bottom: 0; color: #000000 }
+        ul { font-family: Arial; font-size: 12; margin-top: 6; margin-left: 30; vertical-align: middle; list-style-position: outside }
       --&gt;
     &lt;/style&gt;
     
   &lt;/head&gt;
   &lt;body&gt;
-    &lt;p color="#000000" style="color: #000000"&gt;
-      &lt;b&gt;&lt;font style="font-size:48;"&gt;Chain Particle Emitter Map&lt;/font&gt;&lt;/b&gt;
+    &lt;p style="color: #000000" color="#000000"&gt;
+      &lt;font style="font-size:48;"&gt;&lt;b&gt;Chain Particle Emitter Map&lt;/b&gt;&lt;/font&gt;
     &lt;/p&gt;
   &lt;/body&gt;
 &lt;/html&gt;
 </richText>
         <label>Chain Particle Emitter Map</label>
+    </child>
+    <child ID="58" label="Anchor [0]" layerID="1"
+        created="1576994516819" x="316.0" y="133.75" width="65.0"
+        height="23.0" strokeWidth="1.0" autoSized="true" xsi:type="node">
+        <fillColor>#83CEFF</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/2c381529c0a8010901f09a71ab6056f1</URIString>
+        <shape arcwidth="20.0" archeight="20.0" xsi:type="roundRect"/>
+    </child>
+    <child ID="59" label="Anchor Point" layerID="1"
+        created="1576994537840" x="185.0" y="128.75" width="86.0"
+        height="32.0" strokeWidth="1.0" autoSized="false" xsi:type="node">
+        <fillColor>#00000000</fillColor>
+        <strokeColor>#000000</strokeColor>
+        <textColor>#000000</textColor>
+        <font>Arial-plain-12</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/2c381529c0a8010901f09a71fea0d4ef</URIString>
+        <shape xsi:type="rectangle"/>
+    </child>
+    <child ID="60" layerID="1" created="1576994556625" x="270.5"
+        y="144.42844" width="46.0" height="1.1867218" strokeWidth="1.0"
+        strokeStyle="3" autoSized="false" controlCount="0"
+        arrowState="0" xsi:type="link">
+        <strokeColor>#404040</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/2c381529c0a8010901f09a71aa408651</URIString>
+        <point1 x="271.0" y="144.92842"/>
+        <point2 x="316.0" y="145.11514"/>
+        <ID1 xsi:type="node">59</ID1>
+        <ID2 xsi:type="node">58</ID2>
+    </child>
+    <child ID="61" label="LeashTo" layerID="1" created="1576994581565"
+        x="380.46082" y="142.16373" width="86.062775" height="14.0"
+        strokeWidth="1.0" autoSized="false" controlCount="0"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#7C18C9</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/2c38152ac0a8010901f09a714490d657</URIString>
+        <point1 x="466.0236" y="151.38338"/>
+        <point2 x="380.96082" y="146.94408"/>
+        <ID1 xsi:type="node">11</ID1>
+        <ID2 xsi:type="node">58</ID2>
+    </child>
+    <child ID="62" label="CuffTo" layerID="1" created="1576994604669"
+        x="340.93427" y="156.25" width="34.0" height="49.75"
+        strokeWidth="1.0" autoSized="false" controlCount="0"
+        arrowState="2" xsi:type="link">
+        <strokeColor>#0877C0</strokeColor>
+        <textColor>#404040</textColor>
+        <font>Arial-plain-11</font>
+        <URIString>http://vue.tufts.edu/rdf/resource/2c38152ac0a8010901f09a71a34f455d</URIString>
+        <point1 x="364.3443" y="205.5"/>
+        <point2 x="351.52423" y="156.75"/>
+        <ID1 xsi:type="node">14</ID1>
+        <ID2 xsi:type="node">58</ID2>
     </child>
     <layer ID="1" label="Layer 1" created="1576556915851" x="0.0"
         y="0.0" width="1.4E-45" height="1.4E-45" strokeWidth="0.0" autoSized="false">
@@ -651,6 +712,6 @@
     </PathwayList>
     <date>2019-12-16</date>
     <modelVersion>6</modelVersion>
-    <saveLocation>C:\Users\tzolk\Desktop</saveLocation>
-    <saveFile>C:\Users\tzolk\Desktop\emitter_map.vue</saveFile>
+    <saveLocation>D:\My Repositories\RRDC\rrdc_collar_cuffs</saveLocation>
+    <saveFile>D:\My Repositories\RRDC\rrdc_collar_cuffs\emitter_map.vue</saveFile>
 </LW-MAP>
