@@ -5,56 +5,27 @@
 //  http://mozilla.org/MPL/2.0/.
 // =========================================================================================================
 
-// Modifiable Variables.
+// System Configuration Variables
 // ---------------------------------------------------------------------------------------------------------
-integer g_appChan           = -89039937;        // The channel for this application set.
-integer g_useChainSteps     = TRUE;             // If FALSE, random chain steps are not played.
+integer g_appChan     = -89039937;                              // The channel for this application set.
 
-// Assets.
+// Particle System Defaults.
 // ---------------------------------------------------------------------------------------------------------
-string  g_whiteTex          =   "aaff45c0-a0ef-c00d-58cb-bff31860d7be"; // RRDC_Collar_Metals_Diffuse_Wte.
-string  g_orangeTex         =   "658f1177-cede-3ea2-57f9-d50e2b1402e4"; // RRDC_Collar_Metals_Diffuse_Orange.
-string  g_lilacTex          =   "25be29e2-cc69-1559-4ad9-511d130554b9"; // RRDC_Collar_Metals_Diffuse_Lilac.
-string  g_blueTex           =   "7add76cf-24f4-a2d3-6102-c6338db891fc"; // RRDC_Collar_Metals_Diffuse_Blue.
-string  g_blackTex          =   "8c61b3ad-2723-cc83-c454-e602a8258ed7"; // RRDC_Collar_Metals_Diffuse_Blk.
-string  g_whiteCuffTex      =   "700b9155-5138-e4c7-d194-1db9a6c09861"; // RRDC_Cuff_Diffuse_Basic.
-string  g_orangeCuffTex     =   "ec94158c-2455-be49-a07d-7604be76c933"; // RRDC_Cuff_Diffuse_Orange.
-string  g_lilacCuffTex      =   "93628600-5364-0a17-fcd8-e617ddd731e5"; // RRDC_Cuff_Diffuse_Lilac.
-string  g_blueCuffTex       =   "e84a056b-f95f-a0db-acf0-7354749bbc03"; // RRDC_Cuff_Diffuse_Blue.
-string  g_blackCuffTex      =   "04c857b4-78d1-8add-3d45-c134e70afa8f"; // RRDC_Cuff_Diffuse_Black.
-string  g_partTex           =   "dbeee6e7-4a63-9efe-125f-ceff36ceeed2"; // thinchain.
- 
-string  g_zapLoopSound      =   "27a18333-a425-30b1-1ab6-c9a3a3554903"; // soundZapLoop.
-string  g_zapStopSound      =   "a4602ead-96f3-ee86-5e0f-63faeb1ed7cf"; // soundZapStop.
-list    g_chainSteps        = [ "f729d711-085e-f899-a723-a4afefd6a7d0", // ChainStep001.
-                                "1f08a669-11ac-96e0-0435-419d2ae01254", // ChainStep002.
-                                "9da21f36-14b1-9e79-3363-fc9d241628ba", // ChainStep003.
-                                "35154062-4f0d-a489-35d3-696d8004b0cc", // ChainStep004.
-                                "93ce44ed-014d-6e58-9d7b-1c9c5242ac6c"  // ChainStep005.
-                              ];
- 
-string  g_zapAnim           =   "animCollarZap";                        // Played during shock effect.
-string  g_poseBackU         =   "cuffedArmsBackU_001";                  // Arms behind back U pose.
-string  g_poseBackV         =   "cuffedArmsBackV_001";                  // Arms behind back V pose.
-string  g_poseFrontX        =   "cuffedArmsFrontX_001";                 // Arms in front X pose.
-string  g_poseFrontV        =   "cuffedArmsFrontV_002";                 // Arms in front V pose.
-list    g_poseComboSet      = [ "cuffedArmsCollar001",                  // Arms in front V pose higher.
-                                "cuffedNeckForward001"                  // Neck forward pose.
-                              ];
-
-// Particle System Defaults. It is best not to mess with these.
-// ---------------------------------------------------------------------------------------------------------
-float   g_partSizeX         = 0.04;             // Particle size X-axis.
-float   g_partSizeY         = 0.04;             // Particle size Y-axis.
-float   g_partLife          = 1.2;              // How long each particle 'lives'.
-float   g_partGravity       = 0.3;              // How much gravity affects the particles.
-vector  g_partColor         = <1.0, 1.0, 1.0>;  // Color of the particles.
-float   g_partRate          = 0.01;             // Interval between particle bursts.
-integer g_partFollow        = 1;                // Particles move relative to the emitter.
+string  g_partTex     = "dbeee6e7-4a63-9efe-125f-ceff36ceeed2"; // thinchain. (Default chain texture)
+float   g_partSizeX   = 0.04;                                   // Particle size X-axis.
+float   g_partSizeY   = 0.04;                                   // Particle size Y-axis.
+float   g_partLife    = 1.2;                                    // How long each particle 'lives'.
+float   g_partGravity = 0.3;                                    // How much gravity affects the particles.
+vector  g_partColor   = <1.0, 1.0, 1.0>;                        // Color of the particles.
+float   g_partRate    = 0.01;                                   // Interval between particle bursts.
+integer g_partFollow  = 1;                                      // Particles move relative to the emitter.
 
 // =========================================================================================================
 // CAUTION: Modifying anything below this line may cause issues. Edit at your own risk!
 // =========================================================================================================
+
+// Current Particle System Parameters for leashLink.
+// ---------------------------------------------------------------------------------------------------------
 string  g_curPartTex;                           // Current particle texture.
 float   g_curPartSizeX;                         // Current particle X size.
 float   g_curPartSizeY;                         // Current particle Y size.
@@ -63,35 +34,55 @@ float   g_curPartGravity;                       // Current particle gravity.
 vector  g_curPartColor;                         // Current particle color.
 float   g_curPartRate;                          // Current particle rate.
 integer g_curPartFollow;                        // Current particle follow flag.
-integer g_leashPartOn;                          // If TRUE, leashLink particles are on.
-integer g_shacklePartOn;                        // If TRUE, shackleLink particles are on.
-string  g_leashPartTarget;                      // Key of the target prim for LG/leash.
-string  g_shacklePartTarget;                    // Key of the target prim for shackle.
-integer g_leashLink;                            // Link number of the leashing point prim.
-integer g_shackleLink;                          // Link number of the chain to shackles point prim.
-integer g_particleMode;                         // FALSE = LG/LM, TRUE = Intercuff.
-list    g_LGTags;                               // List of current LockGuard tags.
-list    g_LMTags;                               // List of current LockMeister tags.
 
-// State Variables.
+// Saved Link Numbers.
 // ---------------------------------------------------------------------------------------------------------
-list    g_animList;                             // List of currently playing (base) anim names.
-integer g_animToggle;                           // 0 = A versions playing. 1 = B versions playing.
 integer g_powerLink;                            // Link number of the power core FX prim.
 integer g_ledLink;                              // Link number of the LED light.
-integer g_ledState;                             // Tracks the current on-off state of the LED.
+integer g_leashLink;                            // Link number of the leashing point prim.
+integer g_shackleLink;                          // Link number of the chain to shackles point prim.
+
+// Timer System Variables.
+// ---------------------------------------------------------------------------------------------------------
 integer g_ledCount;                             // Tracks how long to wait to blink LED.
 integer g_shockCount;                           // Tracks how long to keep shock active.
 integer g_pingCount;                            // Tracks how long to wait for pong messages.
-integer g_ankleChain;                           // If TRUE, ankle chain is active.
-integer g_isShackled;                           // If TRUE, wrist to ankle shackle chain active.
-integer g_isLeashed;                            // If TRUE, wearer is leashed to something.
+
+// Leash System Variables.
+// ---------------------------------------------------------------------------------------------------------
 string  g_leashMode;                            // Tag of the anchor point we're polling for.
 string  g_leashUser;                            // Key of the avatar currently polling for leash points.
 integer g_followHandle;                         // Handle for the leash follower llTarget.
 vector  g_leashTargetPos;                       // Last known position of g_leashPartTarget's owner.
-list    g_curMenus;                             // Tracks current menu by user.
+
+// Particle and Leash Targets.
+// ---------------------------------------------------------------------------------------------------------
+string  g_leashPartTarget;                      // Key of the target prim for LG/leash.
+string  g_shacklePartTarget;                    // Key of the target prim for shackle.
+
+// Data Store Variables.
+// ---------------------------------------------------------------------------------------------------------
+list    g_animList;                             // List of currently playing (base) anim names.
 list    g_avList;                               // Tracks leash/chaingang enabled avatars.
+list    g_curMenus;                             // Tracks current menu by user.
+list    g_LGTags;                               // List of current LockGuard tags.
+list    g_LMTags;                               // List of current LockMeister tags.
+
+// Toggle Switch Bitfield.
+// ---------------------------------------------------------------------------------------------------------
+// OR Mask       AND Mask      Variable
+// ---------------------------------------------------------------------------------------------------------
+// 0x00000001    0xFFFFFFFE    Toggle for anim version. 0=A, 1=B.
+// 0x00000002    0xFFFFFFFD    Current on/off state for the collar LED.
+// 0x00000004    0xFFFFFFFB    Controls whether leashLink particles are turned on.
+// 0x00000008    0xFFFFFFF7    Controls whether shackleLink particles are turned on.
+// 0x00000010    0xFFFFFFEF    Particle Mode. 0=LG/LM, 1=Intercuff/Leash.
+// 0x00000020    0xFFFFFFDF    TRUE when ankle chain is active.
+// 0x00000040    0xFFFFFFBF    TRUE when wrist to ankle shackle chains are active.
+// 0x00000080    0xFFFFFF7F    TRUE when the wearer is leashed to something.
+// 0x00000100    0xFFFFFEFF    TRUE when chain walk sounds are muted.
+// ---------------------------------------------------------------------------------------------------------
+integer g_settings;
 // ---------------------------------------------------------------------------------------------------------
 
 // getAvChannel - Given an avatar key, returns a static channel XORed with g_appChan.
@@ -145,7 +136,14 @@ string getAnimVersion(integer toggle)
 // ---------------------------------------------------------------------------------------------------------
 playRandomSound()
 {
-    llPlaySound(llList2String(g_chainSteps, (integer)llFrand(llGetListLength(g_chainSteps))), 0.2);
+    llPlaySound(llList2String([ "f729d711-085e-f899-a723-a4afefd6a7d0", // ChainStep001.
+                                "1f08a669-11ac-96e0-0435-419d2ae01254", // ChainStep002.
+                                "9da21f36-14b1-9e79-3363-fc9d241628ba", // ChainStep003.
+                                "35154062-4f0d-a489-35d3-696d8004b0cc", // ChainStep004.
+                                "93ce44ed-014d-6e58-9d7b-1c9c5242ac6c"  // ChainStep005.
+                              ], 
+                              (integer)llFrand(5)), 0.2
+    );
 }
 
 // stopCurAnims - Stop all AO anims that are playing.
@@ -156,7 +154,7 @@ stopCurAnims()
     integer i;
     for (i = 0; i < llGetListLength(g_animList); i++)
     {
-        llStopAnimation(llList2String(g_animList, i) + getAnimVersion(g_animToggle));
+        llStopAnimation(llList2String(g_animList, i) + getAnimVersion((g_settings & 0x00000001)));
     }
     g_animList = [];
     llSetTimerEvent(0.2); // Restart timer.
@@ -168,8 +166,8 @@ stopCurAnims()
 // ---------------------------------------------------------------------------------------------------------
 leashParticles(integer on)
 {
-    g_leashPartOn = on; // Save the state we passed in.
-    
+    g_settings = ((g_settings & 0xFFFFFFFB) | (on << 2)); // Save the state we passed in.
+
     if(!on) // If LG particles should be turned off, turn them off and reset defaults.
     {
         llLinkParticleSystem(g_leashLink, []); // Stop particle system and clear target.
@@ -211,7 +209,7 @@ leashParticles(integer on)
 // ---------------------------------------------------------------------------------------------------------
 shackleParticles(integer on)
 {
-    g_shacklePartOn = on;
+    g_settings = ((g_settings & 0xFFFFFFF7) | (on << 3)) // Save the state we passed in.
 
     if (!on) // Turn inner particle system off.
     {
@@ -268,7 +266,7 @@ resetParticles()
 // ---------------------------------------------------------------------------------------------------------
 resetLeash()
 {
-    if (g_isLeashed) // If we're leashed.
+    if ((g_settings & 0x00000080)) // If we're leashed.
     {
         llStopMoveToTarget(); // Stop follow effect.
         llTargetRemove(g_followHandle);
@@ -282,7 +280,7 @@ resetLeash()
         g_leashMode         = "";
         g_avList            = [];
         g_pingCount         = 0;
-        g_isLeashed         = FALSE;
+        g_settings          = (g_settings & 0xFFFFFF7F);
     }
 }
 
@@ -290,7 +288,7 @@ resetLeash()
 // ---------------------------------------------------------------------------------------------------------
 leashFollow(integer atTarget)
 {
-    if (g_isLeashed && g_leashPartTarget != NULL_KEY) // We actually are leashed to something?
+    if ((g_settings & 0x00000080) && g_leashPartTarget != NULL_KEY) // We actually leashed to something?
     {
         vector newPos = llList2Vector( // Get the target's owner's position.
             llGetObjectDetails(llGetOwnerKey(g_leashPartTarget), [OBJECT_POS]), 0
@@ -326,14 +324,14 @@ leashFollow(integer atTarget)
 // ---------------------------------------------------------------------------------------------------------
 toggleMode(integer mode)
 {
-    if (g_particleMode != mode) // If the mode actually changed.
+    if ((g_settings & 0x00000010) != mode) // If the mode actually changed.
     {
         shackleParticles(FALSE); // Clear all particles.
         leashParticles(FALSE);
         resetParticles();
         resetLeash();
 
-        g_particleMode = mode; // Toggle mode.
+        g_settings = ((g_settings & 0xFFFFFFEF) | (mode << 4)); // Toggle mode.
     }
 }
 
@@ -430,7 +428,7 @@ showMenu(string menu, key user)
         {
             buttons = ["📜 Textures"];
 
-            if (g_useChainSteps)
+            if (!(g_settings & 0x00000100))
             {
                 buttons += ["☒ WalkSound"];
             }
@@ -444,7 +442,7 @@ showMenu(string menu, key user)
             buttons = [" ", "✖ Close"];
         }
 
-        if (g_isLeashed && g_leashMode == "leashanchor") // Leash toggle.
+        if ((g_settings & 0x00000080) && g_leashMode == "leashanchor") // Leash toggle.
         {
             buttons = ["☒ Leash"] + buttons;
         }
@@ -453,7 +451,7 @@ showMenu(string menu, key user)
             buttons = ["☐ Leash"] + buttons;
         }
 
-        if (g_isLeashed && g_leashMode == "leftankle") // Chain gang toggle.
+        if ((g_settings & 0x00000080) && g_leashMode == "leftankle") // Chain gang toggle.
         {
             buttons += ["☒ ChainGang"];
         }
@@ -462,7 +460,7 @@ showMenu(string menu, key user)
             buttons += ["☐ ChainGang"];
         }
 
-        if (g_ankleChain) // Ankle chain toggle.
+        if ((g_settings & 0x00000020)) // Ankle chain toggle.
         {
             buttons += ["☒ AnkleChain"];
         }
@@ -471,7 +469,7 @@ showMenu(string menu, key user)
             buttons += ["☐ AnkleChain"];
         }
 
-        if (g_isShackled) // Shackle link toggle.
+        if ((g_settings & 0x00000040)) // Shackle link toggle.
         {
             buttons += ["☒ Shackles"];
         }
@@ -674,7 +672,7 @@ state main
                         {
                             shackleParticles(FALSE);
                         }
-                        else if (g_particleMode) // Leash.
+                        else if ((g_settings & 0x00000010)) // Leash.
                         {
                             resetParticles();
                             leashParticles(FALSE);
@@ -776,8 +774,8 @@ state main
                                     CONTROL_ML_LBUTTON,
                                     TRUE, FALSE
                     );
-                    llStartAnimation(g_zapAnim);
-                    llLoopSound(g_zapLoopSound, 0.5);
+                    llStartAnimation("animCollarZap");
+                    llLoopSound("27a18333-a425-30b1-1ab6-c9a3a3554903", 0.5); // soundZapLoop.
                     g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
                     llSetTimerEvent(0.2);
                 }
@@ -785,7 +783,7 @@ state main
                 // ---------------------------------------------------------------------------------------------
                 else if (mesg == "☐ AnkleChain" || mesg == "☒ AnkleChain") // Toggle chain between ankles.
                 {
-                    if (g_ankleChain = !g_ankleChain)
+                    if (g_settings = (g_settings ^ 0x00000020))
                     {
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " attached your ankle chain.");
@@ -805,7 +803,7 @@ state main
                 // ---------------------------------------------------------------------------------------------
                 else if (mesg == "☐ Shackles" || mesg == "☒ Shackles") // Chains from wrists to ankles.
                 {
-                    if (g_isShackled = !g_isShackled)
+                    if (g_settings = (g_settings ^ 0x00000040))
                     {
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " attached your shackle links.");
@@ -829,9 +827,9 @@ state main
                 {
                     if (id == llGetOwner())
                     {
-                        llInstantMessage(id, "Holding your own leash would seem rather odd.");
+                        llInstantMessage(id, "No matter where you go, there you are.");
                     }
-                    else if (g_isLeashed && g_leashMode == "leashanchor") // Turn off leash.
+                    else if ((g_settings & 0x00000080) && g_leashMode == "leashanchor") // Turn off leash.
                     {
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " removed your leash.");
@@ -841,7 +839,7 @@ state main
                     }
                     else // Grab leash.
                     {
-                        if (g_isLeashed) // Switch to leash from chain gang.
+                        if ((g_settings & 0x00000080)) // Switch to leash from chain gang.
                         {
                             resetLeash();
                         }
@@ -851,7 +849,7 @@ state main
                     
                         toggleMode(TRUE);
 
-                        g_isLeashed       = TRUE;
+                        g_settings        = (g_settings | 0x00000080);
                         g_leashMode       = "leashanchor";
                         g_leashPartTarget = (string)id;
                         g_curPartLife     = 2.4;
@@ -867,7 +865,7 @@ state main
                 // ---------------------------------------------------------------------------------------------
                 else if (mesg == "☐ ChainGang" || mesg == "☒ ChainGang")
                 {
-                    if (g_isLeashed && g_leashMode == "leftankle") // Turn off chain gang.
+                    if ((g_settings & 0x00000080) && g_leashMode == "leftankle") // Turn off chain gang.
                     {
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " removed you from the chain gang.");
@@ -877,7 +875,7 @@ state main
                     }
                     else // Poll for Chain Gang.
                     {
-                        if (g_isLeashed) // Switch to chain gang from leash.
+                        if ((g_settings & 0x00000080)) // Switch to chain gang from leash.
                         {
                             resetLeash();
                         }
@@ -910,7 +908,7 @@ state main
                     g_avList          = [];
                     g_leashUser       = "";
                     g_pingCount       = 0;
-                    g_isLeashed       = TRUE;
+                    g_settings        = (g_settings | 0x00000080);
                     g_leashPartTarget = (string)id;
 
                     llWhisper(getAvChannel(llGetOwner()), "leashto leftankle outer " +
@@ -933,35 +931,35 @@ state main
                 else if (mesg == "웃 Back U") // Emitter is always leftwrist inner or collar shacklesPoint.
                 { // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
                     stopCurAnims();
-                    g_animList = [g_poseBackU];
+                    g_animList = ["cuffedArmsBackU_001"];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
                 }
                 else if (mesg == "웃 Back V")
                 {
                     stopCurAnims();
-                    g_animList = [g_poseBackV];
+                    g_animList = ["cuffedArmsBackV_001"];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
                 else if (mesg == "웃 Front X")
                 {
                     stopCurAnims();
-                    g_animList = [g_poseFrontX];
+                    g_animList = ["cuffedArmsFrontX_001"];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
                 }
                 else if (mesg == "웃 Front V")
                 {
                     stopCurAnims();
-                    g_animList = [g_poseFrontV];
+                    g_animList = ["cuffedArmsFrontV_002"];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
                 else if (mesg == "웃 ComboSet") // Combination two poses.
                 {
                     stopCurAnims();
-                    g_animList = g_poseComboSet;
+                    g_animList = ["cuffedArmsCollar001", "cuffedNeckForward001"];
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest leftwrist inner collarfrontloop shackle");
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
                 }
@@ -982,51 +980,59 @@ state main
                     }
                     else if (mesg == "▩ Blue") // Set textures.
                     {
-                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                            PRIM_TEXTURE, 0, g_blueTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [ // RRDC_Collar_Metals_Diffuse_Blue.
+                            PRIM_TEXTURE, 0, "7add76cf-24f4-a2d3-6102-c6338db891fc",
+                            <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
-                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blueCuffTex);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " +
+                            "e84a056b-f95f-a0db-acf0-7354749bbc03" // RRDC_Cuff_Diffuse_Blue.
+                        );
                     }
                     else if (mesg == "▩ Black")
                     {
-                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                            PRIM_TEXTURE, 0, g_blackTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [ // RRDC_Collar_Metals_Diffuse_Blk.
+                            PRIM_TEXTURE, 0, "8c61b3ad-2723-cc83-c454-e602a8258ed7",
+                            <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
-                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_blackCuffTex);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " +
+                            "04c857b4-78d1-8add-3d45-c134e70afa8f" // RRDC_Cuff_Diffuse_Black.
+                        );
                     }
                     else if (mesg == "▩ White")
                     {
-                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                            PRIM_TEXTURE, 0, g_whiteTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [ // RRDC_Collar_Metals_Diffuse_Wte.
+                            PRIM_TEXTURE, 0, "aaff45c0-a0ef-c00d-58cb-bff31860d7be",
+                            <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
-                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_whiteCuffTex);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " +
+                            "700b9155-5138-e4c7-d194-1db9a6c09861" // RRDC_Cuff_Diffuse_Basic.
+                        );
                     }
                     else if (mesg == "▩ Orange")
                     {
-                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                            PRIM_TEXTURE, 0, g_orangeTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [ // RRDC_Collar_Metals_Diffuse_Orange.
+                            PRIM_TEXTURE, 0, "658f1177-cede-3ea2-57f9-d50e2b1402e4",
+                            <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
-                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_orangeCuffTex);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " +
+                            "ec94158c-2455-be49-a07d-7604be76c933" // RRDC_Cuff_Diffuse_Orange.
+                        );
                     }
                     else if (mesg == "▩ Lilac")
                     {
-                        llSetLinkPrimitiveParamsFast(LINK_THIS, [
-                            PRIM_TEXTURE, 0, g_lilacTex, <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [ // RRDC_Collar_Metals_Diffuse_Lilac.
+                            PRIM_TEXTURE, 0, "25be29e2-cc69-1559-4ad9-511d130554b9",
+                            <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
                         ]);
-                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " + g_lilacCuffTex);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " +
+                            "93628600-5364-0a17-fcd8-e617ddd731e5" // RRDC_Cuff_Diffuse_Lilac.
+                        );
                     }
                     // Sound Commands.
                     // -----------------------------------------------------------------------------------------
                     else if (mesg == "☐ WalkSound" || mesg == "☒ WalkSound" ) // Turn chain walk sounds on/off.
                     {
-                        if (g_useChainSteps = !g_useChainSteps)
-                        {
-                            g_useChainSteps = TRUE;
-                        }
-                        else
-                        {
-                            g_useChainSteps = FALSE;
-                        }
+                        g_settings = (g_settings ^ 0x00000100);
                     }
                 }
             }
@@ -1065,7 +1071,7 @@ state main
                         leashParticles(TRUE);
                         i += 2;
                     }
-                    else if(name == "unlink" && !g_particleMode)
+                    else if(name == "unlink" && !(g_settings & 0x00000010))
                     {
                         resetParticles();
                         leashParticles(FALSE);
@@ -1134,7 +1140,7 @@ state main
                     }
                     else if(name == "free")
                     {
-                        if(g_leashPartOn)
+                        if((g_settings & 0x00000004))
                         {
                             llRegionSayTo(id, -9119, "lockguard " + ((string)llGetOwner()) + " " + 
                                 llList2String(g_LGTags, 0) + " no"
@@ -1154,7 +1160,7 @@ state main
                     }
                 }
                 
-                leashParticles(g_leashPartOn); // Refresh particles.
+                leashParticles((g_settings & 0x00000004)); // Refresh particles.
             }
         }
     }
@@ -1165,13 +1171,13 @@ state main
     {
         if (g_animList != []) // Persistent AO (0.2 seconds).
         {
-            g_animToggle = !g_animToggle;
+            g_settings = (g_settings ^ 0x00000001);
 
             integer i;
             for (i = 0; i < llGetListLength(g_animList); i++)
             {
-                llStartAnimation(llList2String(g_animList, i) + getAnimVersion(g_animToggle));
-                llStopAnimation(llList2String(g_animList, i) + getAnimVersion(!g_animToggle));
+                llStartAnimation(llList2String(g_animList, i) + getAnimVersion((g_settings & 0x00000001)));
+                llStopAnimation(llList2String(g_animList, i) + getAnimVersion(!(g_settings & 0x00000001)));
             }
         }
 
@@ -1180,7 +1186,7 @@ state main
             if (g_shockCount == 10) // Ending effect.
             {
                 llStopSound();
-                llPlaySound(g_zapStopSound, 0.5);
+                llPlaySound("a4602ead-96f3-ee86-5e0f-63faeb1ed7cf", 0.5); // soundZapStop.
             }
             g_shockCount--;
         }
@@ -1228,9 +1234,9 @@ state main
         {
             g_pingCount--;
         }
-        else if (g_pingCount == -1 && !g_isLeashed) // To clear the leash user.
+        else if (g_pingCount == -1 && !(g_settings & 0x00000080)) // To clear the leash user.
         {
-            llInstantMessage(g_leashUser, "Chain gang selection menu expired.");
+            llInstantMessage(g_leashUser, "Inmate selection menu has expired.");
             g_leashUser = "";
             g_pingCount = 0;
         }
@@ -1241,7 +1247,7 @@ state main
 
         if (g_ledCount++ >= 4) // Blinking LED effects (1.0 seconds).
         {
-            if (g_ledState = !g_ledState) 
+            if (g_settings = (g_settings ^ 0x00000002)) 
             {
                 llSetLinkPrimitiveParamsFast(g_ledLink, [
                     PRIM_COLOR, ALL_SIDES, <0.3, 0.0, 0.0>, llGetAlpha(0), 
@@ -1280,7 +1286,8 @@ state main
     // ---------------------------------------------------------------------------------------------------------
     moving_start()
     {
-        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_isLeashed))
+        if (!(g_settings & 0x00000100) && (g_animList != [] || (g_settings & 0x00000020) ||
+            (g_settings & 0x00000040) || (g_settings & 0x00000080)))
         {
             playRandomSound();
         }
@@ -1288,7 +1295,8 @@ state main
 
     moving_end()
     {
-        if (g_useChainSteps && (g_animList != [] || g_ankleChain || g_isShackled || g_isLeashed))
+        if (!(g_settings & 0x00000100) && (g_animList != [] || (g_settings & 0x00000020) ||
+            (g_settings & 0x00000040) || (g_settings & 0x00000080)))
         {
             playRandomSound();
         }
