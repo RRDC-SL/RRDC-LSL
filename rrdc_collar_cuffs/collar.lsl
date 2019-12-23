@@ -827,6 +827,8 @@ state main
 
                         if (g_leashUser != "" && g_leashUser != (string)id)
                         {
+                            llInstantMessage(id, "Scanning for nearby inmates. Please wait...");
+
                             g_leashUser = (string)id; // Start scan for chain gang anchors.
                             g_leashMode = "leftankle";
                             llSensor("", NULL_KEY, AGENT, 10.0, PI);
@@ -1152,8 +1154,16 @@ state main
 
         if (g_pingCount == 1) // Pong message wait timer.
         {
-            //TODO: Show avs found by query and allow select. llDialog.
-            g_pingCount = -100;
+            integer i; // Show the chain gang selection dialog.
+            string text  = "Select an Inmate by number below:\n\n";
+            list buttons = [];
+            for (i = 0; i < llGetListLength(g_avList); i++)
+            {
+                text += ((string)(i + 1)) + ". " + llKey2Name(llList2Key(g_avList, i));
+                buttons += [((string)(i + 1))];
+            }
+            llDialog(g_leashUser, text, buttons, getAvChannel(llGetOwner()));
+            g_pingCount = -100; // 20 seconds.
         }
         else if (g_pingCount > 0)
         {
@@ -1179,7 +1189,7 @@ state main
         {
             if (llDetectedKey(i) != llGetOwner()) // Exclude the wearer.
             {
-                llSay(getAvChannel(llDetectedKey(i)), "ping leftankle collarfrontloop");
+                llWhisper(getAvChannel(llDetectedKey(i)), "ping leftankle collarfrontloop");
             }
         }
         g_pingCount = 5;
