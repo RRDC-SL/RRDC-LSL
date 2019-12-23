@@ -277,7 +277,7 @@ resetLeash()
         llWhisper(getAvChannel(llGetOwner()), "unlink leftankle outer");
 
         g_followHandle      = 0;
-        g_leashTargetPos    = ZERO_VECTOR
+        g_leashTargetPos    = ZERO_VECTOR;
         g_leashUser         = "";
         g_leashMode         = "";
         g_avList            = [];
