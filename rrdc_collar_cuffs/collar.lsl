@@ -605,6 +605,7 @@ state main
         }
 
         llSetMemoryLimit(llGetUsedMemory() + 3072‬); // Limit script memory consumption.
+        llMinEventDelay(0.2);
 
         if (g_LMTags == [] || g_shackleLink <= 0 || g_leashLink <= 0)
         {
