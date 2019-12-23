@@ -690,12 +690,6 @@ state main
                         }
                         else // Leash.
                         {
-                            if (g_isLeashed) // Make the chain a little longer for leash.
-                            {
-                                g_curPartLife = 2.4;
-                                g_curPartGravity = 0.15;
-                            }
-
                             g_leashPartTarget = llList2Key(l, 3);
                             leashParticles(TRUE);
                         }
@@ -725,7 +719,7 @@ state main
                     }           // pong collarfrontloop <my-tag>
                     else if (name == "pong" && llList2String(l, 2) == g_leashMode)
                     {
-                        id == llGetOwnerKey(id); // Add responder av keys to list.
+                        id = llGetOwnerKey(id); // Add responder av keys to list.
                         if (id != llGetOwner() && llGetListLength(g_avList) <= 12 && 
                             llListFindList(g_avList, [(string)id]) <= -1)
                         {
@@ -833,7 +827,11 @@ state main
                 // ---------------------------------------------------------------------------------------------
                 else if (mesg == "☐ Leash" || mesg == "☒ Leash")
                 {
-                    if (g_isLeashed && g_leashMode == "leashanchor") // Turn off leash.
+                    if (id == llGetOwner())
+                    {
+                        llInstantMessage(id, "Holding your own leash would seem rather odd.");
+                    }
+                    else if (g_isLeashed && g_leashMode == "leashanchor") // Turn off leash.
                     {
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " removed your leash.");
@@ -850,12 +848,16 @@ state main
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " attached your leash.");
                     
+                        toggleMode(TRUE);
+
                         g_isLeashed       = TRUE;
                         g_leashMode       = "leashanchor";
                         g_leashPartTarget = (string)id;
+                        g_curPartLife     = 2.4;
+                        g_curPartGravity  = 0.15;
 
                         llWhisper(getAvChannel(id), "linkrequest leashanchor x collarfrontloop leash");
-
+                        leashParticles(TRUE);
                         leashFollow(FALSE); // Start follow effect on id.
                     }
                 }
@@ -877,7 +879,7 @@ state main
                             resetLeash();
                         }
 
-                        if (g_leashUser != "" && g_leashUser != (string)id)
+                        if (g_leashUser == "" || g_leashUser == (string)id)
                         {
                             llInstantMessage(id, "Scanning for nearby inmates. Please wait...");
 
@@ -1205,8 +1207,18 @@ state main
                 text += ((string)(i + 1)) + ". " + llKey2Name(llList2Key(g_avList, i));
                 buttons += [((string)(i + 1))];
             }
-            llDialog(g_leashUser, text, buttons, getAvChannel(llGetOwner()));
-            g_pingCount = -100; // 20 seconds.
+
+            if (buttons != [])
+            {
+                llDialog(g_leashUser, text, buttons, getAvChannel(llGetOwner()));
+                g_pingCount = -225; // 45 seconds.
+            }
+            else
+            {
+                llInstantMessage(g_leashUser, "There aren't any other inmates around.");
+                g_leashUser = "";
+                g_pingCount = 0;
+            }
         }
         else if (g_pingCount > 0)
         {
@@ -1216,6 +1228,7 @@ state main
         {
             llInstantMessage(g_leashUser, "Chain gang selection menu expired.");
             g_leashUser = "";
+            g_pingCount = 0;
         }
         else if (g_pingCount < 0)
         {

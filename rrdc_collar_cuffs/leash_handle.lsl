@@ -23,7 +23,7 @@ default
     // -----------------------------------------------------------------------------------------------------
     state_entry()
     {
-        llSetMemoryLimit(llGetUsedMemory() + 512);
+        llSetMemoryLimit(llGetUsedMemory() + 1024);
         llListen(getAvChannel(llGetOwner()), "", "", ""); // Open collar/cuffs avChannel.
     }
 
