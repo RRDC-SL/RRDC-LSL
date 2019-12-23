@@ -88,7 +88,6 @@ integer g_isShackled;                           // If TRUE, wrist to ankle shack
 integer g_isLeashed;                            // If TRUE, wearer is leashed to something.
 string  g_leashMode;                            // Tag of the anchor point we're polling for.
 string  g_leashUser;                            // Key of the avatar currently polling for leash points.
-integer g_inRange;                              // If TRUE, g_leashPartTarget's owner was within 6m.
 integer g_followHandle;                         // Handle for the leash follower llTarget.
 vector  g_leashTargetPos;                       // Last known position of g_leashPartTarget's owner.
 list    g_curMenus;                             // Tracks current menu by user.
@@ -271,15 +270,55 @@ resetLeash()
 {
     if (g_isLeashed) // If we're leashed.
     {
-        // TODO: Stop follow functions.
+        llStopMoveToTarget(); // Stop follow effect.
+        llTargetRemove(g_followHandle);
+
         leashParticles(FALSE);
         llWhisper(getAvChannel(llGetOwner()), "unlink leftankle outer");
 
-        g_leashUser = "";
-        g_leashMode = "";
-        g_avList    = [];
-        g_pingCount = 0;
-        g_isLeashed = FALSE;
+        g_followHandle      = 0;
+        g_leashTargetPos    = ZERO_VECTOR
+        g_leashUser         = "";
+        g_leashMode         = "";
+        g_avList            = [];
+        g_pingCount         = 0;
+        g_isLeashed         = FALSE;
+    }
+}
+
+// leashFollow - Controls leash auto-follow functionality.
+// ---------------------------------------------------------------------------------------------------------
+leashFollow(integer atTarget)
+{
+    if (g_isLeashed && g_leashPartTarget != NULL_KEY) // We actually are leashed to something?
+    {
+        vector newPos = llList2Vector( // Get the target's owner's position.
+            llGetObjectDetails(llGetOwnerKey(g_leashPartTarget), [OBJECT_POS]), 0
+        );
+
+        if (newPos == ZERO_VECTOR || newPos.x < -25 || newPos.x > 280 || newPos.y < -25 || 
+            newPos.y > 280 || llVecDist(llGetPos(), newPos) > 15.0)
+        {
+            resetLeash(); // If target's owner is not on the sim and within 15m, stop leash.
+        }
+        else // Target is within range.
+        {
+            if (g_leashTargetPos != newPos) // Update target if pos changed.
+            {
+                llTargetRemove(g_followHandle);
+                g_leashTargetPos = newPos;
+                g_followHandle = llTarget(g_leashTargetPos, 2.0);
+            }
+
+            if (!atTarget) // Only keep moving if we're not at target.
+            {
+                llMoveToTarget(g_leashTargetPos, 0.85);
+            }
+            else
+            {
+                llStopMoveToTarget();
+            }
+        }
     }
 }
 
@@ -651,6 +690,12 @@ state main
                         }
                         else // Leash.
                         {
+                            if (g_isLeashed) // Make the chain a little longer for leash.
+                            {
+                                g_curPartLife = 2.4;
+                                g_curPartGravity = 0.15;
+                            }
+
                             g_leashPartTarget = llList2Key(l, 3);
                             leashParticles(TRUE);
                         }
@@ -805,10 +850,13 @@ state main
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " attached your leash.");
                     
-                        g_isLeashed = TRUE;
-                        g_leashMode = "leashanchor";
+                        g_isLeashed       = TRUE;
+                        g_leashMode       = "leashanchor";
+                        g_leashPartTarget = (string)id;
+
                         llWhisper(getAvChannel(id), "linkrequest leashanchor x collarfrontloop leash");
-                        // TODO: Start follow effect on id.
+
+                        leashFollow(FALSE); // Start follow effect on id.
                     }
                 }
                 // Chain Gang Commands.
@@ -835,6 +883,7 @@ state main
 
                             g_leashUser = (string)id; // Start scan for chain gang anchors.
                             g_leashMode = "leftankle";
+
                             llSensor("", NULL_KEY, AGENT, 10.0, PI);
                         }
                         else
@@ -852,14 +901,18 @@ state main
                             " added you to a chain gang.");
 
                     id = llList2Key(g_avList, ((integer)mesg - 1));
-                    g_avList    = [];
-                    g_leashUser = "";
-                    g_pingCount = 0;
-                    g_isLeashed = TRUE;
+
+                    g_avList          = [];
+                    g_leashUser       = "";
+                    g_pingCount       = 0;
+                    g_isLeashed       = TRUE;
+                    g_leashPartTarget = (string)id;
+
                     llWhisper(getAvChannel(llGetOwner()), "leashto leftankle outer " +
                         (string)id + " " + "leftankle outer"
                     );
-                    // TODO: Start follow effect on id.
+
+                    leashFollow(FALSE); // Start follow effect on id.
                 }
                 // Pose Commands.
                 // ---------------------------------------------------------------------------------------------
@@ -1169,7 +1222,7 @@ state main
             g_pingCount++;
         }
 
-        if (g_ledCount++ >= 4) // Blinking LED effects and Leash (1.0 seconds).
+        if (g_ledCount++ >= 4) // Blinking LED effects (1.0 seconds).
         {
             if (g_ledState = !g_ledState) 
             {
@@ -1188,8 +1241,6 @@ state main
                 ]);
             }
             g_ledCount = 0;
-
-            // TODO: Leash follower inRange Stuff.
         }
     }
 
@@ -1224,5 +1275,17 @@ state main
         {
             playRandomSound();
         }
+    }
+
+    // Tells the leash follow system whether the avatar needs to move or not.
+    // ---------------------------------------------------------------------------------------------------------
+    at_target(integer tnum, vector targetpos, vector ourpos)
+    {
+        leashFollow(TRUE); // Let the follow system know we've reached our target.
+    }
+
+    not_at_target()
+    {
+        leashFollow(FALSE); // Let the follow system know we're not at target yet.
     }
 }

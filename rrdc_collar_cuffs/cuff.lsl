@@ -357,6 +357,9 @@ default
                 else if (name == "leashto")
                 {
                     toggleMode(TRUE);
+                    g_curPartLife = 2.4;     // Make the chain a little longer for leash/chain gang.
+                    g_curPartGravity = 0.15;
+
                     if (llToLower(llList2String(l, 2)) == "inner") // Make a temp link.
                     {
                         g_innerPartTarget = llList2Key(l, 3);
