@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v0.25 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.0 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -606,7 +606,7 @@ state main
             }
         }
 
-        llSetMemoryLimit(llGetUsedMemory() + 2048); // Limit script memory consumption.
+        llSetMemoryLimit(llGetUsedMemory() + 3072‬); // Limit script memory consumption.
 
         if (g_LMTags == [] || g_shackleLink <= 0 || g_leashLink <= 0)
         {
@@ -837,6 +837,7 @@ state main
                             " removed your leash.");
 
                         resetLeash();
+                        playRandomSound();
                     }
                     else // Grab leash.
                     {
@@ -859,6 +860,7 @@ state main
                         llWhisper(getAvChannel(id), "linkrequest leashanchor x collarfrontloop leash");
                         leashParticles(TRUE);
                         leashFollow(FALSE); // Start follow effect on id.
+                        playRandomSound();
                     }
                 }
                 // Chain Gang Commands.
@@ -871,6 +873,7 @@ state main
                             " removed you from the chain gang.");
 
                         resetLeash();
+                        playRandomSound();
                     }
                     else // Poll for Chain Gang.
                     {
@@ -915,6 +918,7 @@ state main
                     );
 
                     leashFollow(FALSE); // Start follow effect on id.
+                    playRandomSound();
                 }
                 // Pose Commands.
                 // ---------------------------------------------------------------------------------------------

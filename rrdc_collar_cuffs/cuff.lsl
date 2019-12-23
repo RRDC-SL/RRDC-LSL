@@ -1,4 +1,4 @@
-// [SGD] RRDC Cuffs Script v0.1 Copyright 2019 Alex Pascal (Alex Carpenter).
+// [SGD] RRDC Cuffs Script v1.0 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter).
 //  Based on combined Lockmeister and LockGuard script by Felis Darwin.
 // ----------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
