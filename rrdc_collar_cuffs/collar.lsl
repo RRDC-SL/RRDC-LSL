@@ -688,6 +688,10 @@ state main
                     {
                         stopCurAnims();
                     }
+                    else if (name == "stopleash") // stopleash collarfrontloop
+                    {
+                        resetLeash();
+                    }
                 }
                 return;
             }

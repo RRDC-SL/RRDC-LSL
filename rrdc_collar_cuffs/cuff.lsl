@@ -186,9 +186,16 @@ toggleMode(integer mode)
 
         g_particleMode = mode; // Toggle mode.
 
-        if (!mode && llList2String(g_LMTags, 0) == "lcuff") // Send stop poses command.
+        if (!mode) // Send stop poses or stop leash command.
         {
-            llWhisper(getAvChannel(llGetOwner()), "stopposes collarfrontloop");
+            if (llList2String(g_LMTags, 0) == "lcuff")
+            {
+                llWhisper(getAvChannel(llGetOwner()), "stopposes collarfrontloop");
+            }
+            else if (llList2String(g_LMTags, 0) == "llcuff")
+            {
+                llWhisper(getAvChannel(llGetOwner()), "stopleash collarfrontloop");
+            }
         }
     }
 }

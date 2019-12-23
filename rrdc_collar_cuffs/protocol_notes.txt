@@ -33,4 +33,7 @@ pong            -   [From: Any. To: Collar] Replies to the ping message.
                     pong <ping-tag> <my-tag>
                     pong collarfrontloop <my-tag>
 
+stopleash       -   [From: Cuffs. To: Collar] Tells the collar to stop the leash effect.
+                    stopleash <tag>
+
 *Note: Introduces the 'leashanchor' tag for leash holders.
