@@ -88,6 +88,8 @@ integer g_isShackled;                           // If TRUE, wrist to ankle shack
 integer g_isLeashed;                            // If TRUE, wearer is leashed to something.
 string  g_leashMode;                            // Tag of the anchor point we're polling for.
 string  g_leashUser;                            // Key of the avatar currently polling for leash points.
+integer g_followHandle;                         // Handle for the leash follower llTarget.
+vector  g_leashTargetPos;                       // Last known position of g_leashPartTarget's owner.
 list    g_curMenus;                             // Tracks current menu by user.
 list    g_avList;                               // Tracks leash/chaingang enabled avatars.
 // ---------------------------------------------------------------------------------------------------------
@@ -1131,27 +1133,6 @@ state main
             );
         }
 
-        if (g_ledCount++ >= 4) // Blinking LED effects (1.0 seconds).
-        {
-            if (g_ledState = !g_ledState) 
-            {
-                llSetLinkPrimitiveParamsFast(g_ledLink, [
-                    PRIM_COLOR, ALL_SIDES, <0.3, 0.0, 0.0>, llGetAlpha(0), 
-                    PRIM_POINT_LIGHT, FALSE, ZERO_VECTOR, 0.5, 0.5, 0.1,
-                    PRIM_GLOW, ALL_SIDES, 0.0
-                ]);
-            }
-            else
-            {
-                llSetLinkPrimitiveParamsFast(g_ledLink, [
-                    PRIM_COLOR, ALL_SIDES, <1.0, 0.0, 0.0>, llGetAlpha(0), 
-                    PRIM_POINT_LIGHT, TRUE, <1.0, 0.0, 0.0>, 0.35, 0.075, 0.1,
-                    PRIM_GLOW, ALL_SIDES, 1.0
-                ]);
-            }
-            g_ledCount = 0;
-        }
-
         if (g_pingCount == 1) // Pong message wait timer.
         {
             integer i; // Show the chain gang selection dialog.
@@ -1177,6 +1158,29 @@ state main
         else if (g_pingCount < 0)
         {
             g_pingCount++;
+        }
+
+        if (g_ledCount++ >= 4) // Blinking LED effects and Leash (1.0 seconds).
+        {
+            if (g_ledState = !g_ledState) 
+            {
+                llSetLinkPrimitiveParamsFast(g_ledLink, [
+                    PRIM_COLOR, ALL_SIDES, <0.3, 0.0, 0.0>, llGetAlpha(0), 
+                    PRIM_POINT_LIGHT, FALSE, ZERO_VECTOR, 0.5, 0.5, 0.1,
+                    PRIM_GLOW, ALL_SIDES, 0.0
+                ]);
+            }
+            else
+            {
+                llSetLinkPrimitiveParamsFast(g_ledLink, [
+                    PRIM_COLOR, ALL_SIDES, <1.0, 0.0, 0.0>, llGetAlpha(0), 
+                    PRIM_POINT_LIGHT, TRUE, <1.0, 0.0, 0.0>, 0.35, 0.075, 0.1,
+                    PRIM_GLOW, ALL_SIDES, 1.0
+                ]);
+            }
+            g_ledCount = 0;
+
+            // TODO: Leash follower inRange Stuff.
         }
     }
 
