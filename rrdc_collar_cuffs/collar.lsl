@@ -88,6 +88,7 @@ integer g_isShackled;                           // If TRUE, wrist to ankle shack
 integer g_isLeashed;                            // If TRUE, wearer is leashed to something.
 string  g_leashMode;                            // Tag of the anchor point we're polling for.
 string  g_leashUser;                            // Key of the avatar currently polling for leash points.
+integer g_inRange;                              // If TRUE, g_leashPartTarget's owner was within 6m.
 integer g_followHandle;                         // Handle for the leash follower llTarget.
 vector  g_leashTargetPos;                       // Last known position of g_leashPartTarget's owner.
 list    g_curMenus;                             // Tracks current menu by user.
@@ -268,11 +269,12 @@ resetParticles()
 // ---------------------------------------------------------------------------------------------------------
 resetLeash()
 {
-    if (g_isLeashed)
+    if (g_isLeashed) // If we're leashed.
     {
         // TODO: Stop follow functions.
         leashParticles(FALSE);
         llWhisper(getAvChannel(llGetOwner()), "unlink leftankle outer");
+
         g_leashUser = "";
         g_leashMode = "";
         g_avList    = [];
@@ -628,19 +630,18 @@ state main
                     name = llToLower(llList2String(l, 0));
                     if (name == "unlink") // unlink collarfrontloop <leash|shackle>
                     {
-                        resetParticles();
                         if (llToLower(llList2String(l, 2)) == "shackle")
                         {
                             shackleParticles(FALSE);
                         }
                         else if (g_particleMode) // Leash.
                         {
+                            resetParticles();
                             leashParticles(FALSE);
                         }
                     }
                     else if (name == "link") // link collarfrontloop <leash|shackle> <dest-uuid>
                     {
-                        resetParticles();
                         toggleMode(TRUE);
                         if (llToLower(llList2String(l, 2)) == "shackle")
                         {
@@ -649,6 +650,7 @@ state main
                         }
                         else // Leash.
                         {
+                            resetParticles();
                             g_leashPartTarget = llList2Key(l, 3);
                             leashParticles(TRUE);
                         }

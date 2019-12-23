@@ -313,19 +313,18 @@ default
                 name = llToLower(llList2String(l, 0));
                 if (name == "unlink") // unlink <tag> <inner|outer>
                 {
-                    resetParticles();
                     if (llToLower(llList2String(l, 2)) == "inner")
                     {
                         innerParticles(FALSE);
                     }
                     else if (g_particleMode) // Outer.
                     {
+                        resetParticles();
                         outerParticles(FALSE);
                     }
                 }
                 else if (name == "link") // link <tag> <inner|outer> <dest-uuid>
                 {
-                    resetParticles();
                     toggleMode(TRUE);
                     if (llToLower(llList2String(l, 2)) == "inner")
                     {
@@ -334,6 +333,7 @@ default
                     }
                     else // Outer.
                     {
+                        resetParticles();
                         g_outerPartTarget = llList2Key(l, 3);
                         outerParticles(TRUE);
                     }
@@ -356,7 +356,6 @@ default
                 }           // leashto <src-tag> <inner|outer> <uuid> <dest-tag> <inner|outer|x>
                 else if (name == "leashto")
                 {
-                    resetParticles();
                     toggleMode(TRUE);
                     if (llToLower(llList2String(l, 2)) == "inner") // Make a temp link.
                     {
@@ -365,6 +364,7 @@ default
                     }
                     else // Outer.
                     {
+                        resetParticles();
                         g_outerPartTarget = llList2Key(l, 3);
                         outerParticles(TRUE);
                     }
