@@ -291,6 +291,7 @@ toggleMode(integer mode)
     {
         shackleParticles(FALSE); // Clear all particles.
         leashParticles(FALSE);
+        resetParticles();
         resetLeash();
 
         g_particleMode = mode; // Toggle mode.
@@ -650,7 +651,6 @@ state main
                         }
                         else // Leash.
                         {
-                            resetParticles();
                             g_leashPartTarget = llList2Key(l, 3);
                             leashParticles(TRUE);
                         }
@@ -1015,16 +1015,19 @@ state main
                     }
                     else if(name == "gravity")
                     {
+                        toggleMode(FALSE);
                         g_curPartGravity = fMax(0.0, fMin(llList2Float(tList, (i + 1)), 100.0));
                         i += 2;
                     }
                     else if(name == "life")
                     {
+                        toggleMode(FALSE);
                         g_curPartLife = fMax(0.0, llList2Float(tList, (i + 1)));
                         i += 2;
                     }
                     else if(name == "texture")
                     {
+                        toggleMode(FALSE);
                         name = llList2String(tList, (i + 1));
                         if(name == "chain" || name == "rope")
                         {
@@ -1038,22 +1041,26 @@ state main
                     }
                     else if(name == "rate")
                     {
+                        toggleMode(FALSE);
                         g_curPartRate = fMax(0.0, llList2Float(tList, (i + 1)));
                         i += 2;
                     }
                     else if(name == "follow")
                     {
+                        toggleMode(FALSE);
                         g_curPartFollow = (llList2Integer(tList, (i + 1)) > 0);
                         i += 2;
                     }
                     else if(name == "size")
                     {
+                        toggleMode(FALSE);
                         g_curPartSizeX = fMax(0.03125, fMin(llList2Float(tList, (i + 1)), 4.0));
                         g_curPartSizeY = fMax(0.03125, fMin(llList2Float(tList, (i + 2)), 4.0));
                         i += 3;
                     }
                     else if(name == "color")
                     {
+                        toggleMode(FALSE);
                         g_curPartColor.x = fMax(0.0, fMin(llList2Float(tList, (i + 1)), 1.0));
                         g_curPartColor.y = fMax(0.0, fMin(llList2Float(tList, (i + 2)), 1.0));
                         g_curPartColor.z = fMax(0.0, fMin(llList2Float(tList, (i + 3)), 1.0));
