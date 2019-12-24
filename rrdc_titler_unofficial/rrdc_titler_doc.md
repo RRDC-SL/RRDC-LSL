@@ -6,6 +6,7 @@
     /4[</me|:|`>][((]<text>
 
 **Examples:**
+
     /4This is an IC statement.
     /4/me makes an IC emote.
     /4:makes an IC emote.
