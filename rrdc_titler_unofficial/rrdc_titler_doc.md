@@ -36,6 +36,7 @@
          menu was associated with. This is a known limitation of the parser.
 
 **Available Commands:**
+    
     menu
             - Shows the main menu.
     help
