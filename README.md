@@ -18,11 +18,11 @@ Sub-projects are organized into directories. Not all sub-projects are used.
     
 5. Copy assets from the folder you created back into the collar/cuffs.
     * Copy all animations into the root prim of the collar.
-    * (optional) Copy all sounds into the root prim of the collar.
-    * (optional) Copy all textures into the root prim of the collar.
-    * (optional) Copy 'thinchain' into the root prim of each cuff.
+    * (OPTIONAL) Copy all sounds into the root prim of the collar.
+    * (OPTIONAL) Copy all textures into the root prim of the collar.
+    * (OPTIONAL) Copy 'thinchain' into the root prim of each cuff.
 
-6. (optional, recommended) Remove unnecessary prims from each cuffs linkset.
+6. (OPTIONAL) Remove unnecessary prims from each cuffs linkset.
     * Each cuff should have exactly two transparent spheres. One on each side.
     * Unlink and delete additional spheres. Pay attention to which side 'LM-LG link' spheres are on.
     * Make sure the remaining spheres are centered on the top of the cuff anchor point.
@@ -43,5 +43,5 @@ Sub-projects are organized into directories. Not all sub-projects are used.
 
 ## Leash Handle Script Instructions ##
 
-1. Edit the object you want to act as a leash handle and select the prim you want to recieve chains.
+1. Edit the object you want to act as a leash handle and select the prim you want to receive chains.
 2. Drop the leash_handle.lsl script into the prim.
