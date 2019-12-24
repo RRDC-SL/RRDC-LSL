@@ -39,109 +39,141 @@
 **Available Commands:**
     
     menu
-            - Shows the main menu.
+Shows the main menu.
+
     help
-            - Gives a copy of this notecard.
+Gives a copy of this notecard.
 
     new [<name>]
-            - Create a new character. You can create up to 12.
+Create a new character. You can create up to 12.
+
     select [<partial-name>]
-            - Switch to a different character.
+Switch to a different character.
+
     erase [<partial-name>]
-            - Erase a character.
+Erase a character.
 
     name [<text>]
-            - Set the name of the current character.
+Set the name of the current character.
+
     prefix [<text>]
-            - Sets a prefix that appears before the character's name.
+Sets a prefix that appears before the character's name.
+
     sex [<text>]
-            - Sets the sex/gender of the current character.
+Sets the sex/gender of the current character.
+
     species [<text>]
-            - Sets the species of the current character.
+Sets the species of the current character.
+
     misc<1|2|3|4> [<text>]
-            - Sets any of the 4 misc text fields for the current character.
+Sets any of the 4 misc text fields for the current character.
 
     cmdchan [<number>]
-            - Changes the channel these commands are accepted on.
+Changes the channel these commands are accepted on.
+
     rpchan [<number>]
-            - Changes the channel of the RP character spoofer.
+Changes the channel of the RP character spoofer.
 
     status [<ic|ooc|afk>]
-            - Sets your RP status.
+Sets your RP status.
+
     ic
-            - Sets status to In-Character.
+Sets status to In-Character.
+
     ooc
-            - Sets status to Out-Of-Character.
+Sets status to Out-Of-Character.
+
     afk
-            - Sets status to Away-From-Keyboard.
+Sets status to Away-From-Keyboard.
 
     available
-            - Sets RP availability to available. Shown while OOC.
+Sets RP availability to available. Shown while OOC.
+
     busy
-            - Sets RP availability to unavailable.
+Sets RP availability to unavailable.
     
     depth [<casual|story|either>] 
-            - Sets the desired RP depth for the current character.
+Sets the desired RP depth for the current character.
+
     casual
-            - Sets a preference for casual RP for the current character.
+Sets a preference for casual RP for the current character.
+
     story
-            - Sets a preference for story-driven RP for current character.
+Sets a preference for story-driven RP for current character.
+
     either
-            - Declares no RP depth preference for the current character. 
+Declares no RP depth preference for the current character. 
 
     intimacy [<dom|sub|switch|nonsex|nopref>]
-            - Sets the desired type of intimacy for the current character.
+Sets the desired type of intimacy for the current character.
+
     dom
-            - Sets the current character as a dominant.
+Sets the current character as a dominant.
+
     sub
-            - Sets the current character as a submissive.
+Sets the current character as a submissive.
+
     switch
-            - Sets the current character as versatile/a switch.
+Sets the current character as versatile/a switch.
+
     nonsex
-            - Sets the current character as non-sexual.
+Sets the current character as non-sexual.
+
     nopref
-            - Declares no intimacy preference for the current character.
+Declares no intimacy preference for the current character.
 
     role [<inmate|staff|genpop|violent|guard|biotech|engineer|genstaff>]
-            - Sets the characters role within RRDC.
+Sets the characters role within RRDC.
+
     genpop
-            - Sets the current character as a general inmate (orange).
+Sets the current character as a general inmate (orange).
+
     violent
-            - Sets the current character as a violent inmate (red).
+Sets the current character as a violent inmate (red).
+
     deviant
-            - Sets the current character as a deviant inmate (lilac).
+Sets the current character as a deviant inmate (lilac).
+
     guard
-            - Sets the current character as a guard (blue).
+Sets the current character as a guard (blue).
+
     biotech
-            - Sets the current character as a biotech (olive).
+Sets the current character as a biotech (olive).
+
     engineer
-            - Sets the current character as an engineer (gold).
+Sets the current character as an engineer (gold).
+
     genstaff
-            - Sets the current character as general staff (grey).
+Sets the current character as general staff (grey).
 
     show
-            - Makes the titler hovertext visible.
+Makes the titler hovertext visible.
+
     hide
-            - Makes the titler hovertext invisible.
+Makes the titler hovertext invisible.
 
     blanks
-            - Forces blank lines for empty titler fields to show.
+Forces blank lines for empty titler fields to show.
+
     noblanks
-            - Hides empty titler fields.
+Hides empty titler fields.
 
     speak
-            - Sets the spoofer's chat volume to normal speech (20m).
+Sets the spoofer's chat volume to normal speech (20m).
+
     whisper
-            - Sets the spoofer's chat volume to whispers (10m).
+Sets the spoofer's chat volume to whispers (10m).
 
     redirecton
-            - Enables redirect of local chat/emotes to spoofer (RLV).
+Enables redirect of local chat/emotes to spoofer (RLV).
+
     redirectoff
-            - Disables local chat redirect (RLV).
+Disables local chat redirect (RLV).
 
     heightup
-            - Increases the distance between the hovertext and the titler.
+Increases the distance between the hovertext and the titler.
+
     heightdn
-            - Decreases the distance between the hovertext and the titler.
+Decreases the distance between the hovertext and the titler.
 
 ---------------------------------------------------------------------------------------------------
