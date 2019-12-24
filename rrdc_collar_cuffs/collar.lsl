@@ -324,7 +324,7 @@ leashFollow(integer atTarget)
 // ---------------------------------------------------------------------------------------------------------
 toggleMode(integer mode)
 {
-    if ((g_settings & 0x00000010) != mode) // If the mode actually changed.
+    if (((g_settings & 0x00000010) && TRUE) != mode) // If the mode actually changed.
     {
         shackleParticles(FALSE); // Clear all particles.
         leashParticles(FALSE);
@@ -512,7 +512,7 @@ default
             state main;
         }
     }
-    
+
     on_rez(integer param)
     {
         llResetScript();
