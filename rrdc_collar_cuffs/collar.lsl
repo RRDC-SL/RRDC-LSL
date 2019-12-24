@@ -209,7 +209,7 @@ leashParticles(integer on)
 // ---------------------------------------------------------------------------------------------------------
 shackleParticles(integer on)
 {
-    g_settings = ((g_settings & 0xFFFFFFF7) | (on << 3)) // Save the state we passed in.
+    g_settings = ((g_settings & 0xFFFFFFF7) | (on << 3)); // Save the state we passed in.
 
     if (!on) // Turn inner particle system off.
     {
@@ -784,7 +784,7 @@ state main
                 // ---------------------------------------------------------------------------------------------
                 else if (mesg == "☐ AnkleChain" || mesg == "☒ AnkleChain") // Toggle chain between ankles.
                 {
-                    if (g_settings = (g_settings ^ 0x00000020))
+                    if ((g_settings = (g_settings ^ 0x00000020)) & 0x00000020)
                     {
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " attached your ankle chain.");
@@ -804,7 +804,7 @@ state main
                 // ---------------------------------------------------------------------------------------------
                 else if (mesg == "☐ Shackles" || mesg == "☒ Shackles") // Chains from wrists to ankles.
                 {
-                    if (g_settings = (g_settings ^ 0x00000040))
+                    if ((g_settings = (g_settings ^ 0x00000040)) & 0x00000040)
                     {
                         llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " attached your shackle links.");
@@ -1248,7 +1248,7 @@ state main
 
         if (g_ledCount++ >= 4) // Blinking LED effects (1.0 seconds).
         {
-            if (g_settings = (g_settings ^ 0x00000002)) 
+            if ((g_settings = (g_settings ^ 0x00000002)) & 0x00000002) 
             {
                 llSetLinkPrimitiveParamsFast(g_ledLink, [
                     PRIM_COLOR, ALL_SIDES, <0.3, 0.0, 0.0>, llGetAlpha(0), 
