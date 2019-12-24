@@ -45,3 +45,14 @@ Sub-projects are organized into directories. Not all sub-projects are used.
 
 1. Edit the object you want to act as a leash handle and select the prim you want to receive chains.
 2. Drop the leash_handle.lsl script into the prim.
+
+------
+
+## Unofficial Titler Script Instructions ##
+
+1. Rez a cube or some other simple object that you don't mind having as an invisible attachment.
+2. Drop the rrdc_titler.lsl script and rrdc_titler_doc.md notecard into the object.
+3. Take the object into your inventory and attach it to your spine, chest, or head.
+4. Edit and move the attachment such that its top is just above the top of your avatar's head.
+5. Resize the attachment so that it's big enough to click on without being obstrusive.
+6. Touch the object or type '/2menu' to access the titler menu.
