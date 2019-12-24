@@ -5,8 +5,14 @@
 ## Basic Usage ##
 Wear or add the collar and the 4 cuffs, then touch the collar to access the menu.
 
-To add your character sheet, edit the collar and drag your notecard into the contents tab.
-* For best results, make sure your character sheet is the only notecard in the collar.
+## Adding Your Character Sheet ##
+1. Edit your collar and navigate to the Content tab of the edit window.
+2. Drag your character sheet notecard into the object contents.
+    * For best results, make sure your character sheet is the only notecard in the collar.
+
+## Leash Handle Script Installation ##
+1. Edit the object you want to act as a leash handle and select the prim you want to recieve chains.
+2. Drag and drop the 'Leash Handle' script into the prim contents.
 
 ## LockGuard and Lockmeister ##
 The collar and cuff set are fully capable of _both_ LockGuard and Lockmeister protocols.
