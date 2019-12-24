@@ -14,6 +14,12 @@ The collar and cuff set are fully capable of _both_ LockGuard and Lockmeister pr
 * Don't change the descriptions of the objects, as this is where the ID is stored.
 * Devices only capable of LMV1 will draw particles to the root prim of the cuffs/collar.
 
+## Troubleshooting and Support ##
+If you encounter any issues with the collar and cuff set or would like to request a feature,
+you can create an issue on the project GitHub page:
+
+    https://github.com/ShadowGear-SL/RRDC/issues
+
 ---------------------------------------------------------------------------------------------------
 
 ## CharSheet ##
