@@ -512,6 +512,11 @@ default
             state main;
         }
     }
+    
+    on_rez(integer param)
+    {
+        llResetScript();
+    }
 }
 
 // Main state is where everything happens once we have perms.
