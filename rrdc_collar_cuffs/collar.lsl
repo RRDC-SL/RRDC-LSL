@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.0 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.01 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -892,6 +892,7 @@ state main
 
                             g_leashUser = (string)id; // Start scan for chain gang anchors.
                             g_leashMode = "leftankle";
+                            g_pingCount = 5;
 
                             llSensor("", NULL_KEY, AGENT, 10.0, PI);
                         }
