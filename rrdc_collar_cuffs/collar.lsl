@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.01 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.02 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -81,6 +81,7 @@ list    g_LMTags;                               // List of current LockMeister t
 // 0x00000040    0xFFFFFFBF    TRUE when wrist to ankle shackle chains are active.
 // 0x00000080    0xFFFFFF7F    TRUE when the wearer is leashed to something.
 // 0x00000100    0xFFFFFEFF    TRUE when chain walk sounds are muted.
+// 0x00000200    0xFFFFFDFF    TRUE when shock cooldown is active.
 // ---------------------------------------------------------------------------------------------------------
 integer g_settings;
 // ---------------------------------------------------------------------------------------------------------
@@ -763,27 +764,35 @@ state main
                 // ---------------------------------------------------------------------------------------------
                 if (mesg == "☠ Shock") // Shock feature.
                 {
-                    llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
-                        " just activated your shock collar!");
+                    if ((g_settings & 0x00000200))
+                    {
+                        llInstantMessage(id, "The shock collar's capacitors are still recharging. " +
+                            "Please try again in a moment.");
+                    }
+                    else
+                    {
+                        llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
+                            " just activated your shock collar!");
 
-                    llSetTimerEvent(0.0);
-                    llTakeControls(
-                                    CONTROL_FWD |
-                                    CONTROL_BACK |
-                                    CONTROL_LEFT |
-                                    CONTROL_RIGHT |
-                                    CONTROL_ROT_LEFT |
-                                    CONTROL_ROT_RIGHT |
-                                    CONTROL_UP |
-                                    CONTROL_DOWN |
-                                    CONTROL_LBUTTON |
-                                    CONTROL_ML_LBUTTON,
-                                    TRUE, FALSE
-                    );
-                    llStartAnimation("animCollarZap");
-                    llLoopSound("27a18333-a425-30b1-1ab6-c9a3a3554903", 0.5); // soundZapLoop.
-                    g_shockCount = 11; // 0.8 seconds, then 2.0 seconds.
-                    llSetTimerEvent(0.2);
+                        llSetTimerEvent(0.0);
+                        llTakeControls(
+                                        CONTROL_FWD |
+                                        CONTROL_BACK |
+                                        CONTROL_LEFT |
+                                        CONTROL_RIGHT |
+                                        CONTROL_ROT_LEFT |
+                                        CONTROL_ROT_RIGHT |
+                                        CONTROL_UP |
+                                        CONTROL_DOWN |
+                                        CONTROL_LBUTTON |
+                                        CONTROL_ML_LBUTTON,
+                                        TRUE, FALSE
+                        );
+                        llStartAnimation("animCollarZap");
+                        llLoopSound("27a18333-a425-30b1-1ab6-c9a3a3554903", 0.5); // soundZapLoop.
+                        g_shockCount = 12; // 0.8 seconds, then 2.0 seconds.
+                        llSetTimerEvent(0.2);
+                    }
                 }
                 // Ankle Chain Toggle.
                 // ---------------------------------------------------------------------------------------------
@@ -1176,7 +1185,9 @@ state main
     // ---------------------------------------------------------------------------------------------------------
     timer()
     {
-        if (g_animList != []) // Persistent AO (0.2 seconds).
+        // Persistent AO (0.2 seconds).
+        // -----------------------------------------------------------------------------------------------------
+        if (g_animList != [])
         {
             g_settings = (g_settings ^ 0x00000001);
 
@@ -1188,17 +1199,22 @@ state main
             }
         }
 
-        if (g_shockCount > 0) // Shock effects.
+        // Shock effects.
+        // -----------------------------------------------------------------------------------------------------
+        if (g_shockCount > 1)
         {
-            if (g_shockCount == 10) // Ending effect.
+            if (g_shockCount == 11) // Ending effect.
             {
                 llStopSound();
                 llPlaySound("a4602ead-96f3-ee86-5e0f-63faeb1ed7cf", 0.5); // soundZapStop.
             }
             g_shockCount--;
         }
-        else // Release controls when the anim is done.
+        else if (g_shockCount == 1) // Release controls when the anim is done.
         {
+            g_shockCount = -76;                       // 15 seconds timer.
+            g_settings   = (g_settings | 0x00000200); // Set cooldown bit.
+
             llTakeControls(
                             CONTROL_FWD |
                             CONTROL_BACK |
@@ -1213,8 +1229,19 @@ state main
                             FALSE, TRUE
             );
         }
+        else if (g_shockCount == -1) // Release cooldown.
+        {
+            g_settings   = (g_settings & 0xFFFFFDFF);
+            g_shockCount = 0;
+        }
+        else if (g_shockCount < 0) // Cooldown wait.
+        {
+            g_shockCount++;
+        }
 
-        if (g_pingCount == 1) // Pong message wait timer.
+        // Pong message wait timer.
+        // -----------------------------------------------------------------------------------------------------
+        if (g_pingCount == 1)
         {
             integer i; // Show the chain gang selection dialog.
             string text  = "Select an Inmate by number below:\n\n";
@@ -1252,7 +1279,9 @@ state main
             g_pingCount++;
         }
 
-        if (g_ledCount++ >= 4) // Blinking LED effects (1.0 seconds).
+        // Blinking LED effects (1.0 seconds).
+        // -----------------------------------------------------------------------------------------------------
+        if (g_ledCount++ >= 4)
         {
             if ((g_settings = (g_settings ^ 0x00000002)) & 0x00000002) 
             {

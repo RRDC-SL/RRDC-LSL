@@ -1,4 +1,4 @@
-# [SGD] RRDC Collar and Cuffs v1.0 "Azkaban" - User Manual #
+# [SGD] RRDC Collar and Cuffs v1.02 "Azkaban" - User Manual #
 
 ---------------------------------------------------------------------------------------------------
 
@@ -39,6 +39,7 @@ Delivers a painful electric shock to your avatar, lasting for about a second.
 * You will receive a message telling you who activated the shock feature.
 * Your avatar will freeze in place and fall to the ground.
 * You will be unable to move until the animation sequence finishes.
+* To prevent abuse, there is a cooldown of 15 seconds before you can be shocked again.
 
 ## Poses ##
 Allows the user to pick from one of five different restraint poses, or release you.
