@@ -802,9 +802,9 @@ state main
                                         TRUE, FALSE
                         );
                         llStartAnimation("animCollarZap");
-                        doAnimationOverride(TRUE); // Ensure poses remain in effect despite shock.
                         llLoopSound("27a18333-a425-30b1-1ab6-c9a3a3554903", 0.5); // soundZapLoop.
                         g_shockCount = 12; // 0.8 seconds, then 2.0 seconds.
+                        doAnimationOverride(TRUE); // Ensure poses remain in effect despite shock.
                         llSetTimerEvent(0.2);
                     }
                 }
