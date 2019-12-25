@@ -122,17 +122,6 @@ integer inRange(key object)
     return (llVecDist(llGetPos(), llList2Vector(llGetObjectDetails(object, [OBJECT_POS]), 0)) < 6.0);
 }
 
-// getAnimVersion - Given a toggle state, returns the anim version as a string.
-// ---------------------------------------------------------------------------------------------------------
-string getAnimVersion(integer toggle)
-{
-    if (toggle)
-    {
-        return "b";
-    }
-    return "a";
-}
-
 // playRandomSound - Plays a random chain sound.
 // ---------------------------------------------------------------------------------------------------------
 playRandomSound()
@@ -147,20 +136,44 @@ playRandomSound()
     );
 }
 
-// stopCurAnims - Stop all AO anims that are playing.
+// getAnimVersion - Given a toggle state, returns the anim version as a string.
 // ---------------------------------------------------------------------------------------------------------
-stopCurAnims()
+string getAnimVersion(integer toggle)
 {
-    llSetTimerEvent(0.0); // Stop timer, then anims.
-    integer i;
-    for (i = 0; i < llGetListLength(g_animList); i++)
+    if (toggle)
     {
-        llStopAnimation(llList2String(g_animList, i) + getAnimVersion((g_settings & 0x00000001)));
+        return "b";
     }
-    g_animList = [];
-    llSetTimerEvent(0.2); // Restart timer.
+    return "a";
+}
 
-    playRandomSound();
+// doAnimationOverride - Toggles or switches the persistent AO feature.
+// ---------------------------------------------------------------------------------------------------------
+doAnimationOverride(integer on)
+{
+    integer i;
+    if (!on) // Stop all AO anims that are playing.
+    {
+        llSetTimerEvent(0.0); // Stop timer, then anims.
+        for (i = 0; i < llGetListLength(g_animList); i++)
+        {
+            llStopAnimation(llList2String(g_animList, i) + getAnimVersion((g_settings & 0x00000001)));
+        }
+        g_animList = [];
+        llSetTimerEvent(0.2); // Restart timer.
+
+        playRandomSound();
+    }
+    else if (g_animList != []) // Activate or swap animations for persistent AO.
+    {
+        g_settings = (g_settings ^ 0x00000001);
+
+        for (i = 0; i < llGetListLength(g_animList); i++)
+        {
+            llStartAnimation(llList2String(g_animList, i) + getAnimVersion((g_settings & 0x00000001)));
+            llStopAnimation(llList2String(g_animList, i) + getAnimVersion(!(g_settings & 0x00000001)));
+        }
+    }
 }
 
 // leashParticles - Turns outer/LockGuard chain/rope particles on or off.
@@ -734,7 +747,7 @@ state main
                     }
                     else if (name == "stopposes") // stopposes collarfrontloop
                     {
-                        stopCurAnims();
+                        doAnimationOverride(FALSE);
                     }
                     else if (name == "stopleash") // stopleash collarfrontloop
                     {
@@ -789,6 +802,7 @@ state main
                                         TRUE, FALSE
                         );
                         llStartAnimation("animCollarZap");
+                        doAnimationOverride(TRUE); // Ensure poses remain in effect despite shock.
                         llLoopSound("27a18333-a425-30b1-1ab6-c9a3a3554903", 0.5); // soundZapLoop.
                         g_shockCount = 12; // 0.8 seconds, then 2.0 seconds.
                         llSetTimerEvent(0.2);
@@ -946,42 +960,47 @@ state main
                 }
                 else if (mesg == "웃 Back U") // Emitter is always leftwrist inner or collar shacklesPoint.
                 { // linkrequest <dest-tag> <inner|outer> <src-tag> <inner|outer>
-                    stopCurAnims();
+                    doAnimationOverride(FALSE);
                     g_animList = ["cuffedArmsBackU_001"];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
+                    doAnimationOverride(TRUE);
                 }
                 else if (mesg == "웃 Back V")
                 {
-                    stopCurAnims();
+                    doAnimationOverride(FALSE);
                     g_animList = ["cuffedArmsBackV_001"];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
+                    doAnimationOverride(TRUE);
                 }
                 else if (mesg == "웃 Front X")
                 {
-                    stopCurAnims();
+                    doAnimationOverride(FALSE);
                     g_animList = ["cuffedArmsFrontX_001"];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist outer leftwrist inner");
+                    doAnimationOverride(TRUE);
                 }
                 else if (mesg == "웃 Front V")
                 {
-                    stopCurAnims();
+                    doAnimationOverride(FALSE);
                     g_animList = ["cuffedArmsFrontV_002"];
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
+                    doAnimationOverride(TRUE);
                 }
                 else if (mesg == "웃 ComboSet") // Combination two poses.
                 {
-                    stopCurAnims();
+                    doAnimationOverride(FALSE);
                     g_animList = ["cuffedArmsCollar001", "cuffedNeckForward001"];
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest leftwrist inner collarfrontloop shackle");
                     llWhisper(getAvChannel(llGetOwner()), "linkrequest rightwrist inner leftwrist inner");
+                    doAnimationOverride(TRUE);
                 }
                 else if (mesg == "✖ Release") // Release from pose.
                 {
-                    stopCurAnims();
+                    doAnimationOverride(FALSE);
                     shackleParticles(FALSE);
                     llWhisper(getAvChannel(llGetOwner()), "unlink leftwrist inner");
                 }
@@ -1187,17 +1206,7 @@ state main
     {
         // Persistent AO (0.2 seconds).
         // -----------------------------------------------------------------------------------------------------
-        if (g_animList != [])
-        {
-            g_settings = (g_settings ^ 0x00000001);
-
-            integer i;
-            for (i = 0; i < llGetListLength(g_animList); i++)
-            {
-                llStartAnimation(llList2String(g_animList, i) + getAnimVersion((g_settings & 0x00000001)));
-                llStopAnimation(llList2String(g_animList, i) + getAnimVersion(!(g_settings & 0x00000001)));
-            }
-        }
+        doAnimationOverride(TRUE);
 
         // Shock effects.
         // -----------------------------------------------------------------------------------------------------
