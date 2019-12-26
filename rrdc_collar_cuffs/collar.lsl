@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.04 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.05 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -37,7 +37,6 @@ integer g_curPartFollow;                        // Current particle follow flag.
 
 // Saved Link Numbers.
 // ---------------------------------------------------------------------------------------------------------
-integer g_powerLink;                            // Link number of the power core FX prim.
 integer g_ledLink;                              // Link number of the LED light.
 integer g_leashLink;                            // Link number of the leashing point prim.
 integer g_shackleLink;                          // Link number of the chain to shackles point prim.
@@ -362,7 +361,7 @@ giveCharSheet(key user)
         if (llGetInventoryPermMask(note, MASK_OWNER) & (PERM_COPY | PERM_TRANSFER))
         {
             llOwnerSay("secondlife:///app/agent/" + ((string)user) + "/completename" +
-                " has requested a copy of your character sheet.");
+                " has taken a copy of your character sheet.");
 
             llGiveInventory(user, note); // Offer notecard.
         }
@@ -552,7 +551,7 @@ state main
             tag = llList2String(llGetLinkPrimitiveParams(i, [PRIM_NAME]), 0);
             if (tag == "powerCore")
             {
-                g_powerLink = i; // Also set texture anim for the power core.
+                // Set texture anim for the power core.
                 llSetLinkTextureAnim(i, ANIM_ON | LOOP, ALL_SIDES, 20, 20, 0.0, 64.0, 30.4);
             }
             else if (tag == "LED")
@@ -624,7 +623,7 @@ state main
             }
         }
 
-        llSetMemoryLimit(llGetUsedMemory() + 3072‬); // Limit script memory consumption.
+        llSetMemoryLimit(llGetUsedMemory() + 4096‬); // Limit script memory consumption.
         llMinEventDelay(0.2);
 
         if (g_LMTags == [] || g_shackleLink <= 0 || g_leashLink <= 0)
