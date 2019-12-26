@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.03 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.04 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -62,6 +62,7 @@ string  g_shacklePartTarget;                    // Key of the target prim for sh
 
 // Data Store Variables.
 // ---------------------------------------------------------------------------------------------------------
+string  g_animState;                            // Current AO animation state.
 list    g_animList;                             // List of currently playing (base) anim names.
 list    g_avList;                               // Tracks leash/chaingang enabled avatars.
 list    g_curMenus;                             // Tracks current menu by user.
@@ -1206,7 +1207,11 @@ state main
     {
         // Persistent AO (0.2 seconds).
         // -----------------------------------------------------------------------------------------------------
-        doAnimationOverride(TRUE);
+        if (g_animState != llGetAnimation(llGetOwner()))
+        {
+            g_animState = llGetAnimation(llGetOwner());
+            doAnimationOverride(TRUE);
+        }
 
         // Shock effects.
         // -----------------------------------------------------------------------------------------------------
