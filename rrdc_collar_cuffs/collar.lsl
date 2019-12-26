@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.05 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.06 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -380,10 +380,19 @@ giveCharSheet(key user)
 // ---------------------------------------------------------------------------------------------------------
 showMenu(string menu, key user)
 {
-    integer i;
-    for (i = 0; i < llGetListLength(g_curMenus); i += 3) // Updating existing and remove old.
+    if (!inRange(user) && user != llGetOwner()) // User out of range?
     {
-        if (llList2Key(g_curMenus, i) == user)
+        if (menu == "main") // Only CharSheet option in menu, so just give CharSheet.
+        {
+            giveCharSheet(user);
+        }
+        return; // Just return in other cases, to avoid spamming with notecards.
+    }
+
+    integer i;
+    for (i = 0; i < llGetListLength(g_curMenus); i += 3) // Update existing entries and remove old.
+    {
+        if (llList2Key(g_curMenus, i) == user) // We found the current user.
         {
             if (menu == "") // Access last used menu if menu argument is empty.
             {
@@ -395,7 +404,7 @@ showMenu(string menu, key user)
         else if (llList2Key(g_curMenus, i) != llGetOwner() &&
                  (llGetTime() - llList2Float(g_curMenus, (i + 1))) > 60.0)
         {
-            g_curMenus = llDeleteSubList(g_curMenus, i, (i + 2));
+            g_curMenus = llDeleteSubList(g_curMenus, i, (i + 2)); // Prune old entries.
             i -= 3;
         }
     }
@@ -425,16 +434,6 @@ showMenu(string menu, key user)
         // ☯ CharSheet     ☠ Shock        📜 Poses..
         // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
         // ☐ Leash                         ✖ Close
-        //
-        // Inmate Menu. (From Anywhere)
-        // -----------------------------------------------
-        // CharSheet (Just give char sheet. No menu.)
-
-        if (!inRange(user) && user != llGetOwner())
-        {
-            giveCharSheet(user); // Only CharSheet option in menu, so just give CharSheet.
-            return;
-        }
 
         text = "Main Menu" + text;
 
@@ -527,7 +526,7 @@ default
         }
     }
 
-    on_rez(integer param)
+    on_rez(integer param) // Prevent getting stuck in default state.
     {
         llResetScript();
     }
@@ -678,7 +677,7 @@ state main
     {
         if (chan == getAvChannel(llGetOwner())) // Process RRDC Menu/Commands.
         {
-            // Protocol Commands.
+            // RRDC Collar/Cuff Protocol Commands.
             // -------------------------------------------------------------------------------------------------
             if (llGetOwnerKey(id) != id) // Process RRDC commands.
             {
@@ -756,7 +755,7 @@ state main
                 }
                 return;
             }
-            // Misc Commands.
+            // Misc Menu Commands.
             // -------------------------------------------------------------------------------------------------
             else if (mesg == "↺ Main") // Show main menu.
             {
@@ -1073,7 +1072,9 @@ state main
             }
             showMenu("", id); // Reshow current menu. Whitespace menu items end up here.
         }
-        else if(chan == -8888 && llGetSubString(mesg, 0, 35) == ((string)llGetOwner())) // Process LM.
+        // Lockmeister Protocol Commands.
+        // -----------------------------------------------------------------------------------------------------
+        else if(chan == -8888 && llGetSubString(mesg, 0, 35) == ((string)llGetOwner()))
         {
             if(llListFindList(g_LMTags, [llGetSubString(mesg, 36, -1)]) > -1)
             {
@@ -1087,7 +1088,9 @@ state main
                     llGetSubString(mesg, 55, -1) + "|" + ((string)llGetLinkKey(g_leashLink))
                 );
             }
-        }                                                                          // Process LG.
+        }
+        // LockGuard Protocol Commands.
+        // -----------------------------------------------------------------------------------------------------
         else if(chan == -9119 && llSubStringIndex(mesg, "lockguard " + ((string)llGetOwner())) == 0)
         {
             list tList = llParseString2List(mesg, [" "], []);
@@ -1106,7 +1109,7 @@ state main
                         leashParticles(TRUE);
                         i += 2;
                     }
-                    else if(name == "unlink" && !(g_settings & 0x00000010))
+                    else if(name == "unlink" && !(g_settings & 0x00000010)) // If in LM/LG mode.
                     {
                         resetParticles();
                         leashParticles(FALSE);
