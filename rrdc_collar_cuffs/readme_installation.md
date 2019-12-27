@@ -1,4 +1,4 @@
-# [SGD] RRDC Collar and Cuffs v1.0 "Azkaban" - Script Installation Manual #
+# [SGD] RRDC Collar and Cuffs v1.0.6 "Azkaban" - Script Installation Manual #
 
 -------------------------------------------------------------------------------------------------------
 
