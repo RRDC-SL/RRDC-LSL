@@ -448,9 +448,22 @@ default
                 mesg += " "; // Trailing space required by parser.
 
                 // ----------------------------------------------
+                // Priority commands.
+                // ----------------------------------------------
+                if (cmdMatch(" ", mesg)) // Access the last menu used.
+                {
+                    showMenu(g_curMenu);
+                    return;
+                }
+                else if (cmdMatch("menu", mesg) || cmdMatch("↺ Main", mesg)) // Main menu.
+                {
+                    showMenu("main");
+                    return;
+                }
+                // ----------------------------------------------
                 // Text fields setter.
                 // ----------------------------------------------
-                if (g_textField != -1)
+                else if (g_textField != -1)
                 {
                     // Text argument t runs to the end of the string or the first semicolon found.
                     //  Remaining mesg sent on for further parsing.
@@ -607,19 +620,9 @@ default
                         llOwnerSay("Hmm.. The help notecard appears to be missing!");
                     }
                 }
-                else if (cmdMatch(" ", mesg)) // Access the last menu used.
-                {
-                    showMenu(g_curMenu);
-                    return;
-                }
                 else if (cmdMatch("close", mesg))
                 {
                     return; // Do nothing for close command.
-                }
-                else if (cmdMatch("menu", mesg) || cmdMatch("↺ Main", mesg)) // Main menu.
-                {
-                    showMenu("main");
-                    return;
                 }
                 // ----------------------------------------------
                 // Status commands.
