@@ -1,4 +1,4 @@
-# [SGD] Unofficial RRDC Titler v1.0.4 - User Manual #
+# [SGD] Unofficial RRDC Titler v1.0.5 - User Manual #
 
 ---------------------------------------------------------------------------------------------------
 

@@ -1,4 +1,4 @@
-// [SGD] Custom RRDC Titler v1.0.4 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] Custom RRDC Titler v1.0.5 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // -----------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
