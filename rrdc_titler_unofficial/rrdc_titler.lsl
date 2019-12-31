@@ -1,61 +1,61 @@
-// [SGD] Custom RRDC Titler v1.0.2 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
-// -------------------------------------------------------------------------------------------
+// [SGD] Custom RRDC Titler v1.0.3 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// -----------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
 //  http://mozilla.org/MPL/2.0/.
-// ===========================================================================================
+// ===============================================================================================
 
 // General Settings and Defaults. 
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 integer g_channel       = 2; // Channel to recieve commands on.
 integer g_chatChan      = 4; // Channel to recieve chat on.
 integer g_status        = 0; // 0 = IC, 1 = OOC, 2 = AFK.
 integer g_suffix        = 0; // Trailing newlines to position text, if any.
 
 // Toggle Switch Bitfield.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 // OR Mask       AND Mask      Variable
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 // 0x00000001    0xFFFFFFFE    Available for RP.
 // 0x00000002    0xFFFFFFFD    Show Titler Hovertext.
 // 0x00000004    0xFFFFFFFB    Use Whispers for Chat.
 // 0x00000008    0xFFFFFFF7    Force Showing Blanks.
 // 0x00000010    0xFFFFFFEF    RLV Auto-Redirect Chat.
-// 0x00000020    0xFFFFFFDF    <unassigned>
+// 0x00000020    0xFFFFFFDF    Verbose status changes on.
 // 0x00000040    0xFFFFFFBF    <unassigned>
 // 0x00000080    0xFFFFFF7F    Flag to reshow menu after text field. DO NOT SET BY DEFAULT.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 integer g_settings      = 0x3; // Available, Visible.
 
-// ============================================================================================
+// ===============================================================================================
 // CAUTION: Editing below this line may cause unexpected script behavior. Enter at own risk.
-// ============================================================================================
+// ===============================================================================================
 
 // Strided list of character settings. Stride: 11.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 // 0     1       2       3        4      5      6      7      8      9         10
 // Name, Prefix, Gender, Species, Misc1, Misc2, Misc3, Misc4, Depth, Intimacy, Role.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 // Roles: 0 = General Inmate, 1 = Violent Inmate, 2 = Deviant Inmate, 3 = Guard, 4 = Biotech,
 //        5 = Engineer,       6 = General Staff
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 list    g_characters    = [];
 integer g_handle;                   // Stores listen handle for cmd channel.
 integer g_chatHandle;               // Stores listen handle for chat channel.
 string  g_curMenu       = "main";   // Stores the current menu level.
 integer g_textField     = -1;       // Number of text field we're writing to. -1 is null.
 integer g_curCharacter  = 0;        // Stride offset for the currently selected character.
-// ============================================================================================
+// ===============================================================================================
 
 // cmdMatch - Returns TRUE if 'cmd' is the prefix of 'str'.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 integer cmdMatch(string cmd, string str)
 {
     return (llSubStringIndex(llToLower(str), llToLower(cmd)) == 0);
 }
 
 // createSuffix - Generates a string of newlines to adjust the height of the hovertext.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 string createSuffix()
 {
     string suffix = "\n";
@@ -70,7 +70,7 @@ string createSuffix()
 }
 
 // getRoleColor - Given a role enum (0-6), returns the corresponding LSL color vector.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 vector getRoleColor(integer role)
 {
     if (role == 0) // General Inmate.
@@ -104,7 +104,7 @@ vector getRoleColor(integer role)
 }
 
 // objectSpoof - Sends given text as the name specified, at volume determined by settings.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 objectSpoof(string name, string mesg)
 {
     string t = llGetObjectName(); // Temp store original object name.
@@ -123,7 +123,7 @@ objectSpoof(string name, string mesg)
 }
 
 // updateText - Updates or clears the titler's hovertext.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 updateText()
 {
     if (!(g_settings & 0x00000002)) // Clear text if hidden.
@@ -194,7 +194,7 @@ updateText()
 }
 
 // charSelect - Builds character selection menu.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 list charSelect()
 {
     list l = [];
@@ -208,7 +208,7 @@ list charSelect()
 
 // showMenu - Given a valid menu name, displays the menu to the user.
 //            Note: use special char " " at end of leaf options and empty buttons.
-// -------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 showMenu(string menu) // Display menus.
 {
     g_curMenu = menu; // Save this menu so we can reopen it.
@@ -270,7 +270,7 @@ showMenu(string menu) // Display menus.
     else if (menu == "options") // Options submenu.
     {
         text = "Options and Settings Menu" + text;
-        buttons = [" ", " ", "↺ Main", "ChatVolume", "ChatRedirect", "Channels",
+        buttons = ["Verbosity", " ", "↺ Main", "ChatVolume", "ChatRedirect", "Channels",
                    "Visibility", "BlankLines", "Height"];
     }
     else if (menu == "visibility") // Visibility L2 Submenu.
@@ -332,6 +332,21 @@ showMenu(string menu) // Display menus.
         }
 
         buttons = ["RedirectOn ", "RedirectOff ", "↺ Options"];
+    }
+    else if (menu == "verbosity") // Verbosity L2 Submenu.
+    {
+        text = "Status Change Narration Verbosity" + text + "\n\nCurrent setting: ";
+
+        if ((g_settings & 0x00000020))
+        {
+            text += "Announce";
+        }
+        else
+        {
+            text += "Silent";
+        }
+
+        buttons = ["Announce ", "Silent ", "↺ Options"];
     }
     else if (menu == "height") // Height L2 Submenu.
     {
@@ -613,24 +628,39 @@ default
                     mesg = llGetSubString(mesg, 2, -1);
                     g_status = 0;
 
-                    objectSpoof("[OOC] Narrator", "((" + llList2String(g_characters, (g_curCharacter * 11)) + 
-                        " has gone In-Character.))");
+                    if ((g_settings & 0x00000020)) // Verbose status changes?
+                    {
+                        objectSpoof("[OOC] Narrator", "((" + 
+                            llList2String(g_characters, (g_curCharacter * 11)) + 
+                            " has gone In-Character.))"
+                        );
+                    }
                 }
                 else if (cmdMatch("ooc", mesg)) // OOC option/command.
                 {
                     mesg = llGetSubString(mesg, 3, -1);
                     g_status = 1;
                     
-                    objectSpoof("[OOC] Narrator", "((" + llList2String(g_characters, (g_curCharacter * 11)) + 
-                        " has gone Out-Of-Character.))");
+                    if ((g_settings & 0x00000020)) // Verbose status changes?
+                    {
+                        objectSpoof("[OOC] Narrator", "((" + 
+                            llList2String(g_characters, (g_curCharacter * 11)) + 
+                            " has gone Out-Of-Character.))"
+                        );
+                    }
                 }
                 else if (cmdMatch("afk", mesg)) // AFK option/command.
                 {
                     mesg = llGetSubString(mesg, 3, -1);
                     g_status = 2;
                     
-                    objectSpoof("[OOC] Narrator", "((" + llList2String(g_characters, (g_curCharacter * 11)) + 
-                        " has gone AFK.))");
+                    if ((g_settings & 0x00000020)) // Verbose status changes?
+                    {
+                        objectSpoof("[OOC] Narrator", "((" + 
+                            llList2String(g_characters, (g_curCharacter * 11)) + 
+                            " has gone AFK.))"
+                        );
+                    }
                 }
                 // ----------------------------------------------
                 // RP Role commands.
@@ -890,6 +920,16 @@ default
                     }
                     g_settings = (g_settings & 0xFFFFFFEF);
                 }
+                else if (cmdMatch("announce", mesg)) // Announce command.
+                {
+                    mesg = llGetSubString(mesg, 8, -1);
+                    g_settings = (g_settings | 0x00000020);
+                }
+                else if (cmdMatch("silent", mesg)) // Silent command.
+                {
+                    mesg = llGetSubString(mesg, 6, -1);
+                    g_settings = (g_settings & 0xFFFFFFDF);
+                }
                 else if (cmdMatch("heightup", mesg)) // Height up command.
                 {
                     mesg = llGetSubString(mesg, 8, -1);
@@ -948,6 +988,11 @@ default
                 else if (cmdMatch("options", mesg) || cmdMatch("↺ Options", mesg)) // Options menu.
                 {
                     showMenu("options");
+                    return;
+                }
+                else if (cmdMatch("verbosity", mesg)) // Verbosity menu.
+                {
+                    showMenu("verbosity");
                     return;
                 }
                 else if (cmdMatch("visibility", mesg)) // Visibility menu.

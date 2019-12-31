@@ -1,4 +1,4 @@
-# [SGD] Unofficial RRDC Titler v1.0.2 - User Manual #
+# [SGD] Unofficial RRDC Titler v1.0.3 - User Manual #
 
 ---------------------------------------------------------------------------------------------------
 
@@ -169,6 +169,12 @@ Enables redirect of local chat/emotes to spoofer (RLV).
 
     redirectoff
 Disables local chat redirect (RLV).
+
+    announce
+Enables narrator status change announcements.
+
+    silent
+Disables narrator status change announements.
 
     heightup
 Increases the distance between the hovertext and the titler.
