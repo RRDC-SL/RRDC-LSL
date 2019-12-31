@@ -1,4 +1,4 @@
-// [SGD] Custom RRDC Titler v1.0.3 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] Custom RRDC Titler v1.0.4 - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // -----------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -379,6 +379,16 @@ default
         g_chatHandle = llListen(g_chatChan, "", llGetOwner(), "");
 
         updateText(); // Initialize hovertext.
+    }
+
+    // Reset the script, clearing settings and memory, if we change owner.
+    // ---------------------------------------------------------------------------------------
+    changed(integer change)
+    {
+        if (change & CHANGED_OWNER)
+        {
+            llResetScript();
+        }
     }
 
     // Toggle RLV chat redirect on attach/detach if applicable.
