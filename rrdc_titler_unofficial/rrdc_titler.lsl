@@ -103,6 +103,25 @@ vector getRoleColor(integer role)
     }
 }
 
+// objectSpoof - Sends given text as the name specified, at volume determined by settings.
+// -------------------------------------------------------------------------------------------
+objectSpoof(string name, string mesg)
+{
+    string t = llGetObjectName(); // Temp store original object name.
+    llSetObjectName(name);
+    
+    if ((g_settings & 0x00000004)) // Send text at desired chat volume.
+    {
+        llWhisper(0, mesg);
+    }
+    else
+    {
+        llSay(0, mesg);
+    }
+
+    llSetObjectName(t); // Restore original object name.
+}
+
 // updateText - Updates or clears the titler's hovertext.
 // -------------------------------------------------------------------------------------------
 updateText()
@@ -593,16 +612,25 @@ default
                 {
                     mesg = llGetSubString(mesg, 2, -1);
                     g_status = 0;
+
+                    objectSpoof("[OOC] Narrator", "((" + llList2String(g_characters, (g_curCharacter * 11)) + 
+                        " has gone In-Character.))");
                 }
                 else if (cmdMatch("ooc", mesg)) // OOC option/command.
                 {
                     mesg = llGetSubString(mesg, 3, -1);
                     g_status = 1;
+                    
+                    objectSpoof("[OOC] Narrator", "((" + llList2String(g_characters, (g_curCharacter * 11)) + 
+                        " has gone Out-Of-Character.))");
                 }
                 else if (cmdMatch("afk", mesg)) // AFK option/command.
                 {
                     mesg = llGetSubString(mesg, 3, -1);
                     g_status = 2;
+                    
+                    objectSpoof("[OOC] Narrator", "((" + llList2String(g_characters, (g_curCharacter * 11)) + 
+                        " has gone AFK.))");
                 }
                 // ----------------------------------------------
                 // RP Role commands.
@@ -1121,8 +1149,7 @@ default
         }
         else // Process this as character text.
         {
-            string t = llGetObjectName(); // Temp store original object name.
-            name = "";
+            name = ""; // Empty the name variable so we can use it to build our name.
 
             integer postType = 0; // Default is say.
             if (cmdMatch("/me", mesg)) // Remove /me and set emote flag.
@@ -1158,7 +1185,7 @@ default
 
             if (postType > 1) // Spoof/narrator?
             {
-                name += "-";
+                name += "Narrator";
             }
             else // Add character name.
             {
@@ -1170,18 +1197,7 @@ default
                 }
             }
 
-            llSetObjectName(name);
-            
-            if ((g_settings & 0x00000004)) // Send text at desired chat volume.
-            {
-                llWhisper(0, mesg);
-            }
-            else
-            {
-                llSay(0, mesg);
-            }
-
-            llSetObjectName(t); // Restore original object name.
+            objectSpoof(name, mesg); // Send message as our constructed name.
         }
     }
 }
