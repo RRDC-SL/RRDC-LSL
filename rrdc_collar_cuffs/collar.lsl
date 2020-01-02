@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.0.6 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.0.7 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -502,7 +502,7 @@ showMenu(string menu, key user)
     else if (menu == "textures") // Textures menu.
     {
         text = "Texture Select Menu" + text;
-        buttons = ["▩ Blue", "▩ Black", "↺ Main", "▩ White", "▩ Orange", "▩ Lilac"];
+        buttons = [" ", " ", "↺ Main", "▩ Red", "▩ Blue", "▩ Black", "▩ White", "▩ Orange", "▩ Lilac"];
     }
     llDialog(user, text, buttons, getAvChannel(llGetOwner()));
 }
@@ -1060,6 +1060,16 @@ state main
                         ]);
                         llWhisper(getAvChannel(llGetOwner()), "settexture allfour " +
                             "93628600-5364-0a17-fcd8-e617ddd731e5" // RRDC_Cuff_Diffuse_Lilac.
+                        );
+                    }
+                    else if (mesg == "▩ Red")
+                    {
+                        llSetLinkPrimitiveParamsFast(LINK_THIS, [ // RRDC_Collar_Metals_Diffuse_Red.
+                            PRIM_TEXTURE, 0, "bfea9b1f-5860-0bff-0382-baa00c00172f",
+                            <1.0, 1.0, 0.0>, ZERO_VECTOR, 0.0
+                        ]);
+                        llWhisper(getAvChannel(llGetOwner()), "settexture allfour " +
+                            "cc6ec646-cdc4-44b7-9df3-fc7ba33764d3" // RRDC_Cuff_Diffuse_Red.
                         );
                     }
                     // Sound Commands.
