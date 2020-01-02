@@ -7,6 +7,14 @@ Sub-projects are organized into directories. Not all sub-projects are used.
 
 ## Collar and Cuffs Upgrade Instructions ##
 
+**Version 1.0 and Newer**
+1. Wear or rez collar and cuff set on the ground.
+2. Right click and edit the collar, and go to the Content tab.
+3. Delete the old script.
+4. Drop in the new script.
+5. Repeat steps 2-4 for each cuff.
+
+**Version 0.9 and Older**
 1. Rez collar and cuff set on the ground.
 2. Delete all scripts from every prim of every object.
 3. For each object, go through every prim in the linkset and copy any contents to your inventory.
