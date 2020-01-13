@@ -1,4 +1,4 @@
-# [SGD] RRDC Collar and Cuffs v1.0.7 "Azkaban" - User Manual #
+# [SGD] RRDC Collar and Cuffs v1.0.8 "Azkaban" - User Manual #
 
 ---------------------------------------------------------------------------------------------------
 

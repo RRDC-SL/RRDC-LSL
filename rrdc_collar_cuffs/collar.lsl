@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.0.7 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.0.8 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -932,16 +932,16 @@ state main
                     llOwnerSay("secondlife:///app/agent/" + ((string)id) + "/completename" +
                             " added you to a chain gang.");
 
-                    id = llList2Key(g_avList, ((integer)mesg - 1));
+                    name = llList2String(g_avList, ((integer)mesg - 1));
 
                     g_avList          = [];
                     g_leashUser       = "";
                     g_pingCount       = 0;
                     g_settings        = (g_settings | 0x00000080);
-                    g_leashPartTarget = (string)id;
+                    g_leashPartTarget = name;
 
                     llWhisper(getAvChannel(llGetOwner()), "leashto leftankle outer " +
-                        (string)id + " " + "leftankle outer"
+                        name + " " + "leftankle outer"
                     );
 
                     leashFollow(FALSE); // Start follow effect on id.
