@@ -61,6 +61,7 @@ string  g_shacklePartTarget;                    // Key of the target prim for sh
 
 // Data Store Variables.
 // ---------------------------------------------------------------------------------------------------------
+string  g_inmateNum;                            // The current character's inmate number.
 string  g_animState;                            // Current AO animation state.
 list    g_animList;                             // List of currently playing (base) anim names.
 list    g_avList;                               // Tracks leash/chaingang enabled avatars.
@@ -682,7 +683,19 @@ state main
             if (llGetOwnerKey(id) != id) // Process RRDC commands.
             {
                 list l = llParseString2List(mesg, [" "], []);
-                if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
+                if (llToLower(llList2String(l, 0)) == "ilistresponse") // ilistresponse <csv-of-inmate-numbers>
+                {
+                    // TODO: Add code to parse inmate number list and display the menu.
+                }
+                else if (llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
+                {
+                    if (llList2String(l, 1) == (string)llGetOwner())
+                    {
+                        // inmatereply <inmate-number>
+                        llRegionSayTo(id, g_appChan, "inmatereply " + g_inmateNum);
+                    }
+                }
+                else if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
                 {
                     name = llToLower(llList2String(l, 0));
                     if (name == "unlink") // unlink collarfrontloop <leash|shackle>
