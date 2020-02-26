@@ -561,6 +561,13 @@ state main
             else if (tag == "leashingPoint")
             {
                 g_leashLink = i;
+
+                // Retrieve stored inmate number.
+                g_inmateNum = llList2String(llGetLinkPrimitiveParams(i, [PRIM_DESC]), 0);
+                if (((integer)g_inmateNum) == 0 || llStringLength(g_inmateNum) != 5)
+                {
+                    g_inmateNum = "00000";
+                }
             }
             else if (tag == "chainToShacklesPoint")
             {
