@@ -1,4 +1,4 @@
-// [SGD] RRDC Inmate Number Query Stub v1.0 - Copyright 2020 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Inmate Database Bridge Stub v1.0 - Copyright 2020 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -25,23 +25,25 @@ default
         llListen(g_appChan, "", "", ""); // Listen on the appChan.
     }
 
-    touch_start(integer num)
-    {
-        // Query sent using a range appropriate command on the user's av channel for collars as shown.
-        // Syntax: inmatequery <user-key>
-        llSay(getAvChannel(llDetectedKey(0)), "inmatequery " + (string)llDetectedKey(0));
-    }
-
     listen(integer chan, string name, key id, string mesg)
     {
-        // Reply Syntax: inmatereply <user-key> <inmate-number>
+        // Request Syntax: ilistrequest <user-key>
         list l = llParseString2List(mesg, [" "], []);
-        if (llToLower(llList2String(l, 0)) == "inmatereply" && // Verify message is genuine reply.
+        if (llToLower(llList2String(l, 0)) == "ilistrequest" && // Verify message is genuine request.
             llList2String(l, 1) == (string)llGetOwnerKey(id))
         {
-            // Do something with the response.
-            // A response of 00000 means the user hasn't set up the collar yet or isn't in the system.
-            llSay(0, llKey2Name(llGetOwnerKey(id)) + "'s inmate number is " + llList2String(l, 2));
+            // Get the requested information here and put the reply below in the appropriate event.
+            // We will assume the data came back and is in a list called 'inmateIDs'.
+            // ----------------------------------------------------------------------------------------
+            // list inmateIDs = [""]; // An empty list means the user isn't in the database yet.
+            list inmateIDs = ["12345", "60993", "20309"];
+            // ----------------------------------------------------------------------------------------
+            // Reply sent on requestor's av channel for the collar. Use llRegionSayTo direct to object.
+            // Note: CSV of the inmate number list cannot contain ANY spaces.
+            // Reply Syntax: ilistresponse <user-key> <csv-of-inmate-numbers>
+            llRegionSayTo(id, getAvChannel(llGetOwnerKey(id)), "ilistresponse " + 
+                (string)llGetOwnerKey(id) + " " + llDumpList2String(inmateIDs, ",")
+            );
         }
     }
 }
