@@ -429,7 +429,7 @@ showMenu(string menu, key user)
         // -----------------------------------------------
         // ☯ CharSheet     ☠ Shock        📜 Poses
         // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
-        // ☐ Leash         📜 Textures     📜 Settings
+        // ☐ Leash         📜 Settings     ✖ Close
         //
         // Staff Menu. (Within 6m)
         // -----------------------------------------------
@@ -439,9 +439,9 @@ showMenu(string menu, key user)
 
         text = "Main Menu" + text;
 
-        if (user == llGetOwner()) // Textures and Settings button for owner.
+        if (user == llGetOwner()) // Settings and close button for owner.
         {
-            buttons = ["📜 Textures", "📜 Settings"];
+            buttons = ["📜 Settings", "✖ Close"];
         }
         else // Blank and close button for others.
         {
@@ -494,21 +494,22 @@ showMenu(string menu, key user)
     }
     else if (menu == "settings") // Settings menu.
     {
-        buttons = ["📜 Inmate #", "↺ Main"];
+        buttons = [" ", " ", "↺ Main", "📜 Inmate #", "📜 Textures"];
 
         if (!(g_settings & 0x00000100))
         {
-            buttons = ["☒ WalkSound"] + buttons;
+            buttons += ["☒ WalkSound"];
         }
         else
         {
-            buttons = ["☐ WalkSound"] + buttons;
+            buttons += ["☐ WalkSound"];
         }
     }
     else if (menu == "textures") // Textures menu.
     {
         text = "Texture Select Menu" + text;
-        buttons = [" ", " ", "↺ Main", "▩ Red", "▩ Blue", "▩ Black", "▩ White", "▩ Orange", "▩ Lilac"];
+        buttons = [" ", " ", "↺ Settings", "▩ Red", "▩ Blue", "▩ Black", 
+                   "▩ White", "▩ Orange", "▩ Lilac"];
     }
     llDialog(user, text, buttons, getAvChannel(llGetOwner()));
 }
@@ -701,11 +702,11 @@ state main
                     {
                         l = llParseString2List(llList2String(l, 2), [",", " "], []); // Inmate # list.
 
-                        integer i; // Sanitize the list of invalid values and truncate to 12 items.
+                        integer i; // Sanitize the list of invalid values and truncate to 9 items.
                         for (i = 0; i < llGetListLength(l); i++)
                         {
                             if (((integer)llList2String(l, i)) <= 0 || 
-                                llStringLength(llList2String(l, i)) != 5 || i > 11)
+                                llStringLength(llList2String(l, i)) != 5 || i > 8)
                             {
                                 l = llDeleteSubList(l, i, i);
                                 i--;
@@ -716,7 +717,7 @@ state main
                         {
                             llDialog(llGetOwner(),
                                 "\nWhat inmate number do you want to use?\n\nCurrent: " + g_inmateNum,
-                                l, getAvChannel(llGetOwner())
+                                [" ", " ", "↺ Settings"] + l, getAvChannel(llGetOwner())
                             );
                         }
                         else
@@ -724,7 +725,7 @@ state main
                             llInstantMessage(llGetOwner(), 
                                 "No inmate numbers were found. Please contact staff for further instructions."
                             );
-                            showMenu("", id);
+                            showMenu("", llGetOwner());
                         }
                     }
                     else if (llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
@@ -812,6 +813,11 @@ state main
             else if (mesg == "↺ Main") // Show main menu.
             {
                 showMenu("main", id);
+                return;
+            }
+            else if (mesg == "↺ Settings") // Show settings menu.
+            {
+                showMenu("settings", id);
                 return;
             }
             else if (mesg == "✖ Close") // Close button does nothing but return.
@@ -1070,6 +1076,7 @@ state main
                         {
                             // ilistrequest <user-key>
                             llRegionSay(g_appChan, "ilistrequest " + (string)llGetOwner());
+                            return;
                         }
                         else
                         {
