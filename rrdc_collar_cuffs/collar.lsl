@@ -1155,6 +1155,7 @@ state main
                     else if (((integer)mesg) > 0 && llStringLength(mesg) == 5)
                     {
                         g_inmateNum = mesg;
+                        llSetLinkPrimitiveParamsFast(g_leashLink, [PRIM_DESC, g_inmateNum]);
                         llOwnerSay("Your inmate number has been set to: " + g_inmateNum);
                     }
                 }
