@@ -1042,6 +1042,7 @@ state main
                     else if (mesg == "📜 Inmate #") // Inmate number select.
                     {
                         g_iRequestKey = llHTTPRequest(g_apiURL + llGetUsername(llGetOwner()), [], "");
+                        return;
                     }
                     // Texture Commands.
                     // -----------------------------------------------------------------------------------------
@@ -1283,7 +1284,7 @@ state main
             {
                 llDialog(llGetOwner(), 
                     "\nWhat inmate number do you want to use?\n\nCurrent value: " + (string)g_inmateNum, 
-                    [" ", " ", "↺ Main"] + l, getAvChannel(llGetOwner())
+                    [" ", " ", "↺ Settings"] + l, getAvChannel(llGetOwner())
                 );
             }
             else // Tell the user they have no inmate ids.
