@@ -637,8 +637,7 @@ state main
             }
         }
 
-        llSetMemoryLimit(llGetUsedMemory() + 4096‬); // Limit script memory consumption.
-        llMinEventDelay(0.2);
+        llMinEventDelay(0.2); // Slow events to reduce lag.
 
         if (g_LMTags == [] || g_shackleLink <= 0 || g_leashLink <= 0)
         {
