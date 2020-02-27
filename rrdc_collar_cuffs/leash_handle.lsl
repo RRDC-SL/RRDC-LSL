@@ -27,6 +27,13 @@ default
         llListen(getAvChannel(llGetOwner()), "", "", ""); // Open collar/cuffs avChannel.
     }
 
+    // Reset on rez to ensure we listen on the right channel.
+    // -----------------------------------------------------------------------------------------------------
+    on_rez(integer start)
+    {
+        llResetScript();
+    }
+
     // Listen for link requests.
     // -----------------------------------------------------------------------------------------------------
     listen(integer chan, string name, key id, string mesg)
