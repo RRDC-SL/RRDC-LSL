@@ -7,7 +7,7 @@
 
 // System Configuration Variables
 // ---------------------------------------------------------------------------------------------------------
-string  g_regionName  = "RRDC";                                 // The name of the RRDC region.
+string  g_apiURL      = "http://rrdc.heck.pw/json/name/";       // URL for the inmate number API request.
 integer g_appChan     = -89039937;                              // The channel for this application set.
 
 // Particle System Defaults.
@@ -62,6 +62,7 @@ string  g_shacklePartTarget;                    // Key of the target prim for sh
 
 // Data Store Variables.
 // ---------------------------------------------------------------------------------------------------------
+key     g_iRequestKey;                          // Inmate numbers request key.
 string  g_inmateNum;                            // The current character's inmate number.
 string  g_animState;                            // Current AO animation state.
 list    g_animList;                             // List of currently playing (base) anim names.
@@ -696,44 +697,12 @@ state main
             if (llGetOwnerKey(id) != id) // Process RRDC commands.
             {
                 list l = llParseString2List(mesg, [" "], []);
-                if (llList2String(l, 1) == (string)llGetOwner()) // Inmate number protocol.
+                if (llList2String(l, 1) == (string)llGetOwner() && // Sanity check for inmate protocol.
+                    llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
                 {
-                    if (llToLower(llList2String(l, 0)) == "ilistresponse") // ilistresponse <user-key> <csv-of-#s>
-                    {
-                        l = llParseString2List(llList2String(l, 2), [",", " "], []); // Inmate # list.
-
-                        integer i; // Sanitize the list of invalid values and truncate to 9 items.
-                        for (i = 0; i < llGetListLength(l); i++)
-                        {
-                            if (((integer)llList2String(l, i)) <= 0 || 
-                                llStringLength(llList2String(l, i)) != 5 || i > 8)
-                            {
-                                l = llDeleteSubList(l, i, i);
-                                i--;
-                            }
-                        }
-
-                        if (llGetListLength(l) != 0) // If the list is not empty, let the user select.
-                        {
-                            llDialog(llGetOwner(),
-                                "\nWhat inmate number do you want to use?\n\nCurrent: " + g_inmateNum,
-                                [" ", " ", "↺ Settings"] + l, getAvChannel(llGetOwner())
-                            );
-                        }
-                        else
-                        {
-                            llInstantMessage(llGetOwner(), 
-                                "No inmate numbers were found. Please contact staff for further instructions."
-                            );
-                            showMenu("", llGetOwner());
-                        }
-                    }
-                    else if (llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
-                    {
-                        llRegionSayTo(id, g_appChan, "inmatereply " + // inmatereply <user-key> <inmate-number>
-                            (string)llGetOwner() + " " + g_inmateNum
-                        );
-                    }
+                    llRegionSayTo(id, g_appChan, "inmatereply " + // inmatereply <user-key> <inmate-number>
+                        (string)llGetOwner() + " " + g_inmateNum
+                    );
                 }
                 else if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
                 {
@@ -1072,17 +1041,7 @@ state main
                     }
                     else if (mesg == "📜 Inmate #") // Inmate number select.
                     {
-                        if (llGetRegionName() == g_regionName) // We're in the right region?
-                        {
-                            // ilistrequest <user-key>
-                            llRegionSay(g_appChan, "ilistrequest " + (string)llGetOwner());
-                            return;
-                        }
-                        else
-                        {
-                            llInstantMessage(id, "You must be at " + g_regionName + 
-                                " to set your inmate number.");
-                        }
+                        g_iRequestKey = llHTTPRequest(g_apiURL + llGetUsername(llGetOwner()), [], "");
                     }
                     // Texture Commands.
                     // -----------------------------------------------------------------------------------------
@@ -1298,6 +1257,44 @@ state main
                 leashParticles((g_settings & 0x00000004)); // Refresh particles.
             }
         }
+    }
+
+    // Event for getting a response from the inmate number API.
+    // ---------------------------------------------------------------------------------------------------------
+    http_response(key reqID, integer stat, list m, string body)
+    {
+        if (reqID == g_iRequestKey) // We requested this?
+        {
+            body = llStringTrim(body, STRING_TRIM); // Trim and parse the response.
+            m = llJson2List(body);
+
+            integer i = 0;
+            list l = [];
+            for (i = 0; i < llGetListLength(m) && i < 9; i++) // Get all valid inmateIDs.
+            {
+                string num = llJsonGetValue(llList2String(m, i), ["inmateID"]);
+                if (num != JSON_INVALID && num != JSON_NULL)
+                {
+                    l += [num];
+                }
+            }
+
+            if (llGetListLength(l) > 0) // If the list is non-zero in size, show a menu.
+            {
+                llDialog(llGetOwner(), 
+                    "\nWhat inmate number do you want to use?\n\nCurrent value: " + (string)g_inmateNum, 
+                    [" ", " ", "↺ Main"] + l, getAvChannel(llGetOwner())
+                );
+            }
+            else // Tell the user they have no inmate ids.
+            {
+                llInstantMessage(llGetOwner(),
+                    "No inmate numbers could be found. Please contact staff for assistance."
+                );
+                showMenu("", llGetOwner());
+            }
+        }
+        g_iRequestKey = NULL_KEY;
     }
 
     // Controls timed effects such as blinking light and shock.
