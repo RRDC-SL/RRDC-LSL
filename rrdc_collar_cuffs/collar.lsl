@@ -1068,6 +1068,7 @@ state main
                     {
                         if (llGetRegionName() == g_regionName) // We're in the right region?
                         {
+                            // ilistrequest <user-key>
                             llRegionSay(g_appChan, "ilistrequest " + (string)llGetOwner());
                         }
                         else
