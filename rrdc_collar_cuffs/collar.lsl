@@ -574,7 +574,6 @@ state main
                 if (((integer)g_inmateNum) <= 0 || llStringLength(g_inmateNum) != 5)
                 {
                     g_inmateNum = "00000";
-                    llSetLinkPrimitiveParamsFast(i, [PRIM_DESC, g_inmateNum]);
                 }
             }
             else if (tag == "chainToShacklesPoint")
