@@ -44,13 +44,13 @@ ilistrequest    -   [From: Collar. To: InmateListBridge] Requests list of inmate
                     ilistrequest <user-key>
 
 ilistresponse   -   [From: InmateListBridge. To: Collar] Gives list of inmate numbers.
-                    ilistresponse <csv-of-inmate-numbers>
+                    ilistresponse <user-key> <csv-of-inmate-numbers>
 
 inmatequery     -   [From: Object. To: Collar] Asks for current inmate number.
                     inmatequery <user-key>
 
 inmatereply     -   [From: Collar. To: Object] Gives currently set inmate number.
-                    inmatereply <inmate-number>
+                    inmatereply <user-key> <inmate-number>
 
 *Note: Use llRegionSay and llRegionSayTo for this protocol when possible.
 *Note2: Static channel -89039937. Collar userchan.

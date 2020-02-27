@@ -564,7 +564,7 @@ state main
 
                 // Retrieve stored inmate number.
                 g_inmateNum = llList2String(llGetLinkPrimitiveParams(i, [PRIM_DESC]), 0);
-                if (((integer)g_inmateNum) == 0 || llStringLength(g_inmateNum) != 5)
+                if (((integer)g_inmateNum) <= 0 || llStringLength(g_inmateNum) != 5)
                 {
                     g_inmateNum = "00000";
                 }
@@ -690,16 +690,43 @@ state main
             if (llGetOwnerKey(id) != id) // Process RRDC commands.
             {
                 list l = llParseString2List(mesg, [" "], []);
-                if (llToLower(llList2String(l, 0)) == "ilistresponse") // ilistresponse <csv-of-inmate-numbers>
+                if (llList2String(l, 1) == (string)llGetOwner()) // Inmate number protocol.
                 {
-                    // TODO: Add code to parse inmate number list and display the menu.
-                }
-                else if (llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
-                {
-                    if (llList2String(l, 1) == (string)llGetOwner())
+                    if (llToLower(llList2String(l, 0)) == "ilistresponse") // ilistresponse <user-key> <csv-of-#s>
                     {
-                        // inmatereply <inmate-number>
-                        llRegionSayTo(id, g_appChan, "inmatereply " + g_inmateNum);
+                        l = llParseString2List(llList2String(l, 2), [",", " "], []); // Inmate # list.
+
+                        integer i; // Sanitize the list of invalid values and truncate to 12 items.
+                        for (i = 0; i < llGetListLength(l), i++)
+                        {
+                            if (((integer)llList2String(l, i)) <= 0 || 
+                                llStringLength(llList2String(l, i)) != 5 || i > 11)
+                            {
+                                l = llDeleteSubList(l, i, i);
+                                i--;
+                            }
+                        }
+
+                        if (llGetListLength(l) != 0) // If the list is not empty, let the user select.
+                        {
+                            llDialog(llGetOwner(),
+                                "\nWhat inmate number do you want to use?\n\nCurrent: " + g_inmateNum,
+                                l, getAvChannel(llGetOwner())
+                            );
+                        }
+                        else
+                        {
+                            llInstantMessage(llGetOwner(), 
+                                "No inmate numbers were found. Please contact staff for further instructions."
+                            );
+                            showMenu("", id);
+                        }
+                    }
+                    else if (llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
+                    {
+                        llRegionSayTo(id, g_appChan, "inmatereply " + // inmatereply <user-key> <inmate-number>
+                            (string)llGetOwner() + " " + g_inmateNum
+                        );
                     }
                 }
                 else if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
@@ -1097,6 +1124,12 @@ state main
                     else if (mesg == "☐ WalkSound" || mesg == "☒ WalkSound" ) // Turn chain walk sounds on/off.
                     {
                         g_settings = (g_settings ^ 0x00000100);
+                    }
+                    // Set Inmate Number.
+                    // -----------------------------------------------------------------------------------------
+                    else if (((integer)mesg) > 0 && llStringLength(mesg) == 5)
+                    {
+                        g_inmateNum = mesg;
                     }
                 }
             }
