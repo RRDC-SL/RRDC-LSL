@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.0.8 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.1.0 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -702,7 +702,7 @@ state main
                         l = llParseString2List(llList2String(l, 2), [",", " "], []); // Inmate # list.
 
                         integer i; // Sanitize the list of invalid values and truncate to 12 items.
-                        for (i = 0; i < llGetListLength(l), i++)
+                        for (i = 0; i < llGetListLength(l); i++)
                         {
                             if (((integer)llList2String(l, i)) <= 0 || 
                                 llStringLength(llList2String(l, i)) != 5 || i > 11)
