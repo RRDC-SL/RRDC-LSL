@@ -7,6 +7,7 @@
 
 // System Configuration Variables
 // ---------------------------------------------------------------------------------------------------------
+string  g_regionName  = "RRDC";                                 // The name of the RRDC region.
 integer g_appChan     = -89039937;                              // The channel for this application set.
 
 // Particle System Defaults.
@@ -426,30 +427,21 @@ showMenu(string menu, key user)
     {
         // Wearer Menu. (Owner Only)
         // -----------------------------------------------
-        // ☯ CharSheet     ☠ Shock        📜 Poses..
+        // ☯ CharSheet     ☠ Shock        📜 Poses
         // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
-        // ☐ Leash        📜 Textures..    ☐ WalkSound
+        // ☐ Leash         📜 Textures     📜 Settings
         //
         // Staff Menu. (Within 6m)
         // -----------------------------------------------
-        // ☯ CharSheet     ☠ Shock        📜 Poses..
+        // ☯ CharSheet     ☠ Shock        📜 Poses
         // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
         // ☐ Leash                         ✖ Close
 
         text = "Main Menu" + text;
 
-        if (user == llGetOwner()) // Textures and walk sound options for owner.
+        if (user == llGetOwner()) // Textures and Settings button for owner.
         {
-            buttons = ["📜 Textures"];
-
-            if (!(g_settings & 0x00000100))
-            {
-                buttons += ["☒ WalkSound"];
-            }
-            else
-            {
-                buttons += ["☐ WalkSound"];
-            }
+            buttons = ["📜 Textures", "📜 Settings"];
         }
         else // Blank and close button for others.
         {
@@ -499,6 +491,19 @@ showMenu(string menu, key user)
         text = "Pose Selection Menu" + text;
         buttons = [" ", " ", "↺ Main", "웃 Back U", "✖ Release", "웃 ComboSet", 
                    "웃 Front X", "웃 Front V", "웃 Back V"];
+    }
+    else if (menu == "settings") // Settings menu.
+    {
+        buttons = ["📜 Inmate #", "↺ Main"];
+
+        if (!(g_settings & 0x00000100))
+        {
+            buttons = ["☒ WalkSound"] + buttons;
+        }
+        else
+        {
+            buttons = ["☐ WalkSound"] + buttons;
+        }
     }
     else if (menu == "textures") // Textures menu.
     {
@@ -1052,9 +1057,28 @@ state main
                 }
                 else if (id == llGetOwner()) // Sound and texture commands are owner locked.
                 {
+                    // Settings Commands.
+                    // -----------------------------------------------------------------------------------------
+                    if (mesg == "📜 Settings") // Settings menu.
+                    {
+                        showMenu("settings", id);
+                        return;
+                    }
+                    else if (mesg == "📜 Inmate #") // Inmate number select.
+                    {
+                        if (llGetRegionName() == g_regionName) // We're in the right region?
+                        {
+                            llRegionSay(g_appChan, "ilistrequest " + (string)llGetOwner());
+                        }
+                        else
+                        {
+                            llInstantMessage(id, "You must be at " + g_regionName + 
+                                " to set your inmate number.");
+                        }
+                    }
                     // Texture Commands.
                     // -----------------------------------------------------------------------------------------
-                    if (mesg == "📜 Textures") // Texture select.
+                    else if (mesg == "📜 Textures") // Texture select.
                     {
                         showMenu("textures", id);
                         return;
@@ -1130,6 +1154,7 @@ state main
                     else if (((integer)mesg) > 0 && llStringLength(mesg) == 5)
                     {
                         g_inmateNum = mesg;
+                        llOwnerSay("Your inmate number has been set to: " + g_inmateNum);
                     }
                 }
             }
