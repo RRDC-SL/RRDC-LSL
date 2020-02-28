@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.0.8 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.1.0 "Bolvanger" - Copyright 2019 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -7,6 +7,7 @@
 
 // System Configuration Variables
 // ---------------------------------------------------------------------------------------------------------
+string  g_apiURL      = "http://rrdc.heck.pw/json/name/";       // URL for the inmate number API request.
 integer g_appChan     = -89039937;                              // The channel for this application set.
 
 // Particle System Defaults.
@@ -61,6 +62,8 @@ string  g_shacklePartTarget;                    // Key of the target prim for sh
 
 // Data Store Variables.
 // ---------------------------------------------------------------------------------------------------------
+key     g_iRequestKey;                          // Inmate numbers request key.
+string  g_inmateNum;                            // The current character's inmate number.
 string  g_animState;                            // Current AO animation state.
 list    g_animList;                             // List of currently playing (base) anim names.
 list    g_avList;                               // Tracks leash/chaingang enabled avatars.
@@ -425,30 +428,21 @@ showMenu(string menu, key user)
     {
         // Wearer Menu. (Owner Only)
         // -----------------------------------------------
-        // ☯ CharSheet     ☠ Shock        📜 Poses..
+        // ☯ CharSheet     ☠ Shock        📜 Poses
         // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
-        // ☐ Leash        📜 Textures..    ☐ WalkSound
+        // ☐ Leash         📜 Settings     ✖ Close
         //
         // Staff Menu. (Within 6m)
         // -----------------------------------------------
-        // ☯ CharSheet     ☠ Shock        📜 Poses..
+        // ☯ CharSheet     ☠ Shock        📜 Poses
         // ☐ ChainGang     ☐ AnkleChain    ☐ Shackled
         // ☐ Leash                         ✖ Close
 
         text = "Main Menu" + text;
 
-        if (user == llGetOwner()) // Textures and walk sound options for owner.
+        if (user == llGetOwner()) // Settings and close button for owner.
         {
-            buttons = ["📜 Textures"];
-
-            if (!(g_settings & 0x00000100))
-            {
-                buttons += ["☒ WalkSound"];
-            }
-            else
-            {
-                buttons += ["☐ WalkSound"];
-            }
+            buttons = ["📜 Settings", "✖ Close"];
         }
         else // Blank and close button for others.
         {
@@ -499,10 +493,24 @@ showMenu(string menu, key user)
         buttons = [" ", " ", "↺ Main", "웃 Back U", "✖ Release", "웃 ComboSet", 
                    "웃 Front X", "웃 Front V", "웃 Back V"];
     }
+    else if (menu == "settings") // Settings menu.
+    {
+        buttons = [" ", " ", "↺ Main", "📜 Inmate #", "📜 Textures"];
+
+        if (!(g_settings & 0x00000100))
+        {
+            buttons += ["☒ WalkSound"];
+        }
+        else
+        {
+            buttons += ["☐ WalkSound"];
+        }
+    }
     else if (menu == "textures") // Textures menu.
     {
         text = "Texture Select Menu" + text;
-        buttons = [" ", " ", "↺ Main", "▩ Red", "▩ Blue", "▩ Black", "▩ White", "▩ Orange", "▩ Lilac"];
+        buttons = [" ", " ", "↺ Settings", "▩ Red", "▩ Blue", "▩ Black", 
+                   "▩ White", "▩ Orange", "▩ Lilac"];
     }
     llDialog(user, text, buttons, getAvChannel(llGetOwner()));
 }
@@ -560,6 +568,13 @@ state main
             else if (tag == "leashingPoint")
             {
                 g_leashLink = i;
+
+                // Retrieve stored inmate number.
+                g_inmateNum = llList2String(llGetLinkPrimitiveParams(i, [PRIM_DESC]), 0);
+                if (((integer)g_inmateNum) <= 0 || llStringLength(g_inmateNum) != 5)
+                {
+                    g_inmateNum = "00000";
+                }
             }
             else if (tag == "chainToShacklesPoint")
             {
@@ -622,8 +637,7 @@ state main
             }
         }
 
-        llSetMemoryLimit(llGetUsedMemory() + 4096‬); // Limit script memory consumption.
-        llMinEventDelay(0.2);
+        llMinEventDelay(0.2); // Slow events to reduce lag.
 
         if (g_LMTags == [] || g_shackleLink <= 0 || g_leashLink <= 0)
         {
@@ -682,7 +696,14 @@ state main
             if (llGetOwnerKey(id) != id) // Process RRDC commands.
             {
                 list l = llParseString2List(mesg, [" "], []);
-                if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
+                if (llList2String(l, 1) == (string)llGetOwner() && // Sanity check for inmate protocol.
+                    llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
+                {
+                    llRegionSayTo(id, g_appChan, "inmatereply " + // inmatereply <user-key> <inmate-number>
+                        (string)llGetOwner() + " " + g_inmateNum
+                    );
+                }
+                else if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
                 {
                     name = llToLower(llList2String(l, 0));
                     if (name == "unlink") // unlink collarfrontloop <leash|shackle>
@@ -760,6 +781,11 @@ state main
             else if (mesg == "↺ Main") // Show main menu.
             {
                 showMenu("main", id);
+                return;
+            }
+            else if (mesg == "↺ Settings") // Show settings menu.
+            {
+                showMenu("settings", id);
                 return;
             }
             else if (mesg == "✖ Close") // Close button does nothing but return.
@@ -1005,9 +1031,21 @@ state main
                 }
                 else if (id == llGetOwner()) // Sound and texture commands are owner locked.
                 {
+                    // Settings Commands.
+                    // -----------------------------------------------------------------------------------------
+                    if (mesg == "📜 Settings") // Settings menu.
+                    {
+                        showMenu("settings", id);
+                        return;
+                    }
+                    else if (mesg == "📜 Inmate #") // Inmate number select.
+                    {
+                        g_iRequestKey = llHTTPRequest(g_apiURL + llGetUsername(llGetOwner()), [], "");
+                        return;
+                    }
                     // Texture Commands.
                     // -----------------------------------------------------------------------------------------
-                    if (mesg == "📜 Textures") // Texture select.
+                    else if (mesg == "📜 Textures") // Texture select.
                     {
                         showMenu("textures", id);
                         return;
@@ -1077,6 +1115,14 @@ state main
                     else if (mesg == "☐ WalkSound" || mesg == "☒ WalkSound" ) // Turn chain walk sounds on/off.
                     {
                         g_settings = (g_settings ^ 0x00000100);
+                    }
+                    // Set Inmate Number.
+                    // -----------------------------------------------------------------------------------------
+                    else if (((integer)mesg) > 0 && llStringLength(mesg) == 5)
+                    {
+                        g_inmateNum = mesg;
+                        llSetLinkPrimitiveParamsFast(g_leashLink, [PRIM_DESC, g_inmateNum]);
+                        llOwnerSay("Your inmate number has been set to: " + g_inmateNum);
                     }
                 }
             }
@@ -1211,6 +1257,44 @@ state main
                 leashParticles((g_settings & 0x00000004)); // Refresh particles.
             }
         }
+    }
+
+    // Event for getting a response from the inmate number API.
+    // ---------------------------------------------------------------------------------------------------------
+    http_response(key reqID, integer stat, list m, string body)
+    {
+        if (reqID == g_iRequestKey) // We requested this?
+        {
+            body = llStringTrim(body, STRING_TRIM); // Trim and parse the response.
+            m = llJson2List(body);
+
+            integer i = 0;
+            list l = [];
+            for (i = 0; i < llGetListLength(m) && i < 9; i++) // Get all valid inmateIDs.
+            {
+                string num = llJsonGetValue(llList2String(m, i), ["inmateID"]);
+                if (num != JSON_INVALID && num != JSON_NULL)
+                {
+                    l += [num];
+                }
+            }
+
+            if (llGetListLength(l) > 0) // If the list is non-zero in size, show a menu.
+            {
+                llDialog(llGetOwner(), 
+                    "\nWhat inmate number do you want to use?\n\nCurrent value: " + (string)g_inmateNum, 
+                    [" ", " ", "↺ Settings"] + l, getAvChannel(llGetOwner())
+                );
+            }
+            else // Tell the user they have no inmate ids.
+            {
+                llInstantMessage(llGetOwner(),
+                    "No inmate numbers could be found. Please contact staff for assistance."
+                );
+                showMenu("", llGetOwner());
+            }
+        }
+        g_iRequestKey = NULL_KEY;
     }
 
     // Controls timed effects such as blinking light and shock.

@@ -37,3 +37,14 @@ stopleash       -   [From: Cuffs. To: Collar] Tells the collar to stop the leash
                     stopleash <tag>
 
 *Note: Introduces the 'leashanchor' tag for leash holders.
+
+Inmate Number Select/Query Protocol
+-------------------------------------
+inmatequery     -   [From: Object. To: Collar] Asks for current inmate number.
+                    inmatequery <user-key>
+
+inmatereply     -   [From: Collar. To: Object] Gives currently set inmate number.
+                    inmatereply <user-key> <inmate-number>
+
+*Note: Use llRegionSay and llRegionSayTo for this protocol when possible.
+*Note2: Static channel -89039937. Collar userchan.
