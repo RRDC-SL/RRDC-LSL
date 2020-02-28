@@ -1,4 +1,4 @@
-# [SGD] RRDC Collar and Cuffs v1.0.8 "Azkaban" - User Manual #
+# [SGD] RRDC Collar and Cuffs v1.1.0 "Bolvanger" - User Manual #
 
 ---------------------------------------------------------------------------------------------------
 
@@ -77,8 +77,19 @@ Toggles whether your collar is currently leashed to someone.
 * Activating leash will draw a chain from your collar to the activating user.
 * If the user is wearing a leash-handle enabled attachment, the chain will be drawn to it.
 
+## Settings ##
+Displays the settings menu for the user.
+* Only you (the wearer) can access this menu.
+* Contains the Inmate #, Textures, and Walk Sound menus/options.
+
+## Inmate # ##
+Allows you to select from the inmate numbers associated with your account.
+* Only you (the wearer) can access this menu.
+* You can only select inmate numbers you have registered with the sim database.
+* The inmate number you select can be queried by scripts in-world.
+
 ## Textures ##
-Allows you to select one of five different metal textures for your collar and cuffs.
+Allows you to select one of six different metal textures for your collar and cuffs.
 * Only you (the wearer) can access this menu.
 * Selecting a color will set the texture your collar and cuffs simultaneously.
 
