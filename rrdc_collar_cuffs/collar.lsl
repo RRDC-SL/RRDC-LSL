@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar Script v1.1.0 "Bolvanger" - Copyright 2020 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar Script v1.1.1 "Bolvanger" - Copyright 2020 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -402,7 +402,7 @@ showMenu(string menu, key user)
                 menu = llList2String(g_curMenus, (i + 2));
             }
 
-            g_curMenus = llListReplaceList(g_curMenus, [(string)llGetTime(), menu], (i + 1), (i + 2));
+            g_curMenus = llListReplaceList(g_curMenus, [llGetTime(), menu], (i + 1), (i + 2));
         }
         else if (llList2Key(g_curMenus, i) != llGetOwner() &&
                  (llGetTime() - llList2Float(g_curMenus, (i + 1))) > 60.0)
@@ -419,7 +419,7 @@ showMenu(string menu, key user)
 
     if (llListFindList(g_curMenus, [(string)user]) <= -1) // Add user if they are new.
     {
-        g_curMenus += [(string)user, (string)llGetTime(), menu];
+        g_curMenus += [(string)user, llGetTime(), menu];
     }
 
     string text = "\n\nChoose an option:";
