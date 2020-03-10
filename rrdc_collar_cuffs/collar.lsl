@@ -7,7 +7,7 @@
 
 // System Configuration Variables
 // ---------------------------------------------------------------------------------------------------------
-string  g_apiURL      = "http://rrdc.heck.pw/json/name/";       // URL for the inmate number API request.
+string  g_apiURL      = "https://www.rrdc.xyz/json/name/";      // URL for the inmate number API request.
 integer g_appChan     = -89039937;                              // The channel for this application set.
 
 // Particle System Defaults.
