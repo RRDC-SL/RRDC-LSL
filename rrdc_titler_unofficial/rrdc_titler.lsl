@@ -477,6 +477,10 @@ default
                     {
                         t = "";
                     }
+                    else // Truncate to 60 chars.
+                    {
+                        t = llGetSubString(t, 0, 60);
+                    }
 
                     if ((g_textField == 0 || g_textField == -4) && t == "") // No blank names.
                     {
