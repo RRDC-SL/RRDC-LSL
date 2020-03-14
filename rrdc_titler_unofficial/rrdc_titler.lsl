@@ -75,7 +75,7 @@ vector getRoleColor(integer role)
 {
     if (role == 0) // General Inmate.
     {
-        return <1.000, 0.502, 0.000>;
+        return <1.000, 0.500, 0.000>;
     }
     else if (role == 1) // Violent Inmate.
     {
@@ -83,23 +83,23 @@ vector getRoleColor(integer role)
     }
     else if (role == 2) // Deviant Inmate.
     {
-        return <1.000, 0.000, 0.802>;
+        return <0.941, 0.071, 0.745>;
     }
     else if (role == 3) // Guard.
     {
-        return <0.502, 0.502, 1.000>;
+        return <0.500, 0.500, 1.000>;
     }
     else if (role == 4) // Biotech.
     {
-        return <0.000, 1.000, 0.502>;
+        return <0.004, 1.000, 0.439>;
     }
     else if (role == 5) // Engineer.
     {
-        return <0.831, 0.686, 0.216>;
+        return <0.831, 0.686, 0.215>;
     }
     else // General Staff.
     {
-        return <0.749, 0.749, 0.749>;
+        return <0.750, 0.750, 0.750>;
     }
 }
 
