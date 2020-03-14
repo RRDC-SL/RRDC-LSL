@@ -1,4 +1,4 @@
-# [SGD] Unofficial RRDC Titler v1.0.6 - User Manual #
+# [SGD] Unofficial RRDC Titler v1.0.7 - User Manual #
 
 ---------------------------------------------------------------------------------------------------
 
@@ -35,6 +35,8 @@
 * Note2: If you click 'Ignore' on an input box or a character select menu, your next
          command will be misrouted to the function the ignored input box or selection
          menu was associated with. This is a known limitation of the parser.
+* Note3: Text fields can contain a maximum of 60 characters. Anything longer will be
+         automatically truncated to 60 characters in length.
 
 **Available Commands:**
     
