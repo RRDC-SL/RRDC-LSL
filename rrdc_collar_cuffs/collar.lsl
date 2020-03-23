@@ -1272,7 +1272,7 @@ state main
             list l = [];
             for (i = 0; i < llGetListLength(m) && i < 9; i++) // Get all valid inmateIDs.
             {
-                string num = llJsonGetValue(llList2String(m, i), ["inmateID"]);
+                string num = llJsonGetValue(llList2String(m, i), ["userID"]);
                 if (num != JSON_INVALID && num != JSON_NULL)
                 {
                     l += [num];
