@@ -1,4 +1,4 @@
-// [SGD] RRDC Cuffs Script v1.0.0 "Azkaban" - Copyright 2019 Alex Pascal (Alex Carpenter).
+// [SGD] RRDC Cuffs v1.1.0 "Bolvangar" - Copyright 2020 Alex Pascal (Alex Carpenter).
 //  Based on combined Lockmeister and LockGuard script by Felis Darwin.
 // ----------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
@@ -10,31 +10,17 @@
 // ----------------------------------------------------------------------------------------
 integer g_appChan           = -89039937;        // The channel for this application set.
 
-// Assets.
-// ----------------------------------------------------------------------------------------
-string  g_partTex           = "dbeee6e7-4a63-9efe-125f-ceff36ceeed2"; // thinchain.
-
-// Particle System Defaults. It is best not to mess with these.
-// ----------------------------------------------------------------------------------------
-float   g_partSizeX         = 0.04;             // Particle size X-axis.
-float   g_partSizeY         = 0.04;             // Particle size Y-axis.
-float   g_partLife          = 1.2;              // How long each particle 'lives'.
-float   g_partGravity       = 0.3;              // How much gravity affects the particles.
-vector  g_partColor         = <1.0, 1.0, 1.0>;  // Color of the particles.
-float   g_partRate          = 0.01;             // Interval between particle bursts.
-integer g_partFollow        = 1;                // Particles move relative to the emitter.
-
 // ========================================================================================
 // CAUTION: Modifying anything below this line may cause issues. Edit at your own risk!
 // ========================================================================================
-string  g_curPartTex;                           // Current particle texture.
-float   g_curPartSizeX;                         // Current particle X size.
-float   g_curPartSizeY;                         // Current particle Y size.
-float   g_curPartLife;                          // Current particle life.
-float   g_curPartGravity;                       // Current particle gravity.
-vector  g_curPartColor;                         // Current particle color.
-float   g_curPartRate;                          // Current particle rate.
-integer g_curPartFollow;                        // Current particle follow flag.
+string  g_partTex;                              // Current particle texture.
+float   g_partSizeX;                            // Current particle X size.
+float   g_partSizeY;                            // Current particle Y size.
+float   g_partLife;                             // Current particle life.
+float   g_partGravity;                          // Current particle gravity.
+vector  g_partColor;                            // Current particle color.
+float   g_partRate;                             // Current particle rate.
+integer g_partFollow;                           // Current particle follow flag.
 integer g_outerPartOn;                          // If TRUE, outerLink particles are on.
 integer g_innerPartOn;                          // If TRUE, innerLink particles are on.
 string  g_outerPartTarget;                      // Key of the target prim for LG/outer.
@@ -91,12 +77,12 @@ outerParticles(integer on)
         // Particle bitfield defaults.
         integer nBitField = (PSYS_PART_TARGET_POS_MASK | PSYS_PART_FOLLOW_VELOCITY_MASK);
     
-        if(g_curPartGravity == 0) // Add linear mask if gravity is not zero.
+        if(g_partGravity == 0) // Add linear mask if gravity is not zero.
         {
             nBitField = (nBitField | PSYS_PART_TARGET_LINEAR_MASK);
         }
 
-        if(g_curPartFollow) // Add follow mask if flag is set.
+        if(g_partFollow) // Add follow mask if flag is set.
         {
             nBitField = (nBitField | PSYS_PART_FOLLOW_SRC_MASK);
         }
@@ -106,12 +92,12 @@ outerParticles(integer on)
             PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_DROP,
             PSYS_SRC_BURST_PART_COUNT,  1,
             PSYS_SRC_MAX_AGE,           0.0,
-            PSYS_PART_MAX_AGE,          g_curPartLife,
-            PSYS_SRC_BURST_RATE,        g_curPartRate,
-            PSYS_SRC_TEXTURE,           g_curPartTex,
-            PSYS_PART_START_COLOR,      g_curPartColor,
-            PSYS_PART_START_SCALE,      <g_curPartSizeX, g_curPartSizeY, 0.0>,
-            PSYS_SRC_ACCEL,             <0.0, 0.0, (g_curPartGravity * -1.0)>,
+            PSYS_PART_MAX_AGE,          g_partLife,
+            PSYS_SRC_BURST_RATE,        g_partRate,
+            PSYS_SRC_TEXTURE,           g_partTex,
+            PSYS_PART_START_COLOR,      g_partColor,
+            PSYS_PART_START_SCALE,      <g_partSizeX, g_partSizeY, 0.0>,
+            PSYS_SRC_ACCEL,             <0.0, 0.0, (g_partGravity * -1.0)>,
             PSYS_SRC_TARGET_KEY,        (key)g_outerPartTarget,
             PSYS_PART_FLAGS,            nBitField
         ]);
@@ -134,12 +120,12 @@ innerParticles(integer on)
         // Particle bitfield defaults.
         integer nBitField = (PSYS_PART_TARGET_POS_MASK | PSYS_PART_FOLLOW_VELOCITY_MASK);
     
-        if(g_partGravity == 0) // Add linear mask if gravity is not zero.
+        if(0.3 == 0) // Add linear mask if gravity is not zero.
         {
             nBitField = (nBitField | PSYS_PART_TARGET_LINEAR_MASK);
         }
 
-        if(g_partFollow) // Add follow mask if flag is set.
+        if(TRUE) // Add follow mask if flag is set.
         {
             nBitField = (nBitField | PSYS_PART_FOLLOW_SRC_MASK);
         }
@@ -149,12 +135,12 @@ innerParticles(integer on)
             PSYS_SRC_PATTERN,           PSYS_SRC_PATTERN_DROP,
             PSYS_SRC_BURST_PART_COUNT,  1,
             PSYS_SRC_MAX_AGE,           0.0,
-            PSYS_PART_MAX_AGE,          g_partLife,
-            PSYS_SRC_BURST_RATE,        g_partRate,
-            PSYS_SRC_TEXTURE,           g_partTex,
-            PSYS_PART_START_COLOR,      g_partColor,
-            PSYS_PART_START_SCALE,      <g_partSizeX, g_partSizeY, 0.0>,
-            PSYS_SRC_ACCEL,             <0.0, 0.0, (g_partGravity * -1.0)>,
+            PSYS_PART_MAX_AGE,          1.2,
+            PSYS_SRC_BURST_RATE,        0.01,
+            PSYS_SRC_TEXTURE,           "dbeee6e7-4a63-9efe-125f-ceff36ceeed2", // thinchain.
+            PSYS_PART_START_COLOR,      <1.0, 1.0, 1.0>,
+            PSYS_PART_START_SCALE,      <0.04, 0.04, 0.0>,
+            PSYS_SRC_ACCEL,             <0.0, 0.0, (0.3 * -1.0)>,
             PSYS_SRC_TARGET_KEY,        (key)g_innerPartTarget,
             PSYS_PART_FLAGS,            nBitField
         ]);
@@ -165,14 +151,14 @@ innerParticles(integer on)
 // ---------------------------------------------------------------------------------------------------------
 resetParticles()
 {
-    g_curPartTex        = g_partTex;    // Set current LG settings back to defaults.
-    g_curPartSizeX      = g_partSizeX;
-    g_curPartSizeY      = g_partSizeY;
-    g_curPartLife       = g_partLife;
-    g_curPartGravity    = g_partGravity;
-    g_curPartColor      = g_partColor;
-    g_curPartRate       = g_partRate;
-    g_curPartFollow     = g_partFollow;
+    g_partTex        = "dbeee6e7-4a63-9efe-125f-ceff36ceeed2"; // thinchain.
+    g_partSizeX      = 0.04;
+    g_partSizeY      = 0.04;
+    g_partLife       = 1.2;
+    g_partGravity    = 0.3;
+    g_partColor      = <1.0, 1.0, 1.0>;
+    g_partRate       = 0.01;
+    g_partFollow     = TRUE;
 }
 
 // toggleMode - Controls particle system when changing between LG/LM and Interlink.
@@ -357,8 +343,8 @@ default
                 else if (name == "leashto")
                 {
                     toggleMode(TRUE);
-                    g_curPartLife = 2.4;     // Make the chain a little longer for leash/chain gang.
-                    g_curPartGravity = 0.15;
+                    g_partLife = 2.4;     // Make the chain a little longer for leash/chain gang.
+                    g_partGravity = 0.15;
 
                     if (llToLower(llList2String(l, 2)) == "inner") // Make a temp link.
                     {
@@ -436,54 +422,50 @@ default
                     else if(name == "gravity")
                     {
                         toggleMode(FALSE);
-                        g_curPartGravity = fMax(0.0, fMin(llList2Float(tList, (i + 1)), 100.0));
+                        g_partGravity = fMax(0.0, fMin(llList2Float(tList, (i + 1)), 100.0));
                         i += 2;
                     }
                     else if(name == "life")
                     {
                         toggleMode(FALSE);
-                        g_curPartLife = fMax(0.0, llList2Float(tList, (i + 1)));
+                        g_partLife = fMax(0.0, llList2Float(tList, (i + 1)));
                         i += 2;
                     }
                     else if(name == "texture")
                     {
                         toggleMode(FALSE);
                         name = llList2String(tList, (i + 1));
-                        if(name == "chain" || name == "rope")
+                        if(name != "chain" && name != "rope")
                         {
-                            g_curPartTex = g_partTex;
-                        }
-                        else
-                        {
-                            g_curPartTex = llList2Key(tList, (i + 1));
+                            g_partTex = name;
                         }
                         i += 2;
                     }
                     else if(name == "rate")
                     {
                         toggleMode(FALSE);
-                        g_curPartRate = fMax(0.0, llList2Float(tList, (i + 1)));
+                        g_partRate = fMax(0.0, llList2Float(tList, (i + 1)));
                         i += 2;
                     }
                     else if(name == "follow")
                     {
                         toggleMode(FALSE);
-                        g_curPartFollow = (llList2Integer(tList, (i + 1)) > 0);
+                        g_partFollow = (llList2Integer(tList, (i + 1)) > 0);
                         i += 2;
                     }
                     else if(name == "size")
                     {
                         toggleMode(FALSE);
-                        g_curPartSizeX = fMax(0.03125, fMin(llList2Float(tList, (i + 1)), 4.0));
-                        g_curPartSizeY = fMax(0.03125, fMin(llList2Float(tList, (i + 2)), 4.0));
+                        g_partSizeX = fMax(0.03125, fMin(llList2Float(tList, (i + 1)), 4.0));
+                        g_partSizeY = fMax(0.03125, fMin(llList2Float(tList, (i + 2)), 4.0));
                         i += 3;
                     }
                     else if(name == "color")
                     {
                         toggleMode(FALSE);
-                        g_curPartColor.x = fMax(0.0, fMin(llList2Float(tList, (i + 1)), 1.0));
-                        g_curPartColor.y = fMax(0.0, fMin(llList2Float(tList, (i + 2)), 1.0));
-                        g_curPartColor.z = fMax(0.0, fMin(llList2Float(tList, (i + 3)), 1.0));
+                        g_partColor.x = fMax(0.0, fMin(llList2Float(tList, (i + 1)), 1.0));
+                        g_partColor.y = fMax(0.0, fMin(llList2Float(tList, (i + 2)), 1.0));
+                        g_partColor.z = fMax(0.0, fMin(llList2Float(tList, (i + 3)), 1.0));
                         i += 4;
                     }
                     else if(name == "ping")
