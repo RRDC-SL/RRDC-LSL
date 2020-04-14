@@ -7,8 +7,8 @@
 
 // System Configuration Variables
 // ---------------------------------------------------------------------------------------------------------
-string  g_apiURL      = "https://www.rrdc.xyz/json/name/";      // URL for the inmate number API request.
-integer g_appChan     = -89039937;                              // The channel for this application set.
+string  g_apiURL      = "http://rrdc.xyz/json/UUID/";       // URL for the inmate number API request.
+integer g_appChan     = -89039937;                          // The channel for this application set.
 
 // =========================================================================================================
 // CAUTION: Modifying anything below this line may cause issues. Edit at your own risk!
@@ -1029,7 +1029,7 @@ state main
                     }
                     else if (mesg == "📜 Inmate #") // Inmate number select.
                     {
-                        g_iRequestKey = llHTTPRequest(g_apiURL + llGetUsername(llGetOwner()), [], "");
+                        g_iRequestKey = llHTTPRequest(g_apiURL + (string)llGetOwner(), [], "");
                         return;
                     }
                     // Texture Commands.
