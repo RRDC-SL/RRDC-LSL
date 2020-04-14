@@ -1,4 +1,4 @@
-// [SGD] RRDC Collar v1.1.2 "Bolvangar" - Copyright 2020 Alex Pascal (Alex Carpenter) @ Second Life.
+// [SGD] RRDC Collar v1.1.3 "Bolvangar" - Copyright 2020 Alex Pascal (Alex Carpenter) @ Second Life.
 // ---------------------------------------------------------------------------------------------------------
 // This Source Code Form is subject to the terms of the Mozilla Public License, v2.0. 
 //  If a copy of the MPL was not distributed with this file, You can obtain one at 
@@ -685,12 +685,18 @@ state main
             if (llGetOwnerKey(id) != id) // Process RRDC commands.
             {
                 list l = llParseString2List(mesg, [" "], []);
-                if (llList2String(l, 1) == (string)llGetOwner() && // Sanity check for inmate protocol.
-                    llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
+                if (llList2String(l, 1) == (string)llGetOwner()) // Sanity check for inmate/remote protocol.
                 {
-                    llRegionSayTo(id, g_appChan, "inmatereply " + // inmatereply <user-key> <inmate-number>
-                        (string)llGetOwner() + " " + g_inmateNum
-                    );
+                    if (llToLower(llList2String(l, 0)) == "inmatequery") // inmatequery <user-key>
+                    {
+                        llRegionSayTo(id, g_appChan, "inmatereply " + // inmatereply <user-key> <inmate-number>
+                            (string)llGetOwner() + " " + g_inmateNum
+                        );
+                    }
+                    else if (llToLower(llList2String(l, 0)) == "getmenu") // getmenu <user-key>
+                    {
+                        showMenu("", llGetOwnerKey(id)); // Blank menu stops charsheet spam when out of range.
+                    }
                 }
                 else if (llListFindList(g_LGTags, [llList2String(l, 1)]) > -1) // LG tag match.
                 {

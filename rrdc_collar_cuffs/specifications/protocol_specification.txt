@@ -38,6 +38,13 @@ stopleash       -   [From: Cuffs. To: Collar] Tells the collar to stop the leash
 
 *Note: Introduces the 'leashanchor' tag for leash holders.
 
+Shock Remote Protocol
+-------------------------------------
+getmenu         -   [From: Any. To: Collar] Requests menu on behalf of the object owner.
+                    getmenu <user-key>
+
+*Note: Uses the userchan of the target avatar.
+
 Inmate Number Select/Query Protocol
 -------------------------------------
 inmatequery     -   [From: Object. To: Collar] Asks for current inmate number.
